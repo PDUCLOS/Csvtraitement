@@ -18,7 +18,7 @@ from typing import Optional
 from core.detector import run_detection, DetectionResult
 from core.analyzer import analyze_file, AnalysisResult
 from core.fixer import apply_fixes, FixResult
-from core.exporter import export_xlsx, export_csv_clean, CSV_SEPARATORS
+from core.exporter import export_xlsx, export_csv_clean, export_any, CSV_SEPARATORS, EXPORT_FORMATS
 from core.statistics import compute_statistics, FileStats
 from core.quality import compute_quality, QualityReport
 from core.dedup import find_duplicates, DedupResult
@@ -36,8 +36,13 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
 
     # Fichier unique ou batch (pas requis si --merge ou --cloud)
     group = cli_parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('--file', '-f', type=str, help='Fichier CSV à traiter')
+    group.add_argument('--file', '-f', type=str,
+                       help='Fichier à traiter (CSV, XLSX, XLS, ODS, JSON, Parquet)')
     group.add_argument('--batch', '-b', type=str, help='Dossier pour traitement batch')
+
+    # Sélection de feuille (Excel/ODS)
+    cli_parser.add_argument('--sheet', type=str, default=None,
+                           help='Nom de la feuille à lire (Excel/ODS, défaut: première)')
 
     # Options batch
     cli_parser.add_argument('--pattern', type=str, default='*.csv',
@@ -64,8 +69,8 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
                            help='Ne pas réaligner les colonnes')
 
     # Format de sortie
-    cli_parser.add_argument('--format', choices=['xlsx', 'csv'], default='xlsx',
-                           help='Format de sortie (défaut: xlsx)')
+    cli_parser.add_argument('--format', choices=list(EXPORT_FORMATS.keys()), default='xlsx',
+                           help='Format de sortie : xlsx, csv, json, ods, parquet (défaut: xlsx)')
     sep_choices = list(CSV_SEPARATORS.keys())
     cli_parser.add_argument('--csv-separator', type=str, default='§',
                            help=f"Séparateur pour l'export CSV (défaut: § ). "
@@ -136,11 +141,17 @@ def run_single(args: argparse.Namespace) -> dict:
 
     # ── Détection ──
     if not quiet:
-        print(f"\n📂 Fichier : {filepath.name}")
+        from utils.universal_reader import get_file_format
+        fmt_source = get_file_format(filepath)
+        fmt_display = f" [{fmt_source.upper()}]" if fmt_source != 'csv' else ''
+        print(f"\n📂 Fichier : {filepath.name}{fmt_display}")
+        if sheet_name:
+            print(f"   Feuille : {sheet_name}")
         print("─" * 50)
         print("🔍 Détection en cours...")
 
-    detection = run_detection(filepath)
+    sheet_name = getattr(args, 'sheet', None)
+    detection = run_detection(filepath, sheet_name=sheet_name)
     report['detection'] = {
         'file': str(filepath),
         'encoding': detection.encoding,
@@ -309,15 +320,17 @@ def run_single(args: argparse.Namespace) -> dict:
             csv_sep = getattr(args, 'csv_separator', '§')
 
             if not quiet:
-                print(f"\n💾 Export {fmt.upper()} → {output_path}")
+                fmt_desc = EXPORT_FORMATS.get(fmt, fmt.upper())
+                print(f"\n💾 Export {fmt_desc} → {output_path}")
 
-            if fmt == 'xlsx':
-                export_xlsx(detection, analysis, fix_result, output_path)
-            else:
-                export_csv_clean(detection, fix_result, output_path, separator=csv_sep)
+            export_any(
+                detection, analysis, fix_result, output_path,
+                fmt=fmt, csv_separator=csv_sep,
+            )
+
+            if fmt == 'csv' and not quiet:
                 sep_display = CSV_SEPARATORS.get(csv_sep, csv_sep)
-                if not quiet:
-                    print(f"  Séparateur CSV : {sep_display}")
+                print(f"  Séparateur CSV : {sep_display}")
 
             if not quiet:
                 print(f"  ✅ Fichier exporté : {output_path}")

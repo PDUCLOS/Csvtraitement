@@ -1,7 +1,7 @@
 # CSV Traitement - Claude Code Project
 
 ## Objectif
-Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers CSV volumineux (500K+ lignes) : décalages de colonnes, formats de dates incohérents, séparateurs décimaux mixtes (FR/US), valeurs masquées, doublons. Inclut aussi : score de qualité, fuzzy dedup, comparaison/diff, rapprochement, fusion, anonymisation, normalisation texte, gestion colonnes et connexion cloud.
+Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers tabulaires volumineux (500K+ lignes). Supporte en entrée : CSV, XLSX, XLS, ODS, JSON, Parquet. En sortie : XLSX, CSV, JSON, ODS, Parquet. Inclut : score de qualité, fuzzy dedup, comparaison/diff, rapprochement, fusion, anonymisation, normalisation texte, gestion colonnes et connexion cloud.
 
 ## Architecture
 
@@ -14,10 +14,10 @@ Csvtraitement/
 ├── main.py                    # Entrée : GUI (défaut) ou CLI
 ├── core/
 │   ├── __init__.py
-│   ├── detector.py            # Détection séparateur + profiling colonnes
+│   ├── detector.py            # Détection séparateur + profiling (multi-format)
 │   ├── analyzer.py            # Analyse décalages + conformité
 │   ├── fixer.py               # Corrections dates/décimales/réalignement
-│   ├── exporter.py            # Export XLSX typé + highlight + rapport
+│   ├── exporter.py            # Export XLSX/CSV/JSON/ODS/Parquet + rapport
 │   ├── statistics.py          # Stats colonnes (min/max/outliers/doublons)
 │   ├── quality.py             # Score de qualité des données (0-100, note A-F)
 │   ├── dedup.py               # Détection doublons (exact + fuzzy matching)
@@ -37,6 +37,11 @@ Csvtraitement/
 │   ├── __init__.py
 │   ├── patterns.py            # Regex + types (date/nombre/booléen/masqué)
 │   ├── chunked_reader.py      # Streaming + BOM + guillemets CSV + writer
+│   ├── excel_reader.py        # Lecteur XLSX (openpyxl) + XLS (xlrd)
+│   ├── ods_reader.py          # Lecteur ODS (odfpy)
+│   ├── json_reader.py         # Lecteur JSON tabulaire
+│   ├── parquet_reader.py      # Lecteur Parquet (pyarrow)
+│   ├── universal_reader.py    # Dispatch automatique par extension
 │   ├── validators.py          # Validation par colonne + validation croisée inter-colonnes
 │   ├── templates.py           # Templates profil JSON réutilisables
 │   ├── history.py             # Undo/redo historique corrections
@@ -57,12 +62,16 @@ Csvtraitement/
 python main.py
 python main.py --file data.csv
 
-# CLI — Analyse et correction
-python main.py cli --file data.csv                          # Analyser
+# CLI — Analyse et correction (tous formats : CSV, XLSX, XLS, ODS, JSON, Parquet)
+python main.py cli --file data.csv                          # Analyser un CSV
+python main.py cli --file data.xlsx                         # Analyser un Excel
+python main.py cli --file data.xlsx --sheet "Feuil2"        # Choisir la feuille
 python main.py cli --file data.csv --stats                  # + Statistiques
-python main.py cli --file data.csv --fix -o out.xlsx        # Corriger + export XLSX
-python main.py cli --file data.csv --fix -o out.csv --format csv                # Export CSV (séparateur § par défaut)
-python main.py cli --file data.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV séparateur pipe
+python main.py cli --file data.csv --fix -o out.xlsx        # Export XLSX (défaut)
+python main.py cli --file data.csv --fix -o out.json --format json    # Export JSON
+python main.py cli --file data.csv --fix -o out.ods --format ods      # Export ODS
+python main.py cli --file data.csv --fix -o out.parquet --format parquet  # Export Parquet
+python main.py cli --file data.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV avec pipe
 python main.py cli --batch /dossier/ --fix -o /sortie/      # Batch
 python main.py cli --file data.csv --save-template sap_export  # Sauver template
 python main.py cli --file data.csv --report rapport.json    # Rapport JSON
@@ -114,6 +123,22 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 - Drag & drop (si tkinterdnd2 installé, sinon double-clic)
 - Preview avec pagination, recherche, filtre (conformes/non conformes/corrigées)
 - Undo/redo sur les corrections
+
+### Formats d'entrée
+- CSV/TSV : natif via csv.reader (chunked_reader.py)
+- XLSX/XLSM : openpyxl en mode read_only (streaming), conversion auto → CSV temporaire
+- XLS : xlrd (optionnel), conversion auto → CSV temporaire
+- ODS : odfpy (optionnel), conversion auto → CSV temporaire
+- JSON : json stdlib, détection structure (array d'objets, array d'arrays, objet avec clé data)
+- Parquet : pyarrow (optionnel), streaming par batch via iter_batches
+- Dispatch automatique par extension via universal_reader.py
+
+### Formats de sortie
+- XLSX : xlsxwriter avec constant_memory (streaming), typage et highlighting
+- CSV : séparateur configurable (§, |, tab, ;, , ou custom)
+- JSON : array d'objets ou array d'arrays
+- ODS : odfpy avec style header bold
+- Parquet : pyarrow.parquet.write_table
 
 ### Modules data
 - `quality.py` : Score 0-100 pondéré (remplissage 30%, types 25%, formats 20%, outliers 15%, diversité 10%)

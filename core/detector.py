@@ -5,6 +5,9 @@ Analyse un échantillon du fichier pour déterminer :
 - Le nombre de colonnes attendu
 - Le profil type de chaque colonne (date, nombre, texte, etc.)
 - Le format décimal dominant (FR ou US)
+
+Supporte les fichiers CSV, Excel (XLS/XLSX), ODS, JSON et Parquet.
+Les formats non-CSV sont convertis en CSV temporaire avant détection.
 """
 
 import logging
@@ -57,6 +60,8 @@ class DetectionResult:
     column_profiles: list[ColumnProfile]
     column_count_distribution: dict[int, int] = field(default_factory=dict)
     decimal_format: Optional[str] = None  # Format dominant global
+    source_format: str = 'csv'            # Format source : csv, excel, ods, json, parquet
+    original_filepath: Optional[Path] = None  # Chemin original si conversion
 
     @property
     def regular_column_count(self) -> bool:
@@ -250,12 +255,22 @@ def profile_columns(
     return profiles
 
 
-def run_detection(filepath: Path, progress_callback=None) -> DetectionResult:
+def run_detection(
+    filepath: Path,
+    progress_callback=None,
+    sheet_name: Optional[str] = None,
+    sheet_index: int = 0,
+) -> DetectionResult:
     """Exécute la détection complète sur un fichier.
 
+    Supporte CSV, Excel (XLS/XLSX/XLSM), ODS, JSON et Parquet.
+    Les formats non-CSV sont convertis en CSV temporaire avant détection.
+
     Args:
-        filepath: Chemin vers le fichier CSV.
+        filepath: Chemin vers le fichier.
         progress_callback: Fonction(step, total, message) pour le suivi.
+        sheet_name: Nom de la feuille (Excel/ODS uniquement).
+        sheet_index: Index de la feuille (Excel/ODS, défaut: 0).
 
     Returns:
         DetectionResult avec tous les résultats.
@@ -267,30 +282,52 @@ def run_detection(filepath: Path, progress_callback=None) -> DetectionResult:
         if progress_callback:
             progress_callback(step, total, msg)
 
-    # Étape 1 : Encodage
-    progress(1, 6, "Détection de l'encodage...")
-    encoding = detect_encoding(fp)
+    # Déterminer le format source
+    from utils.universal_reader import get_file_format
+    source_format = get_file_format(fp)
+    original_filepath = None
+    csv_path = fp
 
-    # Étape 2 : Comptage lignes
-    progress(2, 6, "Comptage des lignes...")
-    total_lines = count_lines(fp, encoding)
+    # Si non-CSV, convertir d'abord
+    if source_format != 'csv':
+        progress(1, 7, f"Conversion {source_format.upper()} → CSV...")
+        from utils.universal_reader import convert_to_csv
+        original_filepath = fp
+        csv_path = convert_to_csv(
+            fp, separator=';',
+            sheet_name=sheet_name, sheet_index=sheet_index,
+        )
+        logger.info(f"Fichier converti : {fp.name} → {csv_path.name}")
+        step_offset = 1
+        total_steps = 7
+    else:
+        step_offset = 0
+        total_steps = 6
 
-    # Étape 3 : Séparateur
-    progress(3, 6, "Détection du séparateur...")
-    separator, sep_confidence = detect_separator(fp, encoding)
+    # Étape : Encodage
+    progress(1 + step_offset, total_steps, "Détection de l'encodage...")
+    encoding = detect_encoding(csv_path)
 
-    # Étape 4 : Nombre de colonnes
-    progress(4, 6, "Analyse du nombre de colonnes...")
-    expected_cols, col_distribution = detect_column_count(fp, separator, encoding)
+    # Étape : Comptage lignes
+    progress(2 + step_offset, total_steps, "Comptage des lignes...")
+    total_lines = count_lines(csv_path, encoding)
 
-    # Étape 5 : Header
-    progress(5, 6, "Lecture de l'en-tête...")
-    header_line = next(read_lines_raw(fp, encoding, max_lines=1), '')
+    # Étape : Séparateur
+    progress(3 + step_offset, total_steps, "Détection du séparateur...")
+    separator, sep_confidence = detect_separator(csv_path, encoding)
+
+    # Étape : Nombre de colonnes
+    progress(4 + step_offset, total_steps, "Analyse du nombre de colonnes...")
+    expected_cols, col_distribution = detect_column_count(csv_path, separator, encoding)
+
+    # Étape : Header
+    progress(5 + step_offset, total_steps, "Lecture de l'en-tête...")
+    header_line = next(read_lines_raw(csv_path, encoding, max_lines=1), '')
     header = header_line.split(separator)
 
-    # Étape 6 : Profiling colonnes
-    progress(6, 6, "Profiling des colonnes...")
-    sampled = sample_lines(fp, encoding, n_head=1000, n_random=1000, total_lines=total_lines)
+    # Étape : Profiling colonnes
+    progress(6 + step_offset, total_steps, "Profiling des colonnes...")
+    sampled = sample_lines(csv_path, encoding, n_head=1000, n_random=1000, total_lines=total_lines)
     # Exclure le header de l'échantillon
     if sampled and sampled[0] == header_line:
         sampled = sampled[1:]
@@ -305,7 +342,7 @@ def run_detection(filepath: Path, progress_callback=None) -> DetectionResult:
     global_decimal = decimal_counts.most_common(1)[0][0] if decimal_counts else None
 
     return DetectionResult(
-        filepath=fp,
+        filepath=csv_path,
         encoding=encoding,
         separator=separator,
         separator_confidence=sep_confidence,
@@ -315,4 +352,6 @@ def run_detection(filepath: Path, progress_callback=None) -> DetectionResult:
         column_profiles=col_profiles,
         column_count_distribution=col_distribution,
         decimal_format=global_decimal,
+        source_format=source_format,
+        original_filepath=original_filepath,
     )

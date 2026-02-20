@@ -1,15 +1,36 @@
 # CSV Traitement
 
-Outil de détection et correction automatique des anomalies dans les fichiers CSV volumineux (500K+ lignes).
+Outil de détection et correction automatique des anomalies dans les fichiers tabulaires volumineux (500K+ lignes).
 
 ## Problème résolu
 
-Les exports CSV issus de systèmes ERP (SAP, etc.) présentent souvent des défauts :
+Les exports issus de systèmes ERP (SAP, etc.) présentent souvent des défauts :
 - **Décalages de colonnes** — une cellule vide ou un texte contenant le séparateur décale toutes les colonnes
 - **Formats incohérents** — dates en `00.00.0000`, décimales mixtes FR/US, valeurs masquées (N/A, NULL, #REF!)
 - **Séparateurs ambigus** — point-virgule, virgule, tabulation selon la source
 
 CSV Traitement détecte ces problèmes, les visualise et propose des corrections que vous validez avant export.
+
+## Formats supportés
+
+### En entrée (lecture)
+| Format | Extensions | Bibliothèque | Requis |
+|--------|-----------|--------------|--------|
+| CSV / TSV | `.csv`, `.txt`, `.tsv` | csv (stdlib) | Inclus |
+| Excel (nouveau) | `.xlsx`, `.xlsm` | openpyxl | Inclus |
+| Excel (ancien) | `.xls` | xlrd | Optionnel |
+| ODS (LibreOffice) | `.ods` | odfpy | Optionnel |
+| JSON tabulaire | `.json` | json (stdlib) | Inclus |
+| Apache Parquet | `.parquet`, `.pq` | pyarrow | Optionnel |
+
+### En sortie (export)
+| Format | Description |
+|--------|------------|
+| **XLSX** | Excel typé avec cellules corrigées en surbrillance (défaut) |
+| **CSV** | Texte délimité avec séparateur configurable |
+| **JSON** | Array d'objets — pour intégration web/API |
+| **ODS** | LibreOffice / OpenOffice |
+| **Parquet** | Format columnar Apache — performant pour Big Data |
 
 ## Installation
 
@@ -29,11 +50,21 @@ python main.py --file export.csv  # Charger directement un fichier
 
 ### Ligne de commande
 ```bash
-# Analyse et correction
-python main.py cli --file export.csv                    # Analyser
+# Analyse et correction (tous formats : CSV, XLSX, XLS, ODS, JSON, Parquet)
+python main.py cli --file export.csv                    # Analyser un CSV
+python main.py cli --file rapport.xlsx                  # Analyser un Excel
+python main.py cli --file rapport.xlsx --sheet "Feuil2" # Choisir la feuille
+python main.py cli --file data.ods                      # Analyser un fichier ODS
+python main.py cli --file data.json                     # Analyser un JSON tabulaire
+python main.py cli --file data.parquet                  # Analyser un Parquet
 python main.py cli --file export.csv --stats            # Statistiques détaillées
-python main.py cli --file export.csv --fix -o out.xlsx  # Corriger + exporter XLSX
-python main.py cli --file export.csv --fix -o out.csv --format csv                  # Exporter CSV (séparateur § par défaut)
+
+# Correction + export multi-format
+python main.py cli --file export.csv --fix -o out.xlsx                # Export XLSX (défaut)
+python main.py cli --file export.csv --fix -o out.csv --format csv    # Export CSV
+python main.py cli --file export.csv --fix -o out.json --format json  # Export JSON
+python main.py cli --file export.csv --fix -o out.ods --format ods    # Export ODS
+python main.py cli --file export.csv --fix -o out.parquet --format parquet  # Export Parquet
 python main.py cli --file export.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV avec séparateur pipe
 python main.py cli --batch /exports/ --fix -o /sortie/  # Traitement batch
 python main.py cli --file export.csv --report rapport.json  # Rapport JSON
@@ -42,12 +73,12 @@ python main.py cli --file export.csv --report rapport.json  # Rapport JSON
 python main.py cli --file data.csv --quality            # Score de qualité 0-100
 python main.py cli --file data.csv --dedup              # Détection doublons (exact + fuzzy)
 
-# Comparaison et rapprochement
-python main.py cli --file v1.csv --compare v2.csv       # Diff entre deux fichiers
+# Comparaison et rapprochement (tous formats)
+python main.py cli --file v1.csv --compare v2.xlsx      # Diff CSV vs Excel
 python main.py cli --file factures.csv --reconcile paiements.csv --join-columns 0,1  # Rapprochement
 
-# Fusion de fichiers
-python main.py cli --merge fichier1.csv fichier2.csv fichier3.csv -o fusionne.csv  # Fusion multi-fichiers
+# Fusion de fichiers (tous formats)
+python main.py cli --merge fichier1.csv fichier2.xlsx fichier3.ods -o fusionne.csv
 
 # Cloud
 python main.py cli --cloud                              # Lister les emplacements cloud détectés
@@ -56,16 +87,18 @@ python main.py cli --cloud                              # Lister les emplacement
 ## Fonctionnalités
 
 ### Core
+- **Lecture multi-format** : CSV, XLSX, XLS, ODS, JSON, Parquet — conversion automatique
+- **Sélection de feuille** pour Excel et ODS (multi-feuilles)
 - Détection automatique : encodage (BOM), séparateur, nombre de colonnes
 - Profiling de colonnes : 9 types (date, entier, décimal, texte, booléen, masqué...)
 - Support CSV complet : guillemets, retours à la ligne dans les champs
 - Détection et localisation des décalages colonne par colonne
 - Nettoyage : dates invalides, décimales FR/US, parenthèses comptables, valeurs masquées
 - Statistiques : min/max/moyenne/médiane, outliers IQR, doublons, taux de remplissage
+- **Export multi-format** : XLSX, CSV, JSON, ODS, Parquet
 - Export XLSX typé avec cellules corrigées en surbrillance + onglet rapport
-- Export CSV avec séparateur configurable (§ par défaut — rare, évite les conflits avec les données)
-- Séparateurs CSV disponibles : `§`, `|`, tabulation, `;`, `,` ou caractère personnalisé
-- Écriture via fichier temporaire local (compatible lecteurs réseau/cloud : pCloud, Google Drive, etc.)
+- Export CSV avec séparateur configurable (§ par défaut — rare, évite les conflits)
+- Écriture via fichier temporaire local (compatible lecteurs réseau/cloud)
 
 ### Qualité des données
 - **Score de qualité 0-100** par colonne et global (note A-F)
@@ -142,7 +175,7 @@ python main.py cli --cloud                              # Lister les emplacement
 - Preview avec pagination, recherche par contenu, filtre par statut
 - Drag & drop de fichier
 - Undo/redo des corrections
-- Dialogue d'export : choix du format (XLSX/CSV) et du séparateur CSV
+- Dialogue d'export : choix du format (XLSX/CSV/JSON/ODS/Parquet) et du séparateur CSV
 - Ouverture automatique du fichier exporté (optionnel)
 - Templates de profil réutilisables (JSON)
 - Mode CLI + batch multi-fichiers
@@ -158,14 +191,14 @@ python main.py cli --cloud                              # Lister les emplacement
 
 ```
 core/
-├── detector.py       → Détection séparateur + profiling colonnes
+├── detector.py       → Détection séparateur + profiling (multi-format)
 ├── analyzer.py       → Analyse décalages + conformité
 ├── fixer.py          → Corrections dates/décimales/réalignement
-├── exporter.py       → Export XLSX/CSV typé + rapport
+├── exporter.py       → Export XLSX/CSV/JSON/ODS/Parquet + rapport
 ├── statistics.py     → Stats colonnes (min/max/outliers/doublons)
 ├── quality.py        → Score de qualité des données (0-100)
 ├── dedup.py          → Détection doublons (exact + fuzzy)
-├── comparator.py     → Diff entre deux fichiers CSV
+├── comparator.py     → Diff entre deux fichiers
 ├── reconciler.py     → Rapprochement / réconciliation
 ├── merger.py         → Fusion multi-fichiers + contrôle compatibilité
 ├── columns.py        → Réordonnancement / suppression / renommage colonnes
@@ -181,6 +214,11 @@ ui/
 utils/
 ├── patterns.py       → Regex + types (date/nombre/booléen/masqué)
 ├── chunked_reader.py → Streaming + BOM + guillemets CSV
+├── excel_reader.py   → Lecteur XLSX/XLSM (openpyxl) + XLS (xlrd)
+├── ods_reader.py     → Lecteur ODS (odfpy)
+├── json_reader.py    → Lecteur JSON tabulaire
+├── parquet_reader.py → Lecteur Parquet (pyarrow)
+├── universal_reader.py → Dispatch automatique par extension
 ├── validators.py     → Validation par colonne + validation croisée inter-colonnes
 ├── templates.py      → Templates profil JSON réutilisables
 ├── history.py        → Undo/redo historique corrections
@@ -189,10 +227,22 @@ utils/
 
 ## Dépendances
 
+**Requises :**
 - Python 3.10+
-- xlsxwriter
-- chardet
-- tkinterdnd2 (optionnel, pour le drag & drop)
+- xlsxwriter (export XLSX)
+- chardet (détection encodage)
+- openpyxl (lecture XLSX/XLSM)
+
+**Optionnelles :**
+- xlrd (lecture XLS ancien format)
+- odfpy (lecture/écriture ODS)
+- pyarrow (lecture/écriture Parquet)
+- tkinterdnd2 (drag & drop GUI)
+
+```bash
+# Installation complète
+pip install xlsxwriter chardet openpyxl xlrd odfpy pyarrow
+```
 
 ## Licence
 

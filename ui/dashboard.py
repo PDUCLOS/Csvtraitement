@@ -15,7 +15,8 @@ from typing import Optional
 from core.detector import DetectionResult, run_detection
 from core.analyzer import AnalysisResult, analyze_file
 from core.fixer import FixResult, apply_fixes
-from core.exporter import export_xlsx, export_csv_clean, CSV_SEPARATORS
+from core.exporter import export_xlsx, export_csv_clean, export_any, CSV_SEPARATORS, EXPORT_FORMATS
+from utils.universal_reader import FILETYPES_ALL, get_file_format, is_supported, list_sheets_any
 from core.statistics import compute_statistics, FileStats
 from core.quality import compute_quality, QualityReport
 from core.dedup import find_duplicates, DedupResult, SelectionStrategy
@@ -420,31 +421,88 @@ class DashboardApp:
     def _on_drop(self, event):
         """Callback drag & drop."""
         filepath = event.data.strip('{}')  # Tkinter DnD encapsule dans {}
-        if filepath.lower().endswith(('.csv', '.txt', '.tsv')):
+        if is_supported(Path(filepath)):
             self._load_file(Path(filepath))
         else:
-            messagebox.showwarning("Format", "Fichier CSV/TXT/TSV attendu")
+            messagebox.showwarning(
+                "Format",
+                "Format non supporté. Acceptés : CSV, Excel, ODS, JSON, Parquet"
+            )
 
     # ── Actions ──
 
     def _on_load(self):
         filepath = filedialog.askopenfilename(
-            title="Sélectionner un fichier CSV",
-            filetypes=[("CSV", "*.csv"), ("Texte", "*.txt"), ("TSV", "*.tsv"), ("Tous", "*.*")]
+            title="Sélectionner un fichier",
+            filetypes=FILETYPES_ALL,
         )
         if filepath:
-            self._load_file(Path(filepath))
+            fp = Path(filepath)
+            # Si Excel/ODS avec plusieurs feuilles, demander laquelle
+            sheets = list_sheets_any(fp)
+            if len(sheets) > 1:
+                self._ask_sheet_then_load(fp, sheets)
+            else:
+                self._load_file(fp)
 
-    def _load_file(self, filepath: Path):
+    def _ask_sheet_then_load(self, filepath: Path, sheets: list[str]):
+        """Dialogue de sélection de feuille pour Excel/ODS."""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Sélection de la feuille")
+        dialog.configure(bg=DARK['bg'])
+        dialog.transient(self.root)
+        dialog.grab_set()
+        dialog.resizable(False, False)
+
+        tk.Label(dialog, text=f"Le fichier contient {len(sheets)} feuilles :",
+                 bg=DARK['bg'], fg=DARK['fg'], font=('Segoe UI', 10)).pack(padx=15, pady=(10, 5))
+
+        listbox = tk.Listbox(dialog, bg=DARK['bg_alt'], fg=DARK['fg'],
+                             selectbackground=DARK['accent'], height=min(len(sheets), 10),
+                             font=('Segoe UI', 10))
+        for name in sheets:
+            listbox.insert('end', name)
+        listbox.selection_set(0)
+        listbox.pack(padx=15, pady=5, fill='x')
+
+        def on_ok():
+            sel = listbox.curselection()
+            sheet = sheets[sel[0]] if sel else sheets[0]
+            dialog.destroy()
+            self._load_file(filepath, sheet_name=sheet)
+
+        btn_frame = tk.Frame(dialog, bg=DARK['bg'])
+        btn_frame.pack(pady=10)
+        ttk.Button(btn_frame, text="Ouvrir", command=on_ok, style='Accent.TButton').pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=dialog.destroy).pack(side='left', padx=5)
+
+        dialog.update_idletasks()
+        x = self.root.winfo_x() + (self.root.winfo_width() - dialog.winfo_width()) // 2
+        y = self.root.winfo_y() + (self.root.winfo_height() - dialog.winfo_height()) // 2
+        dialog.geometry(f"+{x}+{y}")
+
+    def _load_file(self, filepath: Path, sheet_name: Optional[str] = None):
         self.current_file = filepath
-        self.lbl_file.config(text=f"📄 {filepath.name}", style='TLabel')
+        fmt = get_file_format(filepath)
+        fmt_label = fmt.upper() if fmt != 'csv' else ''
+        icon = '📄' if fmt == 'csv' else '📊'
+        label = f"{icon} {filepath.name}"
+        if fmt_label:
+            label += f" [{fmt_label}]"
+        if sheet_name:
+            label += f" → {sheet_name}"
+        self.lbl_file.config(text=label, style='TLabel')
         self._set_status("Détection en cours...")
         self.progress['value'] = 0
         self.history.clear()
 
         def task():
             try:
-                result = run_detection(filepath, progress_callback=self._update_progress)
+                result = run_detection(
+                    filepath,
+                    progress_callback=self._update_progress,
+                    sheet_name=sheet_name,
+                )
                 self.root.after(0, lambda: self._on_detection_done(result))
             except Exception as e:
                 logger.exception("Erreur détection")
@@ -657,13 +715,18 @@ class DashboardApp:
         fmt = dialog.result['format']
         csv_sep = dialog.result.get('separator', '§')
 
-        ext = '.xlsx' if fmt == 'xlsx' else '.csv'
+        ext_map = {'xlsx': '.xlsx', 'csv': '.csv', 'json': '.json', 'ods': '.ods', 'parquet': '.parquet'}
+        ext = ext_map.get(fmt, '.xlsx')
         default_name = self.current_file.stem + "_corrigé" + ext
 
-        if fmt == 'xlsx':
-            filetypes = [("Excel", "*.xlsx"), ("Tous", "*.*")]
-        else:
-            filetypes = [("CSV", "*.csv"), ("Tous", "*.*")]
+        filetypes_map = {
+            'xlsx': [("Excel", "*.xlsx"), ("Tous", "*.*")],
+            'csv': [("CSV", "*.csv"), ("Tous", "*.*")],
+            'json': [("JSON", "*.json"), ("Tous", "*.*")],
+            'ods': [("ODS", "*.ods"), ("Tous", "*.*")],
+            'parquet': [("Parquet", "*.parquet"), ("Tous", "*.*")],
+        }
+        filetypes = filetypes_map.get(fmt, [("Tous", "*.*")])
 
         output = filedialog.asksaveasfilename(
             title="Enregistrer", defaultextension=ext, initialfile=default_name,
@@ -672,18 +735,16 @@ class DashboardApp:
         if not output:
             return
 
-        self._set_status("Export en cours...")
+        self._set_status(f"Export {fmt.upper()} en cours...")
         self.progress['value'] = 0
 
         def task():
             try:
-                if fmt == 'xlsx':
-                    path = export_xlsx(self.detection, self.analysis, self.fix_result,
-                                      Path(output), progress_callback=self._update_progress)
-                else:
-                    path = export_csv_clean(self.detection, self.fix_result,
-                                           Path(output), progress_callback=self._update_progress,
-                                           separator=csv_sep)
+                path = export_any(
+                    self.detection, self.analysis, self.fix_result,
+                    Path(output), fmt=fmt, csv_separator=csv_sep,
+                    progress_callback=self._update_progress,
+                )
                 self.root.after(0, lambda: self._on_export_done(path, fmt, csv_sep))
             except Exception as e:
                 logger.exception("Erreur export")
@@ -931,7 +992,7 @@ class DashboardApp:
             return
         filepath = filedialog.askopenfilename(
             title="Sélectionner le second fichier (B) à comparer",
-            filetypes=[("CSV", "*.csv"), ("Texte", "*.txt"), ("TSV", "*.tsv"), ("Tous", "*.*")]
+            filetypes=FILETYPES_ALL,
         )
         if not filepath:
             return
@@ -986,8 +1047,8 @@ class DashboardApp:
     def _on_merge(self):
         """Ouvre un dialogue pour sélectionner des fichiers à fusionner."""
         files = filedialog.askopenfilenames(
-            title="Sélectionner les fichiers CSV à fusionner",
-            filetypes=[("CSV", "*.csv"), ("Texte", "*.txt"), ("TSV", "*.tsv"), ("Tous", "*.*")]
+            title="Sélectionner les fichiers à fusionner",
+            filetypes=FILETYPES_ALL,
         )
         if not files or len(files) < 2:
             messagebox.showinfo("Fusion", "Sélectionnez au moins 2 fichiers.")
@@ -1125,7 +1186,7 @@ class DashboardApp:
             filepath = filedialog.askopenfilename(
                 title="Ouvrir depuis le cloud",
                 initialdir=initial_dir,
-                filetypes=[("CSV", "*.csv"), ("Texte", "*.txt"), ("TSV", "*.tsv"), ("Tous", "*.*")]
+                filetypes=FILETYPES_ALL,
             )
             if filepath:
                 self._load_file(Path(filepath))
@@ -1204,16 +1265,12 @@ class _ExportDialog(tk.Toplevel):
         fmt_frame = tk.Frame(self, bg=DARK['bg'])
         fmt_frame.pack(**pad, anchor='w')
 
-        tk.Radiobutton(fmt_frame, text="XLSX (Excel — typé, colorisé)",
-                       variable=self.format_var, value='xlsx',
-                       bg=DARK['bg'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
-                       activebackground=DARK['bg'], activeforeground=DARK['fg'],
-                       command=self._on_format_change).pack(anchor='w')
-        tk.Radiobutton(fmt_frame, text="CSV (texte — léger, configurable)",
-                       variable=self.format_var, value='csv',
-                       bg=DARK['bg'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
-                       activebackground=DARK['bg'], activeforeground=DARK['fg'],
-                       command=self._on_format_change).pack(anchor='w')
+        for fmt_key, fmt_label in EXPORT_FORMATS.items():
+            tk.Radiobutton(fmt_frame, text=fmt_label,
+                           variable=self.format_var, value=fmt_key,
+                           bg=DARK['bg'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
+                           activebackground=DARK['bg'], activeforeground=DARK['fg'],
+                           command=self._on_format_change).pack(anchor='w')
 
         # ── Choix séparateur CSV ──
         self.sep_frame = tk.LabelFrame(self, text="Séparateur CSV",
