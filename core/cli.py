@@ -18,7 +18,7 @@ from typing import Optional
 from core.detector import run_detection, DetectionResult
 from core.analyzer import analyze_file, AnalysisResult
 from core.fixer import apply_fixes, FixResult
-from core.exporter import export_xlsx, export_csv_clean
+from core.exporter import export_xlsx, export_csv_clean, CSV_SEPARATORS
 from core.statistics import compute_statistics, FileStats
 
 logger = logging.getLogger(__name__)
@@ -60,6 +60,11 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
     # Format de sortie
     cli_parser.add_argument('--format', choices=['xlsx', 'csv'], default='xlsx',
                            help='Format de sortie (défaut: xlsx)')
+    sep_choices = list(CSV_SEPARATORS.keys())
+    cli_parser.add_argument('--csv-separator', type=str, default='§',
+                           help=f"Séparateur pour l'export CSV (défaut: § ). "
+                                f"Valeurs prédéfinies : {', '.join(sep_choices)}. "
+                                f"Ou tout caractère unique.")
     cli_parser.add_argument('--report', type=str,
                            help='Chemin pour le rapport JSON')
 
@@ -195,6 +200,7 @@ def run_single(args: argparse.Namespace) -> dict:
         if output:
             output_path = Path(output)
             fmt = getattr(args, 'format', 'xlsx')
+            csv_sep = getattr(args, 'csv_separator', '§')
 
             if not quiet:
                 print(f"\n💾 Export {fmt.upper()} → {output_path}")
@@ -202,7 +208,10 @@ def run_single(args: argparse.Namespace) -> dict:
             if fmt == 'xlsx':
                 export_xlsx(detection, analysis, fix_result, output_path)
             else:
-                export_csv_clean(detection, fix_result, output_path)
+                export_csv_clean(detection, fix_result, output_path, separator=csv_sep)
+                sep_display = CSV_SEPARATORS.get(csv_sep, csv_sep)
+                if not quiet:
+                    print(f"  Séparateur CSV : {sep_display}")
 
             if not quiet:
                 print(f"  ✅ Fichier exporté : {output_path}")

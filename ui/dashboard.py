@@ -13,7 +13,7 @@ from typing import Optional
 from core.detector import DetectionResult, run_detection
 from core.analyzer import AnalysisResult, analyze_file
 from core.fixer import FixResult, apply_fixes
-from core.exporter import export_xlsx
+from core.exporter import export_xlsx, export_csv_clean, CSV_SEPARATORS
 from core.statistics import compute_statistics, FileStats
 from utils.history import CorrectionHistory
 
@@ -600,17 +600,27 @@ class DashboardApp:
         if not self.detection or not self.analysis or not self.fix_result:
             return
 
-        msg = (f"Exporter avec {self.fix_result.total_corrections:,} corrections ?\n\n"
-               f"• {self.fix_result.date_fixes:,} dates\n"
-               f"• {self.fix_result.decimal_fixes:,} décimales\n"
-               f"• {self.fix_result.realignment_fixes:,} réalignements")
-        if not messagebox.askyesno("Confirmer", msg):
+        # ── Dialogue choix format + séparateur ──
+        dialog = _ExportDialog(self.root, self.fix_result)
+        self.root.wait_window(dialog)
+
+        if not dialog.result:
             return
 
-        default_name = self.current_file.stem + "_corrigé.xlsx"
+        fmt = dialog.result['format']
+        csv_sep = dialog.result.get('separator', '§')
+
+        ext = '.xlsx' if fmt == 'xlsx' else '.csv'
+        default_name = self.current_file.stem + "_corrigé" + ext
+
+        if fmt == 'xlsx':
+            filetypes = [("Excel", "*.xlsx"), ("Tous", "*.*")]
+        else:
+            filetypes = [("CSV", "*.csv"), ("Tous", "*.*")]
+
         output = filedialog.asksaveasfilename(
-            title="Enregistrer", defaultextension=".xlsx", initialfile=default_name,
-            filetypes=[("Excel", "*.xlsx"), ("CSV", "*.csv")]
+            title="Enregistrer", defaultextension=ext, initialfile=default_name,
+            filetypes=filetypes
         )
         if not output:
             return
@@ -620,19 +630,51 @@ class DashboardApp:
 
         def task():
             try:
-                path = export_xlsx(self.detection, self.analysis, self.fix_result,
-                                  Path(output), progress_callback=self._update_progress)
-                self.root.after(0, lambda: self._on_export_done(path))
+                if fmt == 'xlsx':
+                    path = export_xlsx(self.detection, self.analysis, self.fix_result,
+                                      Path(output), progress_callback=self._update_progress)
+                else:
+                    path = export_csv_clean(self.detection, self.fix_result,
+                                           Path(output), progress_callback=self._update_progress,
+                                           separator=csv_sep)
+                self.root.after(0, lambda: self._on_export_done(path, fmt, csv_sep))
             except Exception as e:
                 logger.exception("Erreur export")
                 self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
 
         threading.Thread(target=task, daemon=True).start()
 
-    def _on_export_done(self, path: Path):
+    def _on_export_done(self, path: Path, fmt: str, csv_sep: str = '§'):
         self._set_status(f"Export OK : {path.name}")
         self.progress['value'] = 100
-        messagebox.showinfo("Export", f"Fichier exporté :\n{path}")
+
+        if fmt == 'csv':
+            sep_display = CSV_SEPARATORS.get(csv_sep, csv_sep)
+            msg = (f"Fichier exporté :\n{path}\n\n"
+                   f"Séparateur utilisé : {sep_display}\n"
+                   f"Pensez à utiliser ce séparateur lors de la réouverture.\n\n"
+                   f"Ouvrir le fichier maintenant ?")
+        else:
+            msg = f"Fichier exporté :\n{path}\n\nOuvrir le fichier maintenant ?"
+
+        if messagebox.askyesno("Export terminé", msg):
+            self._open_file(path)
+
+    @staticmethod
+    def _open_file(path: Path):
+        """Ouvre un fichier avec l'application par défaut du système."""
+        import subprocess
+        import sys
+        try:
+            if sys.platform == 'win32':
+                import os
+                os.startfile(str(path))
+            elif sys.platform == 'darwin':
+                subprocess.Popen(['open', str(path)])
+            else:
+                subprocess.Popen(['xdg-open', str(path)])
+        except Exception as e:
+            logger.warning(f"Impossible d'ouvrir {path}: {e}")
 
     def _on_undo(self):
         entry = self.history.undo()
@@ -722,3 +764,111 @@ class DashboardApp:
 
     def _set_status(self, text: str):
         self.status_label.config(text=text)
+
+
+class _ExportDialog(tk.Toplevel):
+    """Dialogue de choix du format d'export et du séparateur CSV."""
+
+    def __init__(self, parent, fix_result: FixResult):
+        super().__init__(parent)
+        self.title("Options d'export")
+        self.configure(bg=DARK['bg'])
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+        self.result = None
+
+        pad = {'padx': 15, 'pady': 5}
+
+        # ── Résumé corrections ──
+        summary = (
+            f"{fix_result.total_corrections:,} corrections : "
+            f"{fix_result.date_fixes:,} dates, "
+            f"{fix_result.decimal_fixes:,} décimales, "
+            f"{fix_result.realignment_fixes:,} réalignements"
+        )
+        tk.Label(self, text=summary, bg=DARK['bg'], fg=DARK['fg'],
+                 font=('Segoe UI', 9)).pack(**pad, anchor='w')
+
+        ttk.Separator(self, orient='horizontal').pack(fill='x', padx=15, pady=5)
+
+        # ── Choix format ──
+        tk.Label(self, text="Format de sortie :", bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 10, 'bold')).pack(**pad, anchor='w')
+
+        self.format_var = tk.StringVar(value='xlsx')
+        fmt_frame = tk.Frame(self, bg=DARK['bg'])
+        fmt_frame.pack(**pad, anchor='w')
+
+        tk.Radiobutton(fmt_frame, text="XLSX (Excel — typé, colorisé)",
+                       variable=self.format_var, value='xlsx',
+                       bg=DARK['bg'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
+                       activebackground=DARK['bg'], activeforeground=DARK['fg'],
+                       command=self._on_format_change).pack(anchor='w')
+        tk.Radiobutton(fmt_frame, text="CSV (texte — léger, configurable)",
+                       variable=self.format_var, value='csv',
+                       bg=DARK['bg'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
+                       activebackground=DARK['bg'], activeforeground=DARK['fg'],
+                       command=self._on_format_change).pack(anchor='w')
+
+        # ── Choix séparateur CSV ──
+        self.sep_frame = tk.LabelFrame(self, text="Séparateur CSV",
+                                       bg=DARK['bg_card'], fg=DARK['accent'],
+                                       font=('Segoe UI', 10, 'bold'))
+        self.sep_frame.pack(padx=15, pady=8, fill='x')
+
+        self.sep_var = tk.StringVar(value='§')
+        for sep_key, sep_label in CSV_SEPARATORS.items():
+            tk.Radiobutton(self.sep_frame, text=sep_label,
+                           variable=self.sep_var, value=sep_key,
+                           bg=DARK['bg_card'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
+                           activebackground=DARK['bg_card'], activeforeground=DARK['fg']
+                           ).pack(anchor='w', padx=10, pady=1)
+
+        # Champ séparateur personnalisé
+        custom_frame = tk.Frame(self.sep_frame, bg=DARK['bg_card'])
+        custom_frame.pack(anchor='w', padx=10, pady=3)
+        tk.Radiobutton(custom_frame, text="Autre :",
+                       variable=self.sep_var, value='__custom__',
+                       bg=DARK['bg_card'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
+                       activebackground=DARK['bg_card'], activeforeground=DARK['fg']
+                       ).pack(side='left')
+        self.custom_entry = tk.Entry(custom_frame, width=5, bg=DARK['bg_alt'],
+                                     fg=DARK['fg'], insertbackground=DARK['fg'])
+        self.custom_entry.pack(side='left', padx=5)
+
+        # Masquer au départ (format XLSX par défaut)
+        self.sep_frame.pack_forget()
+
+        # ── Boutons ──
+        btn_frame = tk.Frame(self, bg=DARK['bg'])
+        btn_frame.pack(pady=12)
+        ttk.Button(btn_frame, text="Exporter", command=self._on_ok,
+                   style='Accent.TButton').pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
+
+        # Centrer
+        self.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
+        y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
+        self.geometry(f"+{x}+{y}")
+
+    def _on_format_change(self):
+        if self.format_var.get() == 'csv':
+            self.sep_frame.pack(padx=15, pady=8, fill='x',
+                                before=self.winfo_children()[-1])  # avant les boutons
+        else:
+            self.sep_frame.pack_forget()
+
+    def _on_ok(self):
+        fmt = self.format_var.get()
+        sep = self.sep_var.get()
+        if sep == '__custom__':
+            sep = self.custom_entry.get()
+            if not sep or len(sep) != 1:
+                messagebox.showwarning("Séparateur",
+                    "Entrez exactement un caractère comme séparateur.",
+                    parent=self)
+                return
+        self.result = {'format': fmt, 'separator': sep}
+        self.destroy()

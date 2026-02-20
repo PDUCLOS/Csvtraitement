@@ -23,6 +23,15 @@ logger = logging.getLogger(__name__)
 
 XLSX_MAX_ROWS = 1_048_576  # Limite Excel
 
+# Séparateurs CSV disponibles pour l'export
+CSV_SEPARATORS = {
+    '§': '§ (section — recommandé, jamais dans les données)',
+    '|': '| (pipe)',
+    '\\t': 'Tabulation (TSV)',
+    ';': '; (point-virgule — classique FR)',
+    ',': ', (virgule — classique US)',
+}
+
 
 def _safe_write(tmp_path: Path, final_path: Path) -> Path:
     """Copie un fichier temporaire vers la destination finale puis supprime le temporaire.
@@ -81,7 +90,7 @@ def export_xlsx(
             f"Export CSV à la place."
         )
         csv_path = output_path.with_suffix('.csv')
-        return export_csv_clean(detection, fix_result, csv_path, progress_callback)
+        return export_csv_clean(detection, fix_result, csv_path, progress_callback, separator='§')
 
     # Écrire dans un fichier temporaire local pour éviter les erreurs d'E/S
     tmp_fd, tmp_path_str = tempfile.mkstemp(suffix='.xlsx', prefix='csvtraitement_')
@@ -307,21 +316,23 @@ def export_csv_clean(
     detection: DetectionResult,
     fix_result: FixResult,
     output_path: Path,
-    progress_callback=None
+    progress_callback=None,
+    separator: str = '§'
 ) -> Path:
-    """Fallback : export CSV nettoyé pour très gros fichiers.
+    """Export CSV nettoyé avec séparateur configurable.
 
     Args:
         detection: Résultat de détection.
         fix_result: Résultat des corrections.
         output_path: Chemin du fichier de sortie.
         progress_callback: Fonction de suivi.
+        separator: Séparateur CSV de sortie (défaut: § pour éviter les conflits).
 
     Returns:
         Chemin du fichier créé.
     """
     output_path = Path(output_path)
-    sep = ';'  # Séparateur de sortie toujours point-virgule
+    sep = '\t' if separator == '\\t' else separator
     enc = detection.encoding
     expected = detection.expected_columns
 
@@ -330,7 +341,7 @@ def export_csv_clean(
     import os
     os.close(tmp_fd)
     tmp_path = Path(tmp_path_str)
-    logger.info(f"Écriture temporaire CSV : {tmp_path}")
+    logger.info(f"Écriture temporaire CSV : {tmp_path} (séparateur: {repr(sep)})")
 
     with open(tmp_path, 'w', encoding='utf-8', newline='') as f:
         # Header
