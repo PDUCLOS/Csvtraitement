@@ -289,6 +289,8 @@ def record_strip_accents(recipe: Recipe, columns: list[str], column_indices: lis
 def _safe_col_name(name: str) -> str:
     """Nettoie un nom de colonne pour utilisation dans du code."""
     safe = re.sub(r'[^a-zA-Z0-9_]', '_', name.strip())
+    # Supprimer les underscores en trop aux extremites
+    safe = safe.strip('_')
     if safe and safe[0].isdigit():
         safe = '_' + safe
     return safe or '_col'

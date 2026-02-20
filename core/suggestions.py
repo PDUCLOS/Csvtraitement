@@ -217,15 +217,18 @@ def generate_suggestions(
         for cs in file_stats.column_stats:
             if cs.outliers_count > 0:
                 col_name = cs.header
+                detail_parts = ["Valeurs hors de la plage normale (IQR)."]
+                if cs.numeric_mean is not None:
+                    detail_parts.append(
+                        f"Min: {cs.numeric_min}, Max: {cs.numeric_max}, "
+                        f"Moyenne: {cs.numeric_mean:.2f}")
                 suggestions.append(Suggestion(
                     category=SuggestionCategory.OUTLIER,
                     priority=SuggestionPriority.MEDIUM if cs.outliers_count < 10 else SuggestionPriority.HIGH,
                     column_index=cs.index,
                     column_name=col_name,
                     message=f"Colonne [{col_name}] : {cs.outliers_count} outliers detectes",
-                    detail=f"Valeurs hors de la plage normale (IQR). "
-                           f"Min: {cs.numeric_min}, Max: {cs.numeric_max}, "
-                           f"Moyenne: {cs.numeric_mean:.2f}" if cs.numeric_mean else "",
+                    detail=' '.join(detail_parts),
                     action="review_outliers",
                     params={'count': cs.outliers_count},
                     icon="\U0001f4c8",
