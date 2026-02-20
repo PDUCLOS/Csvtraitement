@@ -2,9 +2,13 @@
 
 Utilise xlsxwriter pour les performances sur gros fichiers.
 Fallback en CSV nettoyé si > 1M lignes.
+Écriture via fichier temporaire local pour éviter les erreurs d'E/S
+sur les lecteurs réseau/cloud (pCloud, Google Drive, etc.).
 """
 
 import logging
+import shutil
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -18,6 +22,32 @@ from utils.chunked_reader import read_chunks
 logger = logging.getLogger(__name__)
 
 XLSX_MAX_ROWS = 1_048_576  # Limite Excel
+
+
+def _safe_write(tmp_path: Path, final_path: Path) -> Path:
+    """Copie un fichier temporaire vers la destination finale puis supprime le temporaire.
+
+    Args:
+        tmp_path: Chemin du fichier temporaire local.
+        final_path: Chemin de destination (peut être réseau/cloud).
+
+    Returns:
+        Chemin du fichier final créé.
+
+    Raises:
+        OSError: Si la copie vers la destination échoue.
+    """
+    try:
+        final_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(str(tmp_path), str(final_path))
+        logger.info(f"Fichier copié vers : {final_path}")
+        return final_path
+    finally:
+        try:
+            tmp_path.unlink(missing_ok=True)
+            logger.debug(f"Fichier temporaire supprimé : {tmp_path}")
+        except OSError as e:
+            logger.warning(f"Impossible de supprimer le temporaire {tmp_path}: {e}")
 
 
 def export_xlsx(
@@ -53,7 +83,14 @@ def export_xlsx(
         csv_path = output_path.with_suffix('.csv')
         return export_csv_clean(detection, fix_result, csv_path, progress_callback)
 
-    wb = xlsxwriter.Workbook(str(output_path), {
+    # Écrire dans un fichier temporaire local pour éviter les erreurs d'E/S
+    tmp_fd, tmp_path_str = tempfile.mkstemp(suffix='.xlsx', prefix='csvtraitement_')
+    import os
+    os.close(tmp_fd)
+    tmp_path = Path(tmp_path_str)
+    logger.info(f"Écriture temporaire : {tmp_path}")
+
+    wb = xlsxwriter.Workbook(str(tmp_path), {
         'strings_to_numbers': False,
         'constant_memory': True,  # Mode streaming pour gros fichiers
     })
@@ -158,6 +195,9 @@ def export_xlsx(
     _write_report_sheet(ws_report, detection, analysis, fix_result, fmt_header)
 
     wb.close()
+
+    # Copier vers la destination finale et supprimer le temporaire
+    _safe_write(tmp_path, output_path)
     logger.info(f"Export XLSX terminé: {output_path} ({row - 1} lignes de données)")
     return output_path
 
@@ -285,7 +325,14 @@ def export_csv_clean(
     enc = detection.encoding
     expected = detection.expected_columns
 
-    with open(output_path, 'w', encoding='utf-8', newline='') as f:
+    # Écrire dans un fichier temporaire local
+    tmp_fd, tmp_path_str = tempfile.mkstemp(suffix='.csv', prefix='csvtraitement_')
+    import os
+    os.close(tmp_fd)
+    tmp_path = Path(tmp_path_str)
+    logger.info(f"Écriture temporaire CSV : {tmp_path}")
+
+    with open(tmp_path, 'w', encoding='utf-8', newline='') as f:
         # Header
         f.write(sep.join(detection.header[:expected]) + '\n')
 
@@ -311,5 +358,7 @@ def export_csv_clean(
             if progress_callback:
                 progress_callback(line_num, detection.total_lines, f"Export CSV: {line_num} lignes")
 
+    # Copier vers la destination finale et supprimer le temporaire
+    _safe_write(tmp_path, output_path)
     logger.info(f"Export CSV terminé: {output_path}")
     return output_path
