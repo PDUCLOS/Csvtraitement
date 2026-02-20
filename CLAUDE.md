@@ -1,7 +1,7 @@
 # CSV Traitement - Claude Code Project
 
 ## Objectif
-Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers CSV volumineux (500K+ lignes) : décalages de colonnes, formats de dates incohérents, séparateurs décimaux mixtes (FR/US), valeurs masquées, doublons.
+Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers CSV volumineux (500K+ lignes) : décalages de colonnes, formats de dates incohérents, séparateurs décimaux mixtes (FR/US), valeurs masquées, doublons. Inclut aussi : score de qualité, fuzzy dedup, comparaison/diff, rapprochement, fusion, anonymisation, normalisation texte, gestion colonnes et connexion cloud.
 
 ## Architecture
 
@@ -19,18 +19,28 @@ Csvtraitement/
 │   ├── fixer.py               # Corrections dates/décimales/réalignement
 │   ├── exporter.py            # Export XLSX typé + highlight + rapport
 │   ├── statistics.py          # Stats colonnes (min/max/outliers/doublons)
+│   ├── quality.py             # Score de qualité des données (0-100, note A-F)
+│   ├── dedup.py               # Détection doublons (exact + fuzzy matching)
+│   ├── comparator.py          # Diff/comparaison entre deux fichiers CSV
+│   ├── reconciler.py          # Rapprochement / réconciliation entre fichiers
+│   ├── merger.py              # Fusion multi-fichiers + contrôle compatibilité
+│   ├── columns.py             # Réordonnancement / suppression / renommage colonnes
+│   ├── transformer.py         # Règles de transformation (regex, split, merge, mapping)
+│   ├── normalizer.py          # Normalisation texte (casse, accents, invisibles, guillemets)
+│   ├── anonymizer.py          # Anonymisation données sensibles (email, tel, IBAN)
 │   └── cli.py                 # Mode CLI + batch multi-fichiers
 ├── ui/
 │   ├── __init__.py
-│   ├── dashboard.py           # Dashboard Tkinter dark theme + 6 onglets
+│   ├── dashboard.py           # Dashboard Tkinter dark theme + 8 onglets
 │   └── preview.py             # Preview avec recherche/filtre/pagination
 ├── utils/
 │   ├── __init__.py
 │   ├── patterns.py            # Regex + types (date/nombre/booléen/masqué)
 │   ├── chunked_reader.py      # Streaming + BOM + guillemets CSV + writer
-│   ├── validators.py          # Règles validation custom par colonne
+│   ├── validators.py          # Validation par colonne + validation croisée inter-colonnes
 │   ├── templates.py           # Templates profil JSON réutilisables
-│   └── history.py             # Undo/redo historique corrections
+│   ├── history.py             # Undo/redo historique corrections
+│   └── cloud.py               # Connecteurs cloud (OneDrive, SharePoint, pCloud, etc.)
 ├── tests/
 │   ├── fixtures/
 │   ├── test_detector.py
@@ -47,7 +57,7 @@ Csvtraitement/
 python main.py
 python main.py --file data.csv
 
-# CLI
+# CLI — Analyse et correction
 python main.py cli --file data.csv                          # Analyser
 python main.py cli --file data.csv --stats                  # + Statistiques
 python main.py cli --file data.csv --fix -o out.xlsx        # Corriger + export XLSX
@@ -56,6 +66,18 @@ python main.py cli --file data.csv --fix -o out.csv --format csv --csv-separator
 python main.py cli --batch /dossier/ --fix -o /sortie/      # Batch
 python main.py cli --file data.csv --save-template sap_export  # Sauver template
 python main.py cli --file data.csv --report rapport.json    # Rapport JSON
+
+# CLI — Qualité et doublons
+python main.py cli --file data.csv --quality                # Score de qualité 0-100
+python main.py cli --file data.csv --dedup                  # Détection doublons
+
+# CLI — Comparaison et rapprochement
+python main.py cli --file v1.csv --compare v2.csv           # Diff entre deux fichiers
+python main.py cli --file factures.csv --reconcile paiements.csv --join-columns 0,1
+
+# CLI — Fusion et cloud
+python main.py cli --merge f1.csv f2.csv f3.csv -o fusionne.csv
+python main.py cli --cloud                                  # Lister emplacements cloud
 
 # Tests
 pytest tests/ -v
@@ -87,14 +109,28 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 
 ### Interface
 - Thème sombre (palette Catppuccin Mocha)
-- 6 onglets : Diagnostic, Colonnes, Anomalies, Statistiques, Corrections, Historique
+- 8 onglets : Diagnostic, Colonnes, Anomalies, Statistiques, Qualité, Doublons, Corrections, Historique
+- Boutons : Charger, Analyser, Stats, Preview, Corriger, Undo, Export, Qualité, Doublons, Comparer, Fusionner, Anonymiser, Cloud
 - Drag & drop (si tkinterdnd2 installé, sinon double-clic)
 - Preview avec pagination, recherche, filtre (conformes/non conformes/corrigées)
 - Undo/redo sur les corrections
 
+### Modules data
+- `quality.py` : Score 0-100 pondéré (remplissage 30%, types 25%, formats 20%, outliers 15%, diversité 10%)
+- `dedup.py` : Hash exact + fuzzy via difflib.SequenceMatcher + blocking par préfixe
+- `comparator.py` : Indexation fichier A par clé, parcours fichier B, diff cellule par cellule
+- `reconciler.py` : Jointure sur colonnes-clés, comparaison montants avec tolérance
+- `merger.py` : Contrôle compatibilité (noms, nombre colonnes), réalignement auto, fusion
+- `columns.py` : Opérations sur colonnes (reorder, delete, rename) et lignes (filtrage)
+- `transformer.py` : Regex replace, split, merge, value map — sérialisable JSON
+- `normalizer.py` : Casse, accents (unicodedata), invisibles, guillemets typographiques
+- `anonymizer.py` : Détection (email, tel, IBAN, CB, sécu) + masquage (partiel/complet/hash/pseudonyme)
+- `validators.py` : Validation croisée (dates, arithmétique, conditionnel, exclusion mutuelle)
+- `cloud.py` : Détection auto des chemins sync (OneDrive, SharePoint, pCloud, Google Drive, Dropbox)
+
 ### Templates JSON (~/.csvtraitement/templates/)
 - Sauvegarde/rechargement de profils pour exports récurrents
-- Inclut les règles de validation custom
+- Inclut les règles de validation custom et de transformation
 
 ### Style de code
 - Python 3.10+, type hints, docstrings Google, logging (pas de print sauf CLI)

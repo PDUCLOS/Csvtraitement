@@ -1,6 +1,8 @@
 """Dashboard principal Tkinter pour CSV Traitement.
 
-Features: thème sombre, drag & drop, stats, templates, historique, undo.
+Features: thème sombre, drag & drop, stats, templates, historique, undo,
+qualité des données, doublons, comparaison, anonymisation, fusion,
+gestion colonnes, connexions cloud.
 """
 
 import logging
@@ -15,7 +17,21 @@ from core.analyzer import AnalysisResult, analyze_file
 from core.fixer import FixResult, apply_fixes
 from core.exporter import export_xlsx, export_csv_clean, CSV_SEPARATORS
 from core.statistics import compute_statistics, FileStats
+from core.quality import compute_quality, QualityReport
+from core.dedup import find_duplicates, DedupResult, SelectionStrategy
+from core.comparator import compare_files, ComparisonResult, RowStatus
+from core.reconciler import reconcile, ReconciliationResult, MatchStatus
+from core.anonymizer import (
+    AnonymizationRule, SensitiveType, MaskMode,
+    detect_column_sensitivity, anonymize_rows, AnonymizationResult
+)
+from core.merger import check_compatibility, merge_files, MergeResult
+from core.columns import (
+    reorder_columns, delete_columns, rename_columns,
+    delete_rows, RowFilter, apply_column_operations
+)
 from utils.history import CorrectionHistory
+from utils.cloud import detect_cloud_locations, CloudLocation
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +71,9 @@ class DashboardApp:
         self.file_stats: Optional[FileStats] = None
         self.current_file: Optional[Path] = None
         self.history = CorrectionHistory()
+
+        self.quality_report: Optional[QualityReport] = None
+        self.dedup_result: Optional[DedupResult] = None
 
         self._setup_dark_theme()
         self._build_toolbar()
@@ -152,11 +171,28 @@ class DashboardApp:
             btn.pack(side='left', padx=3)
             setattr(self, attr, btn)
 
+        # Séparateur + nouveaux boutons
+        ttk.Separator(toolbar, orient='vertical').pack(side='left', padx=8, fill='y')
+
+        extra_buttons = [
+            ('btn_quality', '🏆 Qualité', self._on_quality, 'disabled'),
+            ('btn_dedup', '🔗 Doublons', self._on_dedup, 'disabled'),
+            ('btn_compare', '⚡ Comparer', self._on_compare, 'disabled'),
+            ('btn_merge', '📎 Fusionner', self._on_merge, 'normal'),
+            ('btn_anonymize', '🔒 Anonymiser', self._on_anonymize, 'disabled'),
+            ('btn_cloud', '☁ Cloud', self._on_cloud, 'normal'),
+        ]
+
+        for attr, text, cmd, state in extra_buttons:
+            btn = ttk.Button(toolbar, text=text, command=cmd, state=state)
+            btn.pack(side='left', padx=2)
+            setattr(self, attr, btn)
+
         # Template buttons
         ttk.Separator(toolbar, orient='vertical').pack(side='left', padx=8, fill='y')
-        self.btn_save_tpl = ttk.Button(toolbar, text='📑 Sauver Template', command=self._on_save_template, state='disabled')
+        self.btn_save_tpl = ttk.Button(toolbar, text='📑 Template', command=self._on_save_template, state='disabled')
         self.btn_save_tpl.pack(side='left', padx=3)
-        self.btn_load_tpl = ttk.Button(toolbar, text='📄 Charger Template', command=self._on_load_template)
+        self.btn_load_tpl = ttk.Button(toolbar, text='📄 Charger', command=self._on_load_template)
         self.btn_load_tpl.pack(side='left', padx=3)
 
         # File label
@@ -187,6 +223,16 @@ class DashboardApp:
         self.tab_stats = ttk.Frame(self.notebook)
         self.notebook.add(self.tab_stats, text='  Statistiques  ')
         self._build_stats_tab()
+
+        # Onglet Qualité
+        self.tab_quality = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_quality, text='  Qualité  ')
+        self._build_quality_tab()
+
+        # Onglet Doublons
+        self.tab_dedup = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab_dedup, text='  Doublons  ')
+        self._build_dedup_tab()
 
         # Onglet Corrections
         self.tab_fixes = ttk.Frame(self.notebook)
@@ -453,7 +499,8 @@ class DashboardApp:
             ))
 
         # Enable buttons
-        for btn in [self.btn_analyze, self.btn_stats, self.btn_preview, self.btn_save_tpl]:
+        for btn in [self.btn_analyze, self.btn_stats, self.btn_preview, self.btn_save_tpl,
+                     self.btn_quality, self.btn_dedup, self.btn_compare, self.btn_anonymize]:
             btn.config(state='normal')
         for btn in [self.btn_fix, self.btn_export, self.btn_undo]:
             btn.config(state='disabled')
@@ -725,6 +772,363 @@ class DashboardApp:
                 f"Template chargé : {template['meta']['name']}\n"
                 f"Colonnes: {template['structure']['expected_columns']}\n"
                 f"Séparateur: {template['structure']['separator']}")
+
+    # ── Qualité ──
+
+    def _build_quality_tab(self):
+        """Onglet score de qualité."""
+        # Score global en haut
+        top = ttk.Frame(self.tab_quality, padding=10)
+        top.pack(fill='x')
+        self.quality_grade_lbl = ttk.Label(top, text="—", style='CardKPI.TLabel',
+                                           font=('JetBrains Mono', 28, 'bold'))
+        self.quality_grade_lbl.pack(side='left', padx=20)
+        self.quality_score_lbl = ttk.Label(top, text="Lancer 🏆 Qualité pour scorer",
+                                           style='Dim.TLabel')
+        self.quality_score_lbl.pack(side='left', padx=10)
+        self.quality_summary_lbl = ttk.Label(top, text="", style='Dim.TLabel')
+        self.quality_summary_lbl.pack(side='left', padx=10)
+
+        # Tableau par colonne
+        cols = ('Colonne', 'Score', 'Note', 'Rempli', 'Types', 'Outliers', 'Format', 'Diversité', 'Problèmes')
+        self.quality_tree = ttk.Treeview(self.tab_quality, columns=cols, show='headings', height=18)
+        for c in cols:
+            self.quality_tree.heading(c, text=c)
+            w = 80 if c not in ('Colonne', 'Problèmes') else 180
+            self.quality_tree.column(c, width=w)
+        sb = ttk.Scrollbar(self.tab_quality, orient='vertical', command=self.quality_tree.yview)
+        self.quality_tree.configure(yscrollcommand=sb.set)
+        self.quality_tree.pack(side='left', fill='both', expand=True, padx=(10, 0), pady=(0, 10))
+        sb.pack(side='right', fill='y', pady=(0, 10), padx=(0, 10))
+
+    def _build_dedup_tab(self):
+        """Onglet détection de doublons."""
+        # Options
+        opts = ttk.LabelFrame(self.tab_dedup, text="Options de détection", padding=10)
+        opts.pack(fill='x', padx=10, pady=5)
+
+        self.var_dedup_fuzzy = tk.BooleanVar(value=True)
+        ttk.Checkbutton(opts, text="Fuzzy matching (similarité > 85%)",
+                        variable=self.var_dedup_fuzzy).pack(anchor='w')
+
+        self.var_dedup_normalize = tk.BooleanVar(value=True)
+        ttk.Checkbutton(opts, text="Normaliser (accents, casse, espaces)",
+                        variable=self.var_dedup_normalize).pack(anchor='w')
+
+        # Résumé
+        self.dedup_summary_lbl = ttk.Label(self.tab_dedup, text="Lancer 🔗 Doublons pour détecter",
+                                           style='Dim.TLabel')
+        self.dedup_summary_lbl.pack(pady=5)
+
+        # Tableau
+        cols = ('Groupe', 'Type', 'Similarité', 'Lignes', 'Nb', 'Clé', 'Différences')
+        self.dedup_tree = ttk.Treeview(self.tab_dedup, columns=cols, show='headings', height=16)
+        for c in cols:
+            self.dedup_tree.heading(c, text=c)
+            w = 60 if c in ('Groupe', 'Nb') else (80 if c in ('Type', 'Similarité') else 200)
+            self.dedup_tree.column(c, width=w)
+        sb = ttk.Scrollbar(self.tab_dedup, orient='vertical', command=self.dedup_tree.yview)
+        self.dedup_tree.configure(yscrollcommand=sb.set)
+        self.dedup_tree.pack(side='left', fill='both', expand=True, padx=(10, 0), pady=(0, 10))
+        sb.pack(side='right', fill='y', pady=(0, 10), padx=(0, 10))
+
+    def _on_quality(self):
+        if not self.detection:
+            return
+        self._set_status("Calcul de la qualité...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                report = compute_quality(self.detection, progress_callback=self._update_progress)
+                self.root.after(0, lambda: self._on_quality_done(report))
+            except Exception as e:
+                logger.exception("Erreur qualité")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_quality_done(self, report: QualityReport):
+        self.quality_report = report
+
+        # Score global
+        grade_colors = {'A': 'CardGood.TLabel', 'B': 'CardGood.TLabel',
+                        'C': 'CardWarning.TLabel', 'D': 'CardBad.TLabel', 'F': 'CardBad.TLabel'}
+        self.quality_grade_lbl.config(text=report.overall_grade,
+                                      style=grade_colors.get(report.overall_grade, 'CardKPI.TLabel'))
+        self.quality_score_lbl.config(
+            text=f"{report.overall_score:.1f}/100 — Doublons: {report.duplicate_rate:.1f}%, "
+                 f"Vides: {report.empty_row_rate:.1f}%",
+            style='TLabel'
+        )
+        if report.summary:
+            self.quality_summary_lbl.config(text=' | '.join(report.summary[:3]))
+
+        # Tableau par colonne
+        self.quality_tree.delete(*self.quality_tree.get_children())
+        for cq in report.column_scores:
+            issues_str = '; '.join(cq.issues[:2]) if cq.issues else '—'
+            self.quality_tree.insert('', 'end', values=(
+                f"[{cq.index}] {cq.header}", f"{cq.overall_score:.0f}",
+                cq.grade, f"{cq.fill_score:.0f}%",
+                f"{cq.type_consistency_score:.0f}%", f"{cq.outlier_score:.0f}%",
+                f"{cq.format_homogeneity_score:.0f}%", f"{cq.uniqueness_score:.0f}%",
+                issues_str
+            ))
+
+        self.notebook.select(self.tab_quality)
+        self._set_status(f"Qualité: {report.overall_score:.1f}/100 ({report.overall_grade})")
+        self.progress['value'] = 100
+
+    def _on_dedup(self):
+        if not self.detection:
+            return
+        self._set_status("Recherche de doublons...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                result = find_duplicates(
+                    self.detection,
+                    enable_fuzzy=self.var_dedup_fuzzy.get(),
+                    normalize=self.var_dedup_normalize.get(),
+                    progress_callback=self._update_progress
+                )
+                self.root.after(0, lambda: self._on_dedup_done(result))
+            except Exception as e:
+                logger.exception("Erreur doublons")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_dedup_done(self, result: DedupResult):
+        self.dedup_result = result
+        self.dedup_summary_lbl.config(
+            text=f"{result.exact_duplicate_groups} groupes exacts ({result.exact_duplicate_rows} lignes), "
+                 f"{result.fuzzy_duplicate_groups} groupes fuzzy ({result.fuzzy_duplicate_rows} lignes) — "
+                 f"Taux: {result.duplicate_rate:.1f}%",
+            style='TLabel'
+        )
+
+        self.dedup_tree.delete(*self.dedup_tree.get_children())
+        for g in result.groups[:5000]:
+            lines_str = ', '.join(str(l) for l in g.line_numbers[:5])
+            if len(g.line_numbers) > 5:
+                lines_str += f'... (+{len(g.line_numbers)-5})'
+            diffs_str = ', '.join(f"col{d[0]}" for d in g.differences[:3]) if g.differences else '—'
+            self.dedup_tree.insert('', 'end', values=(
+                g.group_id, g.match_type, f"{g.similarity:.0%}",
+                lines_str, g.count, g.key[:60], diffs_str
+            ))
+
+        self.notebook.select(self.tab_dedup)
+        self._set_status(f"Doublons: {result.total_duplicate_rows} lignes dupliquées")
+        self.progress['value'] = 100
+
+    def _on_compare(self):
+        """Ouvre un dialogue pour comparer avec un second fichier."""
+        if not self.detection:
+            return
+        filepath = filedialog.askopenfilename(
+            title="Sélectionner le second fichier (B) à comparer",
+            filetypes=[("CSV", "*.csv"), ("Texte", "*.txt"), ("TSV", "*.tsv"), ("Tous", "*.*")]
+        )
+        if not filepath:
+            return
+
+        self._set_status("Comparaison en cours...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                detection_b = run_detection(Path(filepath))
+                result = compare_files(
+                    self.detection, detection_b,
+                    progress_callback=self._update_progress
+                )
+                self.root.after(0, lambda: self._on_compare_done(result))
+            except Exception as e:
+                logger.exception("Erreur comparaison")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_compare_done(self, result: ComparisonResult):
+        status_icons = {
+            RowStatus.ADDED: '➕', RowStatus.REMOVED: '➖',
+            RowStatus.MODIFIED: '✏️', RowStatus.UNCHANGED: '✓'
+        }
+
+        msg = (
+            f"Comparaison: {result.file_a} vs {result.file_b}\n\n"
+            f"Identiques   : {result.unchanged:,}\n"
+            f"Ajoutées     : {result.added:,}\n"
+            f"Supprimées   : {result.removed:,}\n"
+            f"Modifiées    : {result.modified:,}\n"
+            f"Cellules modifiées : {result.total_cell_changes:,}\n"
+            f"Similarité   : {result.similarity_percentage:.1f}%\n"
+        )
+
+        if result.modified > 0 and result.diffs:
+            msg += f"\nPremières différences :\n"
+            for diff in result.diffs[:10]:
+                icon = status_icons.get(diff.status, '?')
+                if diff.cell_diffs:
+                    changes = ', '.join(f"{d.column_name}: '{d.value_a}'→'{d.value_b}'" for d in diff.cell_diffs[:3])
+                    msg += f"  {icon} L{diff.line_a or diff.line_b}: {changes}\n"
+                else:
+                    msg += f"  {icon} L{diff.line_a or diff.line_b}: {diff.status}\n"
+
+        messagebox.showinfo("Résultat de la comparaison", msg)
+        self._set_status(f"Comparaison OK — {result.total_differences:,} différences")
+        self.progress['value'] = 100
+
+    def _on_merge(self):
+        """Ouvre un dialogue pour sélectionner des fichiers à fusionner."""
+        files = filedialog.askopenfilenames(
+            title="Sélectionner les fichiers CSV à fusionner",
+            filetypes=[("CSV", "*.csv"), ("Texte", "*.txt"), ("TSV", "*.tsv"), ("Tous", "*.*")]
+        )
+        if not files or len(files) < 2:
+            messagebox.showinfo("Fusion", "Sélectionnez au moins 2 fichiers.")
+            return
+
+        self._set_status("Fusion en cours...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                detections = []
+                for f in files:
+                    detections.append(run_detection(Path(f)))
+
+                # Vérifier compatibilité
+                issues = []
+                ref = detections[0]
+                for i, det in enumerate(detections[1:], 1):
+                    compat = check_compatibility(ref, det)
+                    for issue in compat.issues:
+                        issues.append(f"[{det.filepath.name}] {issue.severity}: {issue.message}")
+
+                merge_result = merge_files(
+                    detections, skip_empty_rows=True,
+                    progress_callback=self._update_progress
+                )
+                self.root.after(0, lambda: self._on_merge_done(merge_result, issues))
+            except Exception as e:
+                logger.exception("Erreur fusion")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_merge_done(self, result: MergeResult, issues: list[str]):
+        msg = (
+            f"Fusion terminée:\n\n"
+            f"Fichiers: {result.total_files}\n"
+            f"Lignes totales: {result.total_rows:,}\n"
+            f"Lignes vides ignorées: {result.skipped_empty_rows:,}\n"
+            f"Lignes erreurs ignorées: {result.skipped_error_rows:,}\n"
+        )
+        if issues:
+            msg += f"\nAvertissements:\n" + '\n'.join(f"  • {i}" for i in issues[:10])
+
+        msg += "\n\nExporter le résultat fusionné ?"
+
+        if messagebox.askyesno("Résultat de la fusion", msg):
+            output = filedialog.asksaveasfilename(
+                title="Enregistrer le fichier fusionné",
+                defaultextension='.csv',
+                filetypes=[("CSV", "*.csv"), ("Tous", "*.*")]
+            )
+            if output:
+                with open(output, 'w', encoding='utf-8', newline='') as f:
+                    sep = '§'
+                    f.write(sep.join(result.output_headers) + '\n')
+                    for row in result.merged_rows:
+                        f.write(sep.join(row) + '\n')
+                messagebox.showinfo("Export", f"Fichier fusionné exporté:\n{output}")
+
+        self._set_status(f"Fusion OK — {result.total_rows:,} lignes")
+        self.progress['value'] = 100
+
+    def _on_anonymize(self):
+        """Anonymise les données sensibles détectées."""
+        if not self.detection:
+            return
+
+        self._set_status("Détection des données sensibles...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                # Détecter automatiquement les colonnes sensibles
+                profiles = self.detection.column_profiles
+                rules = []
+                for p in profiles:
+                    if p.sample_values:
+                        stype = detect_column_sensitivity(p.sample_values)
+                        if stype:
+                            header = self.detection.header[p.index].strip() if p.index < len(self.detection.header) else ''
+                            rules.append(AnonymizationRule(
+                                column_index=p.index,
+                                sensitive_type=stype,
+                                mask_mode=MaskMode.PARTIAL,
+                            ))
+
+                self.root.after(0, lambda: self._on_anonymize_detected(rules))
+            except Exception as e:
+                logger.exception("Erreur anonymisation")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_anonymize_detected(self, rules: list):
+        if not rules:
+            messagebox.showinfo("Anonymisation",
+                "Aucune donnée sensible détectée automatiquement.\n"
+                "Vous pouvez configurer manuellement les colonnes à masquer.")
+            self._set_status("Aucune donnée sensible détectée")
+            return
+
+        desc = '\n'.join(
+            f"  • Col {r.column_index} ({self.detection.header[r.column_index].strip()}): {r.sensitive_type.name}"
+            for r in rules
+        )
+        msg = f"Données sensibles détectées:\n{desc}\n\nAppliquer le masquage ?"
+
+        if messagebox.askyesno("Anonymisation", msg):
+            messagebox.showinfo("Anonymisation",
+                f"{len(rules)} règle(s) configurées.\n"
+                f"Le masquage sera appliqué lors de l'export.")
+        self._set_status(f"Anonymisation: {len(rules)} colonnes sensibles détectées")
+        self.progress['value'] = 100
+
+    def _on_cloud(self):
+        """Détecte et affiche les emplacements cloud disponibles."""
+        locations = detect_cloud_locations()
+        if not locations:
+            messagebox.showinfo("Cloud",
+                "Aucun service cloud détecté.\n\n"
+                "Services supportés: OneDrive, SharePoint, pCloud,\n"
+                "Google Drive, Dropbox.\n\n"
+                "Installez le client de synchronisation du service souhaité.")
+            return
+
+        msg = "Emplacements cloud détectés:\n\n"
+        for loc in locations:
+            msg += f"  ☁ {loc.name} ({loc.provider})\n    {loc.local_path}\n\n"
+        msg += "Ouvrir un fichier depuis le cloud ?"
+
+        if messagebox.askyesno("Cloud", msg):
+            # Proposer de naviguer dans le premier emplacement
+            initial_dir = str(locations[0].local_path) if locations[0].local_path else None
+            filepath = filedialog.askopenfilename(
+                title="Ouvrir depuis le cloud",
+                initialdir=initial_dir,
+                filetypes=[("CSV", "*.csv"), ("Texte", "*.txt"), ("TSV", "*.tsv"), ("Tous", "*.*")]
+            )
+            if filepath:
+                self._load_file(Path(filepath))
 
     # ── Filtres ──
 

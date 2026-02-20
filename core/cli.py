@@ -20,6 +20,12 @@ from core.analyzer import analyze_file, AnalysisResult
 from core.fixer import apply_fixes, FixResult
 from core.exporter import export_xlsx, export_csv_clean, CSV_SEPARATORS
 from core.statistics import compute_statistics, FileStats
+from core.quality import compute_quality, QualityReport
+from core.dedup import find_duplicates, DedupResult
+from core.comparator import compare_files, ComparisonResult, RowStatus
+from core.reconciler import reconcile, ReconciliationResult, MatchStatus
+from core.merger import check_compatibility, merge_files
+from utils.cloud import detect_cloud_locations
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +34,8 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
     """Configure le sous-parseur CLI."""
     cli_parser = subparsers.add_parser('cli', help='Mode ligne de commande')
 
-    # Fichier unique ou batch
-    group = cli_parser.add_mutually_exclusive_group(required=True)
+    # Fichier unique ou batch (pas requis si --merge ou --cloud)
+    group = cli_parser.add_mutually_exclusive_group(required=False)
     group.add_argument('--file', '-f', type=str, help='Fichier CSV à traiter')
     group.add_argument('--batch', '-b', type=str, help='Dossier pour traitement batch')
 
@@ -68,6 +74,22 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
     cli_parser.add_argument('--report', type=str,
                            help='Chemin pour le rapport JSON')
 
+    # Nouvelles fonctionnalités
+    cli_parser.add_argument('--quality', action='store_true',
+                           help='Calculer le score de qualité des données')
+    cli_parser.add_argument('--dedup', action='store_true',
+                           help='Détecter les doublons (exacts et fuzzy)')
+    cli_parser.add_argument('--compare', type=str,
+                           help='Comparer avec un second fichier CSV')
+    cli_parser.add_argument('--reconcile', type=str,
+                           help='Rapprocher avec un second fichier CSV')
+    cli_parser.add_argument('--join-columns', type=str, default='0',
+                           help='Colonnes de jointure (indices séparés par virgule, défaut: 0)')
+    cli_parser.add_argument('--merge', type=str, nargs='+',
+                           help='Fusionner plusieurs fichiers CSV')
+    cli_parser.add_argument('--cloud', action='store_true',
+                           help='Lister les emplacements cloud détectés')
+
     # Verbosité
     cli_parser.add_argument('--quiet', '-q', action='store_true',
                            help='Mode silencieux')
@@ -77,7 +99,22 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
 
 def run_cli(args: argparse.Namespace):
     """Exécute le mode CLI."""
-    if args.batch:
+    # Commande cloud (pas besoin de fichier)
+    if getattr(args, 'cloud', False):
+        _run_cloud()
+        return
+
+    # Commande merge (fichiers multiples)
+    if getattr(args, 'merge', None):
+        _run_merge(args)
+        return
+
+    # Vérifier qu'un fichier ou batch est fourni
+    if not getattr(args, 'file', None) and not getattr(args, 'batch', None):
+        print("❌ Veuillez spécifier --file, --batch, --merge ou --cloud")
+        sys.exit(1)
+
+    if getattr(args, 'batch', None):
         run_batch(args)
     else:
         run_single(args)
@@ -166,6 +203,75 @@ def run_single(args: argparse.Namespace) -> dict:
             print(f"\n  Décalages par colonne :")
             for col, count in sorted(analysis.shift_columns_summary.items(), key=lambda x: -x[1])[:5]:
                 print(f"    Col {col} : {count:,} occurrences")
+
+    # ── Qualité ──
+    if getattr(args, 'quality', False):
+        if not quiet:
+            print("\n🏆 Score de qualité...")
+        quality = compute_quality(detection)
+        report['quality'] = {
+            'overall_score': quality.overall_score,
+            'overall_grade': quality.overall_grade,
+            'duplicate_rate': quality.duplicate_rate,
+            'empty_row_rate': quality.empty_row_rate,
+            'columns': [
+                {
+                    'index': cq.index, 'header': cq.header,
+                    'score': cq.overall_score, 'grade': cq.grade,
+                    'fill': cq.fill_score, 'type_consistency': cq.type_consistency_score,
+                    'outlier': cq.outlier_score, 'format': cq.format_homogeneity_score,
+                    'issues': cq.issues,
+                }
+                for cq in quality.column_scores
+            ],
+        }
+        if not quiet:
+            _print_quality(quality)
+
+    # ── Doublons ──
+    if getattr(args, 'dedup', False):
+        if not quiet:
+            print("\n🔗 Recherche de doublons...")
+        dedup = find_duplicates(detection, enable_fuzzy=True)
+        report['dedup'] = {
+            'exact_groups': dedup.exact_duplicate_groups,
+            'exact_rows': dedup.exact_duplicate_rows,
+            'fuzzy_groups': dedup.fuzzy_duplicate_groups,
+            'fuzzy_rows': dedup.fuzzy_duplicate_rows,
+            'duplicate_rate': dedup.duplicate_rate,
+        }
+        if not quiet:
+            _print_dedup(dedup)
+
+    # ── Comparaison ──
+    compare_file = getattr(args, 'compare', None)
+    if compare_file:
+        if not quiet:
+            print(f"\n⚡ Comparaison avec {Path(compare_file).name}...")
+        detection_b = run_detection(Path(compare_file))
+        comparison = compare_files(detection, detection_b)
+        report['comparison'] = {
+            'unchanged': comparison.unchanged,
+            'added': comparison.added,
+            'removed': comparison.removed,
+            'modified': comparison.modified,
+            'total_cell_changes': comparison.total_cell_changes,
+            'similarity': comparison.similarity_percentage,
+        }
+        if not quiet:
+            _print_comparison(comparison)
+
+    # ── Rapprochement ──
+    reconcile_file = getattr(args, 'reconcile', None)
+    if reconcile_file:
+        if not quiet:
+            print(f"\n🔄 Rapprochement avec {Path(reconcile_file).name}...")
+        detection_r = run_detection(Path(reconcile_file))
+        join_cols = [int(c.strip()) for c in getattr(args, 'join_columns', '0').split(',')]
+        recon = reconcile(detection, detection_r, join_columns=join_cols)
+        report['reconciliation'] = recon.summary
+        if not quiet:
+            _print_reconciliation(recon)
 
     # ── Template ──
     if getattr(args, 'save_template', None):
@@ -349,3 +455,133 @@ def _stats_to_dict(stats: FileStats) -> dict:
             for cs in stats.column_stats
         ],
     }
+
+
+def _print_quality(quality: QualityReport):
+    """Affiche le score de qualité dans le terminal."""
+    print(f"\n  🏆 Score global : {quality.overall_score:.1f}/100 ({quality.overall_grade})")
+    print(f"  Doublons : {quality.duplicate_rate:.1f}% | Lignes vides : {quality.empty_row_rate:.1f}%")
+
+    for cq in quality.column_scores:
+        grade_icon = {'A': '🟢', 'B': '🟢', 'C': '🟡', 'D': '🟠', 'F': '🔴'}.get(cq.grade, '⚪')
+        print(f"  {grade_icon} [{cq.index}] {cq.header:20s} {cq.overall_score:5.1f}/100 ({cq.grade})"
+              f"  rempli={cq.fill_score:.0f}% types={cq.type_consistency_score:.0f}%"
+              f" outliers={cq.outlier_score:.0f}% format={cq.format_homogeneity_score:.0f}%")
+        if cq.issues:
+            for issue in cq.issues[:2]:
+                print(f"       ⚠️ {issue}")
+
+    if quality.summary:
+        print(f"\n  Résumé:")
+        for s in quality.summary:
+            print(f"    • {s}")
+
+
+def _print_dedup(dedup: DedupResult):
+    """Affiche les doublons dans le terminal."""
+    print(f"  Groupes exacts : {dedup.exact_duplicate_groups} ({dedup.exact_duplicate_rows} lignes en double)")
+    print(f"  Groupes fuzzy  : {dedup.fuzzy_duplicate_groups} ({dedup.fuzzy_duplicate_rows} lignes similaires)")
+    print(f"  Taux doublons  : {dedup.duplicate_rate:.1f}%")
+
+    for g in dedup.groups[:10]:
+        lines = ', '.join(str(l) for l in g.line_numbers[:5])
+        print(f"    [{g.group_id}] {g.match_type} ({g.similarity:.0%}) lignes {lines}"
+              f" — clé: {g.key[:50]}")
+
+
+def _print_comparison(comp: ComparisonResult):
+    """Affiche la comparaison dans le terminal."""
+    print(f"  Fichier A : {comp.file_a} ({comp.total_a:,} lignes)")
+    print(f"  Fichier B : {comp.file_b} ({comp.total_b:,} lignes)")
+    print(f"  Identiques   : {comp.unchanged:,}")
+    print(f"  ➕ Ajoutées  : {comp.added:,}")
+    print(f"  ➖ Supprimées: {comp.removed:,}")
+    print(f"  ✏️ Modifiées : {comp.modified:,} ({comp.total_cell_changes:,} cellules)")
+    print(f"  Similarité   : {comp.similarity_percentage:.1f}%")
+
+    if comp.header_changes:
+        print(f"\n  En-têtes modifiés :")
+        for col, ha, hb in comp.header_changes[:5]:
+            print(f"    Col {col}: '{ha}' → '{hb}'")
+
+
+def _print_reconciliation(recon: ReconciliationResult):
+    """Affiche le rapprochement dans le terminal."""
+    print(f"  Gauche  : {recon.file_left} ({recon.total_left:,} lignes)")
+    print(f"  Droite  : {recon.file_right} ({recon.total_right:,} lignes)")
+    print(f"  ✅ Matchés     : {recon.matched:,}")
+    print(f"  ⚠️ Écarts      : {recon.mismatched:,}")
+    print(f"  ◀ Gauche seul  : {recon.left_only:,}")
+    print(f"  ▶ Droite seul  : {recon.right_only:,}")
+    print(f"  Taux match     : {recon.match_rate:.1f}%")
+    if recon.total_difference > 0:
+        print(f"  Écart total    : {recon.total_difference:,.2f}")
+
+
+def _run_cloud():
+    """Liste les emplacements cloud détectés."""
+    print("\n☁ Détection des emplacements cloud...")
+    locations = detect_cloud_locations()
+
+    if not locations:
+        print("  Aucun service cloud détecté.")
+        print("  Services supportés: OneDrive, SharePoint, pCloud, Google Drive, Dropbox")
+        return
+
+    for loc in locations:
+        print(f"\n  ☁ {loc.name} ({loc.provider})")
+        print(f"    Chemin: {loc.local_path}")
+        print(f"    Disponible: {'✅' if loc.is_available else '❌'}")
+
+
+def _run_merge(args: argparse.Namespace):
+    """Fusionne plusieurs fichiers CSV."""
+    files = [Path(f) for f in args.merge]
+    quiet = getattr(args, 'quiet', False)
+
+    for f in files:
+        if not f.exists():
+            print(f"❌ Fichier non trouvé : {f}")
+            sys.exit(1)
+
+    if not quiet:
+        print(f"\n📎 Fusion de {len(files)} fichiers...")
+
+    detections = [run_detection(f) for f in files]
+
+    # Vérifier compatibilité
+    ref = detections[0]
+    if not quiet:
+        print(f"  Référence: {ref.filepath.name} ({ref.expected_columns} colonnes)")
+
+    for i, det in enumerate(detections[1:], 1):
+        compat = check_compatibility(ref, det)
+        if not quiet:
+            print(f"  [{i+1}] {det.filepath.name}: ", end='')
+            if compat.issues:
+                for issue in compat.issues:
+                    print(f"\n      {issue.severity}: {issue.message}", end='')
+                print()
+            else:
+                print("✅ compatible")
+
+    result = merge_files(detections, skip_empty_rows=True)
+
+    if not quiet:
+        print(f"\n  Lignes fusionnées   : {result.total_rows:,}")
+        print(f"  Lignes vides ignorées : {result.skipped_empty_rows:,}")
+        print(f"  Par fichier: {result.rows_per_file}")
+
+    # Export
+    output = getattr(args, 'output', None)
+    if output:
+        output_path = Path(output)
+        csv_sep = getattr(args, 'csv_separator', '§')
+        with open(output_path, 'w', encoding='utf-8', newline='') as f:
+            f.write(csv_sep.join(result.output_headers) + '\n')
+            for row in result.merged_rows:
+                f.write(csv_sep.join(row) + '\n')
+        if not quiet:
+            print(f"\n  💾 Exporté : {output_path}")
+    elif not quiet:
+        print("\n  Utilisez -o pour exporter le résultat.")
