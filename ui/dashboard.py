@@ -715,7 +715,37 @@ class DashboardApp:
         fmt = dialog.result['format']
         csv_sep = dialog.result.get('separator', '§')
 
-        ext_map = {'xlsx': '.xlsx', 'csv': '.csv', 'json': '.json', 'ods': '.ods', 'parquet': '.parquet'}
+        # PostgreSQL : dialogue de connexion spécial
+        if fmt == 'postgres':
+            pg_dialog = _PostgresDialog(self.root)
+            self.root.wait_window(pg_dialog)
+            if not pg_dialog.result:
+                return
+            pg_params = pg_dialog.result
+            self._set_status("Export PostgreSQL en cours...")
+            self.progress['value'] = 0
+
+            def pg_task():
+                try:
+                    from core.exporter import export_postgres
+                    full_table = export_postgres(
+                        self.detection, self.fix_result,
+                        progress_callback=self._update_progress,
+                        **pg_params,
+                    )
+                    self.root.after(0, lambda: self._on_pg_export_done(full_table))
+                except Exception as e:
+                    logger.exception("Erreur export PostgreSQL")
+                    self.root.after(0, lambda: messagebox.showerror("Erreur PostgreSQL", str(e)))
+
+            threading.Thread(target=pg_task, daemon=True).start()
+            return
+
+        ext_map = {
+            'xlsx': '.xlsx', 'csv': '.csv', 'json': '.json',
+            'ods': '.ods', 'parquet': '.parquet',
+            'sql': '.sql', 'sqlite': '.db',
+        }
         ext = ext_map.get(fmt, '.xlsx')
         default_name = self.current_file.stem + "_corrigé" + ext
 
@@ -725,6 +755,8 @@ class DashboardApp:
             'json': [("JSON", "*.json"), ("Tous", "*.*")],
             'ods': [("ODS", "*.ods"), ("Tous", "*.*")],
             'parquet': [("Parquet", "*.parquet"), ("Tous", "*.*")],
+            'sql': [("SQL", "*.sql"), ("Tous", "*.*")],
+            'sqlite': [("SQLite", "*.db"), ("Tous", "*.*")],
         }
         filetypes = filetypes_map.get(fmt, [("Tous", "*.*")])
 
@@ -751,6 +783,11 @@ class DashboardApp:
                 self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
 
         threading.Thread(target=task, daemon=True).start()
+
+    def _on_pg_export_done(self, full_table: str):
+        self._set_status(f"PostgreSQL OK : {full_table}")
+        self.progress['value'] = 100
+        messagebox.showinfo("Export PostgreSQL", f"Table créée avec succès :\n{full_table}")
 
     def _on_export_done(self, path: Path, fmt: str, csv_sep: str = '§'):
         self._set_status(f"Export OK : {path.name}")
@@ -1332,4 +1369,73 @@ class _ExportDialog(tk.Toplevel):
                     parent=self)
                 return
         self.result = {'format': fmt, 'separator': sep}
+        self.destroy()
+
+
+class _PostgresDialog(tk.Toplevel):
+    """Dialogue de connexion PostgreSQL pour l'export."""
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Connexion PostgreSQL")
+        self.configure(bg=DARK['bg'])
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+        self.result = None
+
+        pad = {'padx': 15, 'pady': 3}
+
+        tk.Label(self, text="Paramètres de connexion PostgreSQL",
+                 bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 10, 'bold')).pack(**pad, anchor='w', pady=(10, 5))
+
+        fields = [
+            ('Hôte :', 'host', 'localhost'),
+            ('Port :', 'port', '5432'),
+            ('Base :', 'database', 'csvtraitement'),
+            ('Utilisateur :', 'user', 'postgres'),
+            ('Mot de passe :', 'password', ''),
+            ('Schéma :', 'schema', 'public'),
+            ('Table :', 'table_name', ''),
+        ]
+
+        self.entries = {}
+        for label, key, default in fields:
+            row = tk.Frame(self, bg=DARK['bg'])
+            row.pack(fill='x', padx=15, pady=2)
+            tk.Label(row, text=label, bg=DARK['bg'], fg=DARK['fg'],
+                     width=14, anchor='e', font=('Segoe UI', 9)).pack(side='left')
+            entry = tk.Entry(row, bg=DARK['bg_alt'], fg=DARK['fg'],
+                           insertbackground=DARK['fg'], width=25, font=('Segoe UI', 9))
+            if key == 'password':
+                entry.config(show='*')
+            entry.insert(0, default)
+            entry.pack(side='left', padx=5)
+            self.entries[key] = entry
+
+        tk.Label(self, text="(Table vide = déduit du nom de fichier)",
+                 bg=DARK['bg'], fg='#6c7086', font=('Segoe UI', 8)).pack(padx=15, anchor='w')
+
+        btn_frame = tk.Frame(self, bg=DARK['bg'])
+        btn_frame.pack(pady=12)
+        ttk.Button(btn_frame, text="Connecter & Exporter", command=self._on_ok,
+                   style='Accent.TButton').pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
+
+        self.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
+        y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
+        self.geometry(f"+{x}+{y}")
+
+    def _on_ok(self):
+        self.result = {
+            'host': self.entries['host'].get(),
+            'port': int(self.entries['port'].get() or 5432),
+            'database': self.entries['database'].get(),
+            'user': self.entries['user'].get(),
+            'password': self.entries['password'].get(),
+            'schema': self.entries['schema'].get(),
+            'table_name': self.entries['table_name'].get() or None,
+        }
         self.destroy()

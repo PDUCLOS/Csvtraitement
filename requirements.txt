@@ -8,5 +8,7 @@ pytest>=7.0.0
 # odfpy>=1.4.0
 # Optional: Apache Parquet
 # pyarrow>=12.0.0
+# Optional: PostgreSQL direct export
+# psycopg2-binary>=2.9.0
 # Optional: drag & drop support
 # tkinterdnd2>=0.3.0

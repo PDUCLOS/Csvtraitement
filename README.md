@@ -24,13 +24,16 @@ CSV Traitement détecte ces problèmes, les visualise et propose des corrections
 | Apache Parquet | `.parquet`, `.pq` | pyarrow | Optionnel |
 
 ### En sortie (export)
-| Format | Description |
-|--------|------------|
-| **XLSX** | Excel typé avec cellules corrigées en surbrillance (défaut) |
-| **CSV** | Texte délimité avec séparateur configurable |
-| **JSON** | Array d'objets — pour intégration web/API |
-| **ODS** | LibreOffice / OpenOffice |
-| **Parquet** | Format columnar Apache — performant pour Big Data |
+| Format | Description | Requis |
+|--------|------------|--------|
+| **XLSX** | Excel typé avec cellules corrigées en surbrillance (défaut) | Inclus |
+| **CSV** | Texte délimité avec séparateur configurable | Inclus |
+| **JSON** | Array d'objets — pour intégration web/API | Inclus |
+| **ODS** | LibreOffice / OpenOffice | Optionnel (odfpy) |
+| **Parquet** | Format columnar Apache — performant pour Big Data | Optionnel (pyarrow) |
+| **SQL** | Fichier `.sql` — CREATE TABLE + INSERT INTO (PostgreSQL/MySQL) | Inclus |
+| **SQLite** | Base locale `.db` — zéro configuration | Inclus (sqlite3) |
+| **PostgreSQL** | Insertion directe sur serveur PostgreSQL | Optionnel (psycopg2) |
 
 ## Installation
 
@@ -65,7 +68,13 @@ python main.py cli --file export.csv --fix -o out.csv --format csv    # Export C
 python main.py cli --file export.csv --fix -o out.json --format json  # Export JSON
 python main.py cli --file export.csv --fix -o out.ods --format ods    # Export ODS
 python main.py cli --file export.csv --fix -o out.parquet --format parquet  # Export Parquet
-python main.py cli --file export.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV avec séparateur pipe
+python main.py cli --file export.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV avec pipe
+
+# Export SQL / bases de données
+python main.py cli --file data.csv --fix -o out.sql --format sql              # Fichier SQL
+python main.py cli --file data.csv --fix -o out.sql --format sql --table-name clients  # Table nommée
+python main.py cli --file data.csv --fix -o out.db --format sqlite            # SQLite local
+python main.py cli --file data.csv --fix --format postgres --pg-host localhost --pg-database mydb  # PostgreSQL direct
 python main.py cli --batch /exports/ --fix -o /sortie/  # Traitement batch
 python main.py cli --file export.csv --report rapport.json  # Rapport JSON
 
@@ -95,7 +104,7 @@ python main.py cli --cloud                              # Lister les emplacement
 - Détection et localisation des décalages colonne par colonne
 - Nettoyage : dates invalides, décimales FR/US, parenthèses comptables, valeurs masquées
 - Statistiques : min/max/moyenne/médiane, outliers IQR, doublons, taux de remplissage
-- **Export multi-format** : XLSX, CSV, JSON, ODS, Parquet
+- **Export multi-format** : XLSX, CSV, JSON, ODS, Parquet, SQL, SQLite, PostgreSQL
 - Export XLSX typé avec cellules corrigées en surbrillance + onglet rapport
 - Export CSV avec séparateur configurable (§ par défaut — rare, évite les conflits)
 - Écriture via fichier temporaire local (compatible lecteurs réseau/cloud)
@@ -237,11 +246,12 @@ utils/
 - xlrd (lecture XLS ancien format)
 - odfpy (lecture/écriture ODS)
 - pyarrow (lecture/écriture Parquet)
+- psycopg2-binary (export PostgreSQL direct)
 - tkinterdnd2 (drag & drop GUI)
 
 ```bash
 # Installation complète
-pip install xlsxwriter chardet openpyxl xlrd odfpy pyarrow
+pip install xlsxwriter chardet openpyxl xlrd odfpy pyarrow psycopg2-binary
 ```
 
 ## Licence

@@ -72,6 +72,9 @@ python main.py cli --file data.csv --fix -o out.json --format json    # Export J
 python main.py cli --file data.csv --fix -o out.ods --format ods      # Export ODS
 python main.py cli --file data.csv --fix -o out.parquet --format parquet  # Export Parquet
 python main.py cli --file data.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV avec pipe
+python main.py cli --file data.csv --fix -o out.sql --format sql              # Export SQL
+python main.py cli --file data.csv --fix -o out.db --format sqlite            # Export SQLite
+python main.py cli --file data.csv --fix --format postgres --pg-host localhost --pg-database mydb  # PostgreSQL
 python main.py cli --batch /dossier/ --fix -o /sortie/      # Batch
 python main.py cli --file data.csv --save-template sap_export  # Sauver template
 python main.py cli --file data.csv --report rapport.json    # Rapport JSON
@@ -139,6 +142,9 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 - JSON : array d'objets ou array d'arrays
 - ODS : odfpy avec style header bold
 - Parquet : pyarrow.parquet.write_table
+- SQL : fichier .sql avec CREATE TABLE + INSERT INTO par batch
+- SQLite : sqlite3 stdlib, zéro dépendance externe
+- PostgreSQL : psycopg2 (optionnel), connexion directe, INSERT par batch
 
 ### Modules data
 - `quality.py` : Score 0-100 pondéré (remplissage 30%, types 25%, formats 20%, outliers 15%, diversité 10%)

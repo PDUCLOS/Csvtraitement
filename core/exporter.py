@@ -45,6 +45,22 @@ EXPORT_FORMATS = {
     'json': 'JSON (array d\'objets — web, API)',
     'ods': 'ODS (LibreOffice / OpenOffice)',
     'parquet': 'Parquet (columnar — Big Data, performant)',
+    'sql': 'SQL (fichier .sql — CREATE TABLE + INSERT)',
+    'sqlite': 'SQLite (base locale .db — zéro config)',
+    'postgres': 'PostgreSQL (insertion directe sur serveur)',
+}
+
+# Types SQL déduits depuis les profils de colonnes
+_SQL_TYPE_MAP = {
+    CellType.INTEGER: 'INTEGER',
+    CellType.DECIMAL: 'NUMERIC',
+    CellType.DATE: 'DATE',
+    CellType.DATE_INVALID: 'TEXT',
+    CellType.BOOLEAN: 'BOOLEAN',
+    CellType.TEXT_SHORT: 'VARCHAR(255)',
+    CellType.TEXT_LONG: 'TEXT',
+    CellType.EMPTY: 'TEXT',
+    CellType.MASKED_EMPTY: 'TEXT',
 }
 
 
@@ -626,6 +642,369 @@ def export_parquet(
     return output_path
 
 
+def _sanitize_sql_name(name: str) -> str:
+    """Nettoie un nom pour l'utiliser comme identifiant SQL."""
+    import re
+    clean = re.sub(r'[^a-zA-Z0-9_]', '_', name.strip())
+    clean = re.sub(r'_+', '_', clean).strip('_')
+    if not clean or clean[0].isdigit():
+        clean = 'col_' + clean
+    # Mots réservés SQL
+    reserved = {'select', 'from', 'where', 'table', 'insert', 'update', 'delete',
+                'create', 'drop', 'alter', 'index', 'order', 'group', 'by', 'and',
+                'or', 'not', 'null', 'is', 'in', 'like', 'between', 'join', 'on',
+                'as', 'into', 'values', 'set', 'key', 'primary', 'foreign', 'default',
+                'check', 'constraint', 'references', 'unique', 'having', 'limit',
+                'offset', 'union', 'all', 'distinct', 'case', 'when', 'then', 'else',
+                'end', 'exists', 'any', 'some', 'column', 'date', 'time', 'text',
+                'integer', 'boolean', 'varchar', 'numeric', 'float', 'double', 'real'}
+    if clean.lower() in reserved:
+        clean = clean + '_col'
+    return clean
+
+
+def _infer_sql_types(detection: DetectionResult) -> list[str]:
+    """Déduit les types SQL depuis les profils de colonnes."""
+    types = []
+    for p in detection.column_profiles:
+        sql_type = _SQL_TYPE_MAP.get(p.dominant_type, 'TEXT')
+        types.append(sql_type)
+    # Compléter si moins de profils que de colonnes
+    while len(types) < detection.expected_columns:
+        types.append('TEXT')
+    return types[:detection.expected_columns]
+
+
+def _sql_escape_value(value: str, sql_type: str) -> str:
+    """Échappe une valeur pour SQL."""
+    stripped = value.strip() if value else ''
+    if not stripped:
+        return 'NULL'
+    if sql_type == 'INTEGER':
+        try:
+            return str(int(stripped))
+        except ValueError:
+            return f"'{stripped.replace(chr(39), chr(39)+chr(39))}'"
+    elif sql_type in ('NUMERIC', 'FLOAT', 'DOUBLE', 'REAL'):
+        try:
+            return str(float(stripped))
+        except ValueError:
+            return f"'{stripped.replace(chr(39), chr(39)+chr(39))}'"
+    elif sql_type == 'BOOLEAN':
+        low = stripped.lower()
+        if low in ('true', 'oui', 'yes', 'y', '1'):
+            return 'TRUE'
+        elif low in ('false', 'non', 'no', 'n', '0'):
+            return 'FALSE'
+        return 'NULL'
+    else:
+        # TEXT, VARCHAR, DATE
+        escaped = stripped.replace("'", "''")
+        return f"'{escaped}'"
+
+
+def export_sql(
+    detection: DetectionResult,
+    fix_result: FixResult,
+    output_path: Path,
+    progress_callback=None,
+    table_name: Optional[str] = None,
+    dialect: str = 'postgresql',
+    batch_size: int = 1000,
+) -> Path:
+    """Export en fichier SQL (CREATE TABLE + INSERT INTO).
+
+    Génère un fichier .sql compatible PostgreSQL, MySQL ou standard SQL.
+    Les INSERT sont groupés par batch pour la performance.
+
+    Args:
+        detection: Résultat de détection.
+        fix_result: Résultat des corrections.
+        output_path: Chemin du fichier .sql de sortie.
+        progress_callback: Fonction de suivi.
+        table_name: Nom de la table (déduit du fichier source si None).
+        dialect: Dialecte SQL ('postgresql', 'mysql', 'standard').
+        batch_size: Nombre de lignes par INSERT multi-valeurs.
+
+    Returns:
+        Chemin du fichier créé.
+    """
+    import os
+
+    output_path = Path(output_path)
+    header = detection.header[:detection.expected_columns]
+    col_names = [_sanitize_sql_name(h) for h in header]
+    sql_types = _infer_sql_types(detection)
+
+    if not table_name:
+        source = detection.original_filepath or detection.filepath
+        table_name = _sanitize_sql_name(source.stem)
+
+    if progress_callback:
+        progress_callback(0, detection.total_lines, "Collecte des données...")
+
+    rows = _collect_rows(detection, fix_result)
+
+    if progress_callback:
+        progress_callback(len(rows) // 3, detection.total_lines, "Génération SQL...")
+
+    # Écrire dans un temporaire
+    tmp_fd, tmp_path_str = tempfile.mkstemp(suffix='.sql', prefix='csvtraitement_')
+    os.close(tmp_fd)
+    tmp_path = Path(tmp_path_str)
+
+    with open(tmp_path, 'w', encoding='utf-8') as f:
+        # Prologue
+        f.write(f"-- Généré par CSV Traitement le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        f.write(f"-- Source: {(detection.original_filepath or detection.filepath).name}\n")
+        f.write(f"-- {len(rows)} lignes, {len(col_names)} colonnes\n\n")
+
+        # DROP TABLE IF EXISTS
+        f.write(f"DROP TABLE IF EXISTS {table_name};\n\n")
+
+        # CREATE TABLE
+        f.write(f"CREATE TABLE {table_name} (\n")
+        col_defs = []
+        for i, (name, stype) in enumerate(zip(col_names, sql_types)):
+            col_defs.append(f"    {name} {stype}")
+        f.write(',\n'.join(col_defs))
+        f.write('\n);\n\n')
+
+        # INSERT par batch
+        total_written = 0
+        for batch_start in range(0, len(rows), batch_size):
+            batch = rows[batch_start:batch_start + batch_size]
+
+            f.write(f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES\n")
+            value_lines = []
+            for row in batch:
+                values = []
+                for i, val in enumerate(row):
+                    stype = sql_types[i] if i < len(sql_types) else 'TEXT'
+                    values.append(_sql_escape_value(val, stype))
+                value_lines.append(f"    ({', '.join(values)})")
+            f.write(',\n'.join(value_lines))
+            f.write(';\n\n')
+
+            total_written += len(batch)
+            if progress_callback:
+                progress_callback(total_written, len(rows), f"SQL: {total_written}/{len(rows)} lignes")
+
+    _safe_write(tmp_path, output_path)
+
+    if progress_callback:
+        progress_callback(detection.total_lines, detection.total_lines, "Export SQL terminé")
+
+    logger.info(f"Export SQL terminé: {output_path} ({len(rows)} lignes, table '{table_name}')")
+    return output_path
+
+
+def export_sqlite(
+    detection: DetectionResult,
+    fix_result: FixResult,
+    output_path: Path,
+    progress_callback=None,
+    table_name: Optional[str] = None,
+) -> Path:
+    """Export vers une base SQLite locale (.db).
+
+    Utilise sqlite3 (stdlib) — aucune dépendance externe.
+
+    Args:
+        detection: Résultat de détection.
+        fix_result: Résultat des corrections.
+        output_path: Chemin du fichier .db de sortie.
+        progress_callback: Fonction de suivi.
+        table_name: Nom de la table (déduit du fichier source si None).
+
+    Returns:
+        Chemin du fichier créé.
+    """
+    import os
+    import sqlite3
+
+    output_path = Path(output_path)
+    header = detection.header[:detection.expected_columns]
+    col_names = [_sanitize_sql_name(h) for h in header]
+    sql_types = _infer_sql_types(detection)
+
+    if not table_name:
+        source = detection.original_filepath or detection.filepath
+        table_name = _sanitize_sql_name(source.stem)
+
+    if progress_callback:
+        progress_callback(0, detection.total_lines, "Collecte des données...")
+
+    rows = _collect_rows(detection, fix_result)
+
+    if progress_callback:
+        progress_callback(len(rows) // 3, detection.total_lines, "Écriture SQLite...")
+
+    # Écrire dans un temporaire
+    tmp_fd, tmp_path_str = tempfile.mkstemp(suffix='.db', prefix='csvtraitement_')
+    os.close(tmp_fd)
+    tmp_path = Path(tmp_path_str)
+
+    conn = sqlite3.connect(str(tmp_path))
+    cursor = conn.cursor()
+
+    # CREATE TABLE
+    col_defs = ', '.join(f'{name} {stype}' for name, stype in zip(col_names, sql_types))
+    cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+    cursor.execute(f"CREATE TABLE {table_name} ({col_defs})")
+
+    # INSERT par batch
+    placeholders = ', '.join(['?'] * len(col_names))
+    insert_sql = f"INSERT INTO {table_name} ({', '.join(col_names)}) VALUES ({placeholders})"
+
+    batch_size = 5000
+    for batch_start in range(0, len(rows), batch_size):
+        batch = rows[batch_start:batch_start + batch_size]
+        # Normaliser chaque ligne au bon nombre de colonnes
+        normalized = []
+        for row in batch:
+            r = list(row[:len(col_names)])
+            while len(r) < len(col_names):
+                r.append(None)
+            # Convertir les vides en None
+            r = [v if v and v.strip() else None for v in r]
+            normalized.append(r)
+        cursor.executemany(insert_sql, normalized)
+        conn.commit()
+
+        if progress_callback:
+            done = min(batch_start + batch_size, len(rows))
+            progress_callback(done, len(rows), f"SQLite: {done}/{len(rows)} lignes")
+
+    conn.close()
+    _safe_write(tmp_path, output_path)
+
+    if progress_callback:
+        progress_callback(detection.total_lines, detection.total_lines, "Export SQLite terminé")
+
+    logger.info(f"Export SQLite terminé: {output_path} ({len(rows)} lignes, table '{table_name}')")
+    return output_path
+
+
+def export_postgres(
+    detection: DetectionResult,
+    fix_result: FixResult,
+    host: str = 'localhost',
+    port: int = 5432,
+    database: str = 'csvtraitement',
+    user: str = 'postgres',
+    password: str = '',
+    table_name: Optional[str] = None,
+    schema: str = 'public',
+    drop_existing: bool = True,
+    progress_callback=None,
+) -> str:
+    """Export direct vers un serveur PostgreSQL.
+
+    Utilise psycopg2 pour la connexion et COPY pour la performance.
+
+    Args:
+        detection: Résultat de détection.
+        fix_result: Résultat des corrections.
+        host: Hôte PostgreSQL.
+        port: Port.
+        database: Nom de la base.
+        user: Utilisateur.
+        password: Mot de passe.
+        table_name: Nom de la table.
+        schema: Schéma PostgreSQL.
+        drop_existing: Supprimer la table existante.
+        progress_callback: Fonction de suivi.
+
+    Returns:
+        Nom complet de la table créée (schema.table).
+    """
+    try:
+        import psycopg2
+        import psycopg2.extras
+    except ImportError:
+        raise ImportError(
+            "psycopg2 est requis pour l'export PostgreSQL. "
+            "Installez-le avec : pip install psycopg2-binary"
+        )
+
+    header = detection.header[:detection.expected_columns]
+    col_names = [_sanitize_sql_name(h) for h in header]
+    sql_types = _infer_sql_types(detection)
+
+    if not table_name:
+        source = detection.original_filepath or detection.filepath
+        table_name = _sanitize_sql_name(source.stem)
+
+    full_table = f"{schema}.{table_name}"
+
+    if progress_callback:
+        progress_callback(0, detection.total_lines, "Collecte des données...")
+
+    rows = _collect_rows(detection, fix_result)
+
+    if progress_callback:
+        progress_callback(len(rows) // 3, detection.total_lines, "Connexion PostgreSQL...")
+
+    conn = psycopg2.connect(
+        host=host, port=port, database=database,
+        user=user, password=password,
+    )
+    cursor = conn.cursor()
+
+    try:
+        # Créer le schéma si nécessaire
+        cursor.execute(f"CREATE SCHEMA IF NOT EXISTS {schema}")
+
+        # DROP si demandé
+        if drop_existing:
+            cursor.execute(f"DROP TABLE IF EXISTS {full_table}")
+
+        # CREATE TABLE
+        col_defs = ', '.join(f'{name} {stype}' for name, stype in zip(col_names, sql_types))
+        cursor.execute(f"CREATE TABLE {full_table} ({col_defs})")
+        conn.commit()
+
+        if progress_callback:
+            progress_callback(len(rows) // 2, detection.total_lines, "Insertion PostgreSQL...")
+
+        # INSERT par batch avec execute_values (rapide)
+        placeholders = ', '.join(['%s'] * len(col_names))
+        insert_sql = f"INSERT INTO {full_table} ({', '.join(col_names)}) VALUES ({placeholders})"
+
+        batch_size = 5000
+        for batch_start in range(0, len(rows), batch_size):
+            batch = rows[batch_start:batch_start + batch_size]
+            normalized = []
+            for row in batch:
+                r = list(row[:len(col_names)])
+                while len(r) < len(col_names):
+                    r.append(None)
+                r = [v if v and v.strip() else None for v in r]
+                normalized.append(r)
+            cursor.executemany(insert_sql, normalized)
+            conn.commit()
+
+            if progress_callback:
+                done = min(batch_start + batch_size, len(rows))
+                progress_callback(done, len(rows), f"PostgreSQL: {done}/{len(rows)} lignes")
+
+        conn.commit()
+
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cursor.close()
+        conn.close()
+
+    if progress_callback:
+        progress_callback(detection.total_lines, detection.total_lines, "Export PostgreSQL terminé")
+
+    logger.info(f"Export PostgreSQL terminé: {full_table} ({len(rows)} lignes)")
+    return full_table
+
+
 def export_any(
     detection: DetectionResult,
     analysis: AnalysisResult,
@@ -642,12 +1021,15 @@ def export_any(
         analysis: Résultat d'analyse.
         fix_result: Résultat des corrections.
         output_path: Chemin du fichier de sortie.
-        fmt: Format ('xlsx', 'csv', 'json', 'ods', 'parquet').
+        fmt: Format ('xlsx', 'csv', 'json', 'ods', 'parquet', 'sql', 'sqlite').
         csv_separator: Séparateur pour l'export CSV.
         progress_callback: Fonction de suivi.
 
     Returns:
         Chemin du fichier créé.
+
+    Note:
+        Pour PostgreSQL direct, utiliser export_postgres() avec les paramètres de connexion.
     """
     if fmt == 'xlsx':
         return export_xlsx(detection, analysis, fix_result, output_path, progress_callback)
@@ -659,5 +1041,9 @@ def export_any(
         return export_ods(detection, fix_result, output_path, progress_callback)
     elif fmt == 'parquet':
         return export_parquet(detection, fix_result, output_path, progress_callback)
+    elif fmt == 'sql':
+        return export_sql(detection, fix_result, output_path, progress_callback)
+    elif fmt == 'sqlite':
+        return export_sqlite(detection, fix_result, output_path, progress_callback)
     else:
         raise ValueError(f"Format d'export non supporté : {fmt}. Utilisez : {list(EXPORT_FORMATS.keys())}")

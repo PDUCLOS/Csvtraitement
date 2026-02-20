@@ -70,7 +70,9 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
 
     # Format de sortie
     cli_parser.add_argument('--format', choices=list(EXPORT_FORMATS.keys()), default='xlsx',
-                           help='Format de sortie : xlsx, csv, json, ods, parquet (défaut: xlsx)')
+                           help='Format de sortie (défaut: xlsx). '
+                                'Fichiers : xlsx, csv, json, ods, parquet, sql, sqlite. '
+                                'Serveur : postgres (nécessite psycopg2).')
     sep_choices = list(CSV_SEPARATORS.keys())
     cli_parser.add_argument('--csv-separator', type=str, default='§',
                            help=f"Séparateur pour l'export CSV (défaut: § ). "
@@ -94,6 +96,24 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
                            help='Fusionner plusieurs fichiers CSV')
     cli_parser.add_argument('--cloud', action='store_true',
                            help='Lister les emplacements cloud détectés')
+
+    # Options SQL
+    cli_parser.add_argument('--table-name', type=str, default=None,
+                           help='Nom de la table SQL (déduit du fichier si omis)')
+
+    # Options PostgreSQL
+    cli_parser.add_argument('--pg-host', type=str, default='localhost',
+                           help='Hôte PostgreSQL (défaut: localhost)')
+    cli_parser.add_argument('--pg-port', type=int, default=5432,
+                           help='Port PostgreSQL (défaut: 5432)')
+    cli_parser.add_argument('--pg-database', type=str, default='csvtraitement',
+                           help='Base PostgreSQL (défaut: csvtraitement)')
+    cli_parser.add_argument('--pg-user', type=str, default='postgres',
+                           help='Utilisateur PostgreSQL (défaut: postgres)')
+    cli_parser.add_argument('--pg-password', type=str, default='',
+                           help='Mot de passe PostgreSQL')
+    cli_parser.add_argument('--pg-schema', type=str, default='public',
+                           help='Schéma PostgreSQL (défaut: public)')
 
     # Verbosité
     cli_parser.add_argument('--quiet', '-q', action='store_true',
@@ -138,6 +158,7 @@ def run_single(args: argparse.Namespace) -> dict:
 
     quiet = getattr(args, 'quiet', False)
     report = {}
+    sheet_name = getattr(args, 'sheet', None)
 
     # ── Détection ──
     if not quiet:
@@ -150,7 +171,6 @@ def run_single(args: argparse.Namespace) -> dict:
         print("─" * 50)
         print("🔍 Détection en cours...")
 
-    sheet_name = getattr(args, 'sheet', None)
     detection = run_detection(filepath, sheet_name=sheet_name)
     report['detection'] = {
         'file': str(filepath),
@@ -313,20 +333,51 @@ def run_single(args: argparse.Namespace) -> dict:
             print(f"  Réalignements      : {fix_result.realignment_fixes:,}")
 
         # ── Export ──
+        fmt = getattr(args, 'format', 'xlsx')
         output = getattr(args, 'output', None)
-        if output:
+
+        if fmt == 'postgres':
+            # Export direct PostgreSQL (pas besoin de fichier de sortie)
+            from core.exporter import export_postgres
+            if not quiet:
+                pg_host = getattr(args, 'pg_host', 'localhost')
+                pg_db = getattr(args, 'pg_database', 'csvtraitement')
+                print(f"\n🐘 Export PostgreSQL → {pg_host}/{pg_db}")
+
+            full_table = export_postgres(
+                detection, fix_result,
+                host=getattr(args, 'pg_host', 'localhost'),
+                port=getattr(args, 'pg_port', 5432),
+                database=getattr(args, 'pg_database', 'csvtraitement'),
+                user=getattr(args, 'pg_user', 'postgres'),
+                password=getattr(args, 'pg_password', ''),
+                table_name=getattr(args, 'table_name', None),
+                schema=getattr(args, 'pg_schema', 'public'),
+            )
+            if not quiet:
+                print(f"  ✅ Table créée : {full_table}")
+
+        elif output:
             output_path = Path(output)
-            fmt = getattr(args, 'format', 'xlsx')
             csv_sep = getattr(args, 'csv_separator', '§')
 
             if not quiet:
                 fmt_desc = EXPORT_FORMATS.get(fmt, fmt.upper())
                 print(f"\n💾 Export {fmt_desc} → {output_path}")
 
-            export_any(
-                detection, analysis, fix_result, output_path,
-                fmt=fmt, csv_separator=csv_sep,
-            )
+            # Passer le table_name pour SQL/SQLite
+            if fmt in ('sql', 'sqlite'):
+                from core.exporter import export_sql, export_sqlite
+                tbl = getattr(args, 'table_name', None)
+                if fmt == 'sql':
+                    export_sql(detection, fix_result, output_path, table_name=tbl)
+                else:
+                    export_sqlite(detection, fix_result, output_path, table_name=tbl)
+            else:
+                export_any(
+                    detection, analysis, fix_result, output_path,
+                    fmt=fmt, csv_separator=csv_sep,
+                )
 
             if fmt == 'csv' and not quiet:
                 sep_display = CSV_SEPARATORS.get(csv_sep, csv_sep)
