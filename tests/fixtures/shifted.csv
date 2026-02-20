@@ -1,0 +1,11 @@
+Nom;Prénom;Date_naissance;Montant;Ville
+Dupont;Jean;15.03.1985;1.234,56;Lyon
+Martin;Marie;22.11.1990;987,50;Paris
+Bernard;;Pierre;01.06.1978;45.678,90;Marseille
+Durand;Sophie;00.00.0000;123,45;Toulouse
+Petit;Jacques;14.02.1965;9.876.543,21;Lille
+Moreau;Anne;08.12.1999;2.345,67;Bordeaux
+Lefebvre;;Claire;25.07.1988;567,89;Nantes
+Garcia;Luis;18.01.2003;1.111,11;Nice
+Roux;Isabelle;00.00.0000;0,00;Strasbourg
+Thomas;Marc;11.04.1975;34.567,89;Rennes
