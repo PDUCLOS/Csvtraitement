@@ -50,7 +50,9 @@ python main.py --file data.csv
 # CLI
 python main.py cli --file data.csv                          # Analyser
 python main.py cli --file data.csv --stats                  # + Statistiques
-python main.py cli --file data.csv --fix -o out.xlsx        # Corriger + export
+python main.py cli --file data.csv --fix -o out.xlsx        # Corriger + export XLSX
+python main.py cli --file data.csv --fix -o out.csv --format csv                # Export CSV (séparateur § par défaut)
+python main.py cli --file data.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV séparateur pipe
 python main.py cli --batch /dossier/ --fix -o /sortie/      # Batch
 python main.py cli --file data.csv --save-template sap_export  # Sauver template
 python main.py cli --file data.csv --report rapport.json    # Rapport JSON

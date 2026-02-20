@@ -31,7 +31,9 @@ python main.py --file export.csv  # Charger directement un fichier
 ```bash
 python main.py cli --file export.csv                    # Analyser
 python main.py cli --file export.csv --stats            # Statistiques détaillées
-python main.py cli --file export.csv --fix -o out.xlsx  # Corriger + exporter
+python main.py cli --file export.csv --fix -o out.xlsx  # Corriger + exporter XLSX
+python main.py cli --file export.csv --fix -o out.csv --format csv                  # Exporter CSV (séparateur § par défaut)
+python main.py cli --file export.csv --fix -o out.csv --format csv --csv-separator "|"  # CSV avec séparateur pipe
 python main.py cli --batch /exports/ --fix -o /sortie/  # Traitement batch
 python main.py cli --file export.csv --report rapport.json  # Rapport JSON
 ```
@@ -46,6 +48,9 @@ python main.py cli --file export.csv --report rapport.json  # Rapport JSON
 - Nettoyage : dates invalides, décimales FR/US, parenthèses comptables, valeurs masquées
 - Statistiques : min/max/moyenne/médiane, outliers IQR, doublons, taux de remplissage
 - Export XLSX typé avec cellules corrigées en surbrillance + onglet rapport
+- Export CSV avec séparateur configurable (§ par défaut — rare, évite les conflits avec les données)
+- Séparateurs CSV disponibles : `§`, `|`, tabulation, `;`, `,` ou caractère personnalisé
+- Écriture via fichier temporaire local (compatible lecteurs réseau/cloud : pCloud, Google Drive, etc.)
 
 ### Interface
 - Thème sombre
@@ -53,6 +58,8 @@ python main.py cli --file export.csv --report rapport.json  # Rapport JSON
 - Preview avec pagination, recherche par contenu, filtre par statut
 - Drag & drop de fichier
 - Undo/redo des corrections
+- Dialogue d'export : choix du format (XLSX/CSV) et du séparateur CSV
+- Ouverture automatique du fichier exporté (optionnel)
 - Templates de profil réutilisables (JSON)
 - Mode CLI + batch multi-fichiers
 
