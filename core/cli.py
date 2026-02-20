@@ -25,6 +25,9 @@ from core.dedup import find_duplicates, DedupResult
 from core.comparator import compare_files, ComparisonResult, RowStatus
 from core.reconciler import reconcile, ReconciliationResult, MatchStatus
 from core.merger import check_compatibility, merge_files
+from core.joiner import (
+    join_files, detect_key_candidates, smart_join, JoinType, MatchStrategy, KeyCandidate
+)
 from utils.cloud import detect_cloud_locations
 
 logger = logging.getLogger(__name__)
@@ -96,6 +99,26 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
                            help='Fusionner plusieurs fichiers CSV')
     cli_parser.add_argument('--cloud', action='store_true',
                            help='Lister les emplacements cloud détectés')
+
+    # Jointure intelligente
+    cli_parser.add_argument('--smart-join', type=str,
+                           help='Jointure intelligente avec un second fichier (tout format)')
+    cli_parser.add_argument('--join-type', type=str, default='inner',
+                           choices=['inner', 'left', 'right', 'full'],
+                           help='Type de jointure (défaut: inner)')
+    cli_parser.add_argument('--join-strategy', type=str, default='exact',
+                           choices=['exact', 'case_insensitive', 'normalized', 'fuzzy', 'numeric'],
+                           help='Stratégie de matching sur la clé (défaut: exact)')
+    cli_parser.add_argument('--join-key-left', type=str, default=None,
+                           help='Colonnes-clés fichier gauche (indices séparés par virgule)')
+    cli_parser.add_argument('--join-key-right', type=str, default=None,
+                           help='Colonnes-clés fichier droit (indices séparés par virgule)')
+    cli_parser.add_argument('--join-cols-left', type=str, default=None,
+                           help='Colonnes à reprendre du fichier gauche (indices, défaut: toutes)')
+    cli_parser.add_argument('--join-cols-right', type=str, default=None,
+                           help='Colonnes à reprendre du fichier droit (indices, défaut: toutes sauf clé)')
+    cli_parser.add_argument('--detect-keys', action='store_true',
+                           help='Afficher les clés candidates sans effectuer la jointure')
 
     # Options SQL
     cli_parser.add_argument('--table-name', type=str, default=None,
@@ -174,6 +197,14 @@ def run_cli(args: argparse.Namespace):
     # Import Databricks (pas besoin de fichier local)
     if getattr(args, 'db_query', None):
         _run_databricks_import(args)
+        return
+
+    # Jointure intelligente (nécessite --file + --smart-join)
+    if getattr(args, 'smart_join', None):
+        if not getattr(args, 'file', None):
+            print("❌ --file est requis avec --smart-join (fichier gauche)")
+            sys.exit(1)
+        _run_smart_join(args)
         return
 
     # Vérifier qu'un fichier ou batch est fourni
@@ -774,6 +805,200 @@ def _run_snowflake_import(args: argparse.Namespace):
         print(f"  ✅ Données importées : {csv_path}")
         print(f"  Vous pouvez maintenant traiter ce fichier :")
         print(f"  python main.py cli --file {csv_path} --fix -o resultat.xlsx")
+
+
+def _run_smart_join(args: argparse.Namespace):
+    """Jointure intelligente entre deux fichiers."""
+    quiet = getattr(args, 'quiet', False)
+    filepath_left = Path(args.file)
+    filepath_right = Path(args.smart_join)
+
+    if not filepath_left.exists():
+        print(f"❌ Fichier gauche non trouvé : {filepath_left}")
+        sys.exit(1)
+    if not filepath_right.exists():
+        print(f"❌ Fichier droit non trouvé : {filepath_right}")
+        sys.exit(1)
+
+    if not quiet:
+        print(f"\n🔗 Jointure intelligente")
+        print(f"  Gauche : {filepath_left.name}")
+        print(f"  Droite : {filepath_right.name}")
+        print("─" * 50)
+
+    # Détection-seule (--detect-keys)
+    detect_only = getattr(args, 'detect_keys', False)
+
+    # Parser les colonnes-clés manuelles
+    key_left = None
+    key_right = None
+    jkl = getattr(args, 'join_key_left', None)
+    jkr = getattr(args, 'join_key_right', None)
+    if jkl is not None:
+        key_left = [int(c.strip()) for c in jkl.split(',')]
+    if jkr is not None:
+        key_right = [int(c.strip()) for c in jkr.split(',')]
+
+    # Parser les colonnes de sortie
+    cols_left = None
+    cols_right = None
+    jcl = getattr(args, 'join_cols_left', None)
+    jcr = getattr(args, 'join_cols_right', None)
+    if jcl is not None:
+        cols_left = [int(c.strip()) for c in jcl.split(',')]
+    if jcr is not None:
+        cols_right = [int(c.strip()) for c in jcr.split(',')]
+
+    # Lire les fichiers et détecter les clés
+    from utils.universal_reader import read_any
+    header_l, rows_l, _ = read_any(filepath_left, sheet_name=getattr(args, 'sheet', None))
+    header_r, rows_r, _ = read_any(filepath_right)
+
+    if not quiet:
+        print(f"\n  Fichier gauche : {len(rows_l):,} lignes, {len(header_l)} colonnes")
+        print(f"    En-têtes : {', '.join(header_l[:8])}{'...' if len(header_l) > 8 else ''}")
+        print(f"  Fichier droit  : {len(rows_r):,} lignes, {len(header_r)} colonnes")
+        print(f"    En-têtes : {', '.join(header_r[:8])}{'...' if len(header_r) > 8 else ''}")
+
+    # Détecter les clés candidates
+    candidates = detect_key_candidates(header_l, rows_l, header_r, rows_r)
+
+    if not quiet:
+        print(f"\n🔑 Clés candidates détectées : {len(candidates)}")
+        for i, c in enumerate(candidates[:10]):
+            marker = ' ⭐' if i == 0 and c.confidence > 0.5 else ''
+            print(f"  [{i+1}] {c.confidence:.0%} — {c.left_name!r} (gauche:{c.left_column})"
+                  f" ↔ {c.right_name!r} (droite:{c.right_column}){marker}")
+            print(f"       {c.reason}")
+            print(f"       Valeurs communes: {c.match_count} "
+                  f"(gauche: {c.match_rate_left:.0%}, droite: {c.match_rate_right:.0%})")
+
+    if detect_only:
+        return
+
+    # Effectuer la jointure
+    join_type = getattr(args, 'join_type', 'inner')
+    strategy = getattr(args, 'join_strategy', 'exact')
+
+    if key_left is None or key_right is None:
+        if candidates:
+            best = candidates[0]
+            key_left = key_left or [best.left_column]
+            key_right = key_right or [best.right_column]
+            if not quiet:
+                print(f"\n  Clé utilisée : {best.left_name!r} ↔ {best.right_name!r} "
+                      f"(confiance: {best.confidence:.0%})")
+        else:
+            key_left = key_left or [0]
+            key_right = key_right or [0]
+            if not quiet:
+                print("\n  ⚠️ Aucune clé détectée, utilisation de la colonne 0")
+
+    if not quiet:
+        print(f"\n  Type de jointure : {join_type.upper()}")
+        print(f"  Stratégie        : {strategy}")
+        print(f"  Clé gauche       : colonnes {key_left}")
+        print(f"  Clé droite       : colonnes {key_right}")
+
+    join_result = smart_join(
+        header_l, rows_l, header_r, rows_r,
+        key_left=key_left, key_right=key_right,
+        join_type=join_type, strategy=strategy,
+        columns_left=cols_left, columns_right=cols_right,
+    )
+
+    if not quiet:
+        print(f"\n📊 Résultat de la jointure :")
+        print(f"  ✅ Matchés       : {join_result.matched_count:,}")
+        print(f"  ◀ Gauche seul    : {join_result.left_only_count:,}")
+        print(f"  ▶ Droite seul    : {join_result.right_only_count:,}")
+        print(f"  Total lignes     : {join_result.total_rows:,}")
+        print(f"  Taux de match    : {join_result.match_rate:.1f}%")
+        print(f"  Colonnes sortie  : {len(join_result.header)}")
+        print(f"    {', '.join(join_result.header[:10])}{'...' if len(join_result.header) > 10 else ''}")
+
+    # Export
+    output = getattr(args, 'output', None)
+    if output:
+        import csv
+        output_path = Path(output)
+        csv_sep = getattr(args, 'csv_separator', '§')
+        fmt = getattr(args, 'format', 'xlsx')
+
+        if fmt == 'csv':
+            with open(output_path, 'w', encoding='utf-8', newline='') as f:
+                writer = csv.writer(f, delimiter=csv_sep, quotechar='"',
+                                    quoting=csv.QUOTE_MINIMAL)
+                writer.writerow(join_result.header)
+                for row in join_result.rows:
+                    writer.writerow(row)
+        elif fmt == 'xlsx':
+            import xlsxwriter
+            wb = xlsxwriter.Workbook(str(output_path), {'constant_memory': True})
+            ws = wb.add_worksheet('Jointure')
+            header_fmt = wb.add_format({'bold': True, 'bg_color': '#363650',
+                                        'font_color': '#cdd6f4'})
+            for c, h in enumerate(join_result.header):
+                ws.write(0, c, h, header_fmt)
+            for r, row in enumerate(join_result.rows, 1):
+                for c, val in enumerate(row):
+                    ws.write(r, c, val)
+            wb.close()
+        elif fmt == 'json':
+            import json as json_mod
+            data = []
+            for row in join_result.rows:
+                obj = {join_result.header[c]: val
+                       for c, val in enumerate(row) if c < len(join_result.header)}
+                data.append(obj)
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json_mod.dump(data, f, indent=2, ensure_ascii=False)
+        else:
+            # Fallback CSV
+            with open(output_path, 'w', encoding='utf-8', newline='') as f:
+                writer = csv.writer(f, delimiter=';', quotechar='"',
+                                    quoting=csv.QUOTE_MINIMAL)
+                writer.writerow(join_result.header)
+                for row in join_result.rows:
+                    writer.writerow(row)
+
+        if not quiet:
+            print(f"\n  💾 Exporté : {output_path}")
+    elif not quiet:
+        print("\n  Utilisez -o pour exporter le résultat.")
+
+    # Rapport
+    report_path = getattr(args, 'report', None)
+    if report_path:
+        report = {
+            'smart_join': {
+                'file_left': str(filepath_left),
+                'file_right': str(filepath_right),
+                'join_type': join_type,
+                'strategy': strategy,
+                'key_left': key_left,
+                'key_right': key_right,
+                'matched': join_result.matched_count,
+                'left_only': join_result.left_only_count,
+                'right_only': join_result.right_only_count,
+                'total_rows': join_result.total_rows,
+                'match_rate': join_result.match_rate,
+                'output_columns': join_result.header,
+                'candidates': [
+                    {
+                        'left_col': c.left_column, 'left_name': c.left_name,
+                        'right_col': c.right_column, 'right_name': c.right_name,
+                        'confidence': c.confidence, 'match_count': c.match_count,
+                        'reason': c.reason,
+                    }
+                    for c in candidates[:20]
+                ],
+            }
+        }
+        with open(report_path, 'w', encoding='utf-8') as f:
+            json.dump(report, f, indent=2, ensure_ascii=False, default=str)
+        if not quiet:
+            print(f"  📄 Rapport JSON : {report_path}")
 
 
 def _run_databricks_import(args: argparse.Namespace):

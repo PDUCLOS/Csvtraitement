@@ -97,6 +97,14 @@ python main.py cli --file factures.csv --reconcile paiements.csv --join-columns 
 # Fusion de fichiers (tous formats)
 python main.py cli --merge fichier1.csv fichier2.xlsx fichier3.ods -o fusionne.csv
 
+# Jointure intelligente entre deux fichiers (tous formats)
+python main.py cli --file clients.csv --smart-join commandes.xlsx                        # Auto-détection clé
+python main.py cli --file clients.csv --smart-join commandes.csv --detect-keys           # Voir les clés candidates
+python main.py cli --file clients.csv --smart-join commandes.csv --join-key-left 0 --join-key-right 2  # Clé manuelle
+python main.py cli --file clients.csv --smart-join commandes.csv --join-type left        # LEFT JOIN
+python main.py cli --file clients.csv --smart-join commandes.csv --join-strategy normalized  # Matching normalisé
+python main.py cli --file clients.csv --smart-join commandes.csv -o resultat.xlsx        # Export résultat
+
 # Cloud
 python main.py cli --cloud                              # Lister les emplacements cloud détectés
 ```
@@ -148,6 +156,16 @@ python main.py cli --cloud                              # Lister les emplacement
 - Contrôle de compatibilité avant fusion (colonnes, noms, types)
 - Détection des colonnes permutées et réalignement automatique
 - Option de suppression des lignes vides et en erreur
+
+### Jointure intelligente (Smart Join)
+- **Détection automatique** des colonnes communes entre deux fichiers
+- Analyse par similarité de noms + chevauchement de valeurs
+- Proposition de clés candidates avec score de confiance
+- **5 stratégies de matching** : exact, case-insensitive, normalisé (sans accents), fuzzy, numérique
+- **4 types de jointure** : INNER, LEFT, RIGHT, FULL
+- Sélection manuelle de la clé possible
+- Sélection des colonnes à reprendre dans le résultat
+- Multi-format : CSV ↔ Excel ↔ ODS ↔ JSON ↔ Parquet
 
 ### Gestion des colonnes
 - Réordonnancement des colonnes
@@ -222,6 +240,7 @@ core/
 ├── comparator.py     → Diff entre deux fichiers
 ├── reconciler.py     → Rapprochement / réconciliation
 ├── merger.py         → Fusion multi-fichiers + contrôle compatibilité
+├── joiner.py         → Jointure intelligente entre deux fichiers
 ├── columns.py        → Réordonnancement / suppression / renommage colonnes
 ├── transformer.py    → Règles de transformation personnalisées
 ├── normalizer.py     → Normalisation avancée du texte

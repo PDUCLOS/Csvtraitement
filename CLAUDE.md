@@ -1,7 +1,7 @@
 # CSV Traitement - Claude Code Project
 
 ## Objectif
-Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers tabulaires volumineux (500K+ lignes). Supporte en entrée : CSV, XLSX, XLS, ODS, JSON, Parquet, Snowflake, Databricks. En sortie : XLSX, CSV, JSON, ODS, Parquet, SQL, SQLite, PostgreSQL, Snowflake, Databricks. Inclut : score de qualité, fuzzy dedup, comparaison/diff, rapprochement, fusion, anonymisation, normalisation texte, gestion colonnes, éditeur de données et connexion cloud.
+Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers tabulaires volumineux (500K+ lignes). Supporte en entrée : CSV, XLSX, XLS, ODS, JSON, Parquet, Snowflake, Databricks. En sortie : XLSX, CSV, JSON, ODS, Parquet, SQL, SQLite, PostgreSQL, Snowflake, Databricks. Inclut : score de qualité, fuzzy dedup, comparaison/diff, rapprochement, fusion, jointure intelligente, anonymisation, normalisation texte, gestion colonnes, éditeur de données et connexion cloud.
 
 ## Architecture
 
@@ -24,6 +24,7 @@ Csvtraitement/
 │   ├── comparator.py          # Diff/comparaison entre deux fichiers CSV
 │   ├── reconciler.py          # Rapprochement / réconciliation entre fichiers
 │   ├── merger.py              # Fusion multi-fichiers + contrôle compatibilité
+│   ├── joiner.py              # Jointure intelligente entre deux fichiers (auto-détection clé)
 │   ├── columns.py             # Réordonnancement / suppression / renommage colonnes
 │   ├── transformer.py         # Règles de transformation (regex, split, merge, mapping)
 │   ├── normalizer.py          # Normalisation texte (casse, accents, invisibles, guillemets)
@@ -89,6 +90,13 @@ python main.py cli --file data.csv --dedup                  # Détection doublon
 python main.py cli --file v1.csv --compare v2.csv           # Diff entre deux fichiers
 python main.py cli --file factures.csv --reconcile paiements.csv --join-columns 0,1
 
+# CLI — Jointure intelligente
+python main.py cli --file clients.csv --smart-join commandes.csv                      # Auto-détection clé
+python main.py cli --file clients.csv --smart-join commandes.csv --detect-keys        # Voir les clés candidates
+python main.py cli --file clients.csv --smart-join commandes.csv --join-key-left 0 --join-key-right 2  # Clé manuelle
+python main.py cli --file clients.csv --smart-join commandes.csv --join-type left --join-strategy normalized
+python main.py cli --file clients.csv --smart-join commandes.csv -o resultat.xlsx     # Export
+
 # CLI — Fusion et cloud
 python main.py cli --merge f1.csv f2.csv f3.csv -o fusionne.csv
 python main.py cli --cloud                                  # Lister emplacements cloud
@@ -124,7 +132,7 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 ### Interface
 - Thème sombre (palette Catppuccin Mocha)
 - 8 onglets : Diagnostic, Colonnes, Anomalies, Statistiques, Qualité, Doublons, Corrections, Historique
-- Boutons : Charger, Analyser, Stats, Preview, Éditer, Corriger, Undo, Export, Qualité, Doublons, Comparer, Fusionner, Anonymiser, Cloud, Import DB
+- Boutons : Charger, Analyser, Stats, Preview, Éditer, Corriger, Undo, Export, Qualité, Doublons, Comparer, Fusionner, Jointure, Anonymiser, Cloud, Import DB
 - Éditeur de données : grille éditable (double-clic, Tab, Entrée, ajout/suppression lignes)
 - Drag & drop (si tkinterdnd2 installé, sinon double-clic)
 - Preview avec pagination, recherche, filtre (conformes/non conformes/corrigées)
@@ -157,6 +165,7 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 - `comparator.py` : Indexation fichier A par clé, parcours fichier B, diff cellule par cellule
 - `reconciler.py` : Jointure sur colonnes-clés, comparaison montants avec tolérance
 - `merger.py` : Contrôle compatibilité (noms, nombre colonnes), réalignement auto, fusion
+- `joiner.py` : Jointure intelligente, auto-détection clé (noms + valeurs), 5 stratégies matching, 4 types JOIN
 - `columns.py` : Opérations sur colonnes (reorder, delete, rename) et lignes (filtrage)
 - `transformer.py` : Regex replace, split, merge, value map — sérialisable JSON
 - `normalizer.py` : Casse, accents (unicodedata), invisibles, guillemets typographiques

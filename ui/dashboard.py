@@ -27,6 +27,10 @@ from core.anonymizer import (
     detect_column_sensitivity, anonymize_rows, AnonymizationResult
 )
 from core.merger import check_compatibility, merge_files, MergeResult
+from core.joiner import (
+    detect_key_candidates, smart_join, join_files,
+    JoinType, MatchStrategy, KeyCandidate, JoinResult
+)
 from core.columns import (
     reorder_columns, delete_columns, rename_columns,
     delete_rows, RowFilter, apply_column_operations
@@ -181,6 +185,7 @@ class DashboardApp:
             ('btn_dedup', '🔗 Doublons', self._on_dedup, 'disabled'),
             ('btn_compare', '⚡ Comparer', self._on_compare, 'disabled'),
             ('btn_merge', '📎 Fusionner', self._on_merge, 'normal'),
+            ('btn_smart_join', '🔗 Jointure', self._on_smart_join, 'normal'),
             ('btn_anonymize', '🔒 Anonymiser', self._on_anonymize, 'disabled'),
             ('btn_cloud', '☁ Cloud', self._on_cloud, 'normal'),
             ('btn_import_db', '🗄 Import DB', self._on_import_db, 'normal'),
@@ -1275,6 +1280,94 @@ class DashboardApp:
         self._set_status(f"Fusion OK — {result.total_rows:,} lignes")
         self.progress['value'] = 100
 
+    def _on_smart_join(self):
+        """Ouvre le dialogue de jointure intelligente entre deux fichiers."""
+        dialog = _SmartJoinDialog(self.root, current_file=self.current_file)
+        self.root.wait_window(dialog)
+
+        if not dialog.result:
+            return
+
+        params = dialog.result
+        self._set_status("Jointure en cours...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                result, candidates = join_files(
+                    filepath_left=params['file_left'],
+                    filepath_right=params['file_right'],
+                    key_left=params.get('key_left'),
+                    key_right=params.get('key_right'),
+                    join_type=params.get('join_type', JoinType.INNER),
+                    strategy=params.get('strategy', MatchStrategy.EXACT),
+                    columns_left=params.get('columns_left'),
+                    columns_right=params.get('columns_right'),
+                    progress_callback=self._update_progress,
+                )
+                self.root.after(0, lambda: self._on_smart_join_done(result))
+            except Exception as e:
+                logger.exception("Erreur jointure")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_smart_join_done(self, result: JoinResult):
+        msg = (
+            f"Jointure {result.join_type.upper()} terminée :\n\n"
+            f"Lignes matchées   : {result.matched_count:,}\n"
+            f"Gauche seul       : {result.left_only_count:,}\n"
+            f"Droite seul       : {result.right_only_count:,}\n"
+            f"Total lignes      : {result.total_rows:,}\n"
+            f"Taux de match     : {result.match_rate:.1f}%\n"
+            f"Colonnes sortie   : {len(result.header)}\n"
+            f"\nExporter le résultat ?"
+        )
+
+        if messagebox.askyesno("Résultat de la jointure", msg):
+            output = filedialog.asksaveasfilename(
+                title="Enregistrer le résultat de la jointure",
+                defaultextension='.xlsx',
+                filetypes=[("Excel", "*.xlsx"), ("CSV", "*.csv"),
+                           ("JSON", "*.json"), ("Tous", "*.*")]
+            )
+            if output:
+                output_path = Path(output)
+                ext = output_path.suffix.lower()
+                if ext == '.csv':
+                    import csv as csv_mod
+                    with open(output_path, 'w', encoding='utf-8', newline='') as f:
+                        writer = csv_mod.writer(f, delimiter=';', quotechar='"',
+                                                quoting=csv_mod.QUOTE_MINIMAL)
+                        writer.writerow(result.header)
+                        for row in result.rows:
+                            writer.writerow(row)
+                elif ext == '.json':
+                    import json as json_mod
+                    data = []
+                    for row in result.rows:
+                        obj = {result.header[c]: val
+                               for c, val in enumerate(row) if c < len(result.header)}
+                        data.append(obj)
+                    with open(output_path, 'w', encoding='utf-8') as f:
+                        json_mod.dump(data, f, indent=2, ensure_ascii=False)
+                else:
+                    import xlsxwriter
+                    wb = xlsxwriter.Workbook(str(output_path), {'constant_memory': True})
+                    ws = wb.add_worksheet('Jointure')
+                    header_fmt = wb.add_format({'bold': True, 'bg_color': '#363650',
+                                                'font_color': '#cdd6f4'})
+                    for c, h in enumerate(result.header):
+                        ws.write(0, c, h, header_fmt)
+                    for r, row in enumerate(result.rows, 1):
+                        for c, val in enumerate(row):
+                            ws.write(r, c, val)
+                    wb.close()
+                messagebox.showinfo("Export", f"Résultat exporté :\n{output_path}")
+
+        self._set_status(f"Jointure OK — {result.total_rows:,} lignes")
+        self.progress['value'] = 100
+
     def _on_anonymize(self):
         """Anonymise les données sensibles détectées."""
         if not self.detection:
@@ -1827,3 +1920,232 @@ class _ImportDBDialog(tk.Toplevel):
         self._parent.wait_window(dialog)
         if dialog.result:
             self.result = {'provider': provider, 'params': dialog.result}
+
+
+class _SmartJoinDialog(tk.Toplevel):
+    """Dialogue de jointure intelligente entre deux fichiers.
+
+    Permet de :
+    1. Sélectionner les deux fichiers
+    2. Détecter automatiquement les clés candidates
+    3. Choisir manuellement la clé et la stratégie
+    4. Sélectionner les colonnes de sortie
+    """
+
+    def __init__(self, parent, current_file=None):
+        super().__init__(parent)
+        self.title("Jointure intelligente")
+        self.configure(bg=DARK['bg'])
+        self.geometry("750x650")
+        self.minsize(650, 550)
+        self.transient(parent)
+        self.grab_set()
+        self.result = None
+
+        self._file_left = str(current_file) if current_file else ''
+        self._file_right = ''
+        self._header_left = []
+        self._header_right = []
+        self._rows_left = []
+        self._rows_right = []
+        self._candidates = []
+
+        pad = {'padx': 15, 'pady': 4}
+
+        # ── Fichiers ──
+        files_frame = ttk.LabelFrame(self, text=" Fichiers ", padding=10)
+        files_frame.pack(fill='x', **pad)
+
+        # Gauche
+        row_l = ttk.Frame(files_frame)
+        row_l.pack(fill='x', pady=2)
+        ttk.Label(row_l, text="Gauche :").pack(side='left')
+        self._var_left = tk.StringVar(value=self._file_left)
+        ttk.Entry(row_l, textvariable=self._var_left, width=50).pack(side='left', padx=5, expand=True, fill='x')
+        ttk.Button(row_l, text="...", width=3,
+                   command=lambda: self._browse('left')).pack(side='left')
+
+        # Droite
+        row_r = ttk.Frame(files_frame)
+        row_r.pack(fill='x', pady=2)
+        ttk.Label(row_r, text="Droite :").pack(side='left')
+        self._var_right = tk.StringVar()
+        ttk.Entry(row_r, textvariable=self._var_right, width=50).pack(side='left', padx=5, expand=True, fill='x')
+        ttk.Button(row_r, text="...", width=3,
+                   command=lambda: self._browse('right')).pack(side='left')
+
+        ttk.Button(files_frame, text="Analyser les colonnes",
+                   command=self._analyze_files).pack(pady=(8, 0))
+
+        # ── Clés candidates ──
+        keys_frame = ttk.LabelFrame(self, text=" Clé de jointure ", padding=10)
+        keys_frame.pack(fill='both', expand=True, **pad)
+
+        self._keys_tree = ttk.Treeview(
+            keys_frame,
+            columns=('confidence', 'left', 'right', 'overlap', 'reason'),
+            show='headings', height=6, selectmode='browse'
+        )
+        self._keys_tree.heading('confidence', text='Confiance')
+        self._keys_tree.heading('left', text='Colonne gauche')
+        self._keys_tree.heading('right', text='Colonne droite')
+        self._keys_tree.heading('overlap', text='Chevauchement')
+        self._keys_tree.heading('reason', text='Raison')
+        self._keys_tree.column('confidence', width=80)
+        self._keys_tree.column('left', width=120)
+        self._keys_tree.column('right', width=120)
+        self._keys_tree.column('overlap', width=100)
+        self._keys_tree.column('reason', width=200)
+        self._keys_tree.pack(fill='both', expand=True)
+
+        # Sélection manuelle
+        manual_frame = ttk.Frame(keys_frame)
+        manual_frame.pack(fill='x', pady=(5, 0))
+        ttk.Label(manual_frame, text="Manuel — Gauche:").pack(side='left')
+        self._var_key_left = tk.StringVar()
+        ttk.Entry(manual_frame, textvariable=self._var_key_left, width=8).pack(side='left', padx=3)
+        ttk.Label(manual_frame, text="Droite:").pack(side='left', padx=(10, 0))
+        self._var_key_right = tk.StringVar()
+        ttk.Entry(manual_frame, textvariable=self._var_key_right, width=8).pack(side='left', padx=3)
+        ttk.Label(manual_frame, text="(indices, ex: 0,2)", style='Dim.TLabel').pack(side='left', padx=5)
+
+        # ── Options ──
+        opts_frame = ttk.LabelFrame(self, text=" Options ", padding=10)
+        opts_frame.pack(fill='x', **pad)
+
+        row_opts = ttk.Frame(opts_frame)
+        row_opts.pack(fill='x')
+
+        ttk.Label(row_opts, text="Type :").pack(side='left')
+        self._var_join_type = tk.StringVar(value='inner')
+        join_types = ttk.Combobox(row_opts, textvariable=self._var_join_type, width=10,
+                                  values=['inner', 'left', 'right', 'full'], state='readonly')
+        join_types.pack(side='left', padx=5)
+
+        ttk.Label(row_opts, text="Stratégie :").pack(side='left', padx=(15, 0))
+        self._var_strategy = tk.StringVar(value='exact')
+        strategies = ttk.Combobox(row_opts, textvariable=self._var_strategy, width=16,
+                                  values=['exact', 'case_insensitive', 'normalized', 'fuzzy', 'numeric'],
+                                  state='readonly')
+        strategies.pack(side='left', padx=5)
+
+        # ── Boutons ──
+        btn_frame = ttk.Frame(self)
+        btn_frame.pack(fill='x', **pad, pady=(5, 10))
+        ttk.Button(btn_frame, text="Lancer la jointure",
+                   command=self._on_ok, style='Accent.TButton').pack(side='right', padx=5)
+        ttk.Button(btn_frame, text="Annuler",
+                   command=self.destroy).pack(side='right')
+
+        # Info
+        self._lbl_info = ttk.Label(self, text="", style='Dim.TLabel')
+        self._lbl_info.pack(fill='x', padx=15, pady=(0, 5))
+
+        # Si fichier gauche déjà chargé, lancer l'analyse dès ouverture
+        if self._file_left:
+            self._lbl_info.config(text=f"Fichier gauche pré-chargé : {Path(self._file_left).name}")
+
+    def _browse(self, side: str):
+        filepath = filedialog.askopenfilename(
+            title=f"Sélectionner le fichier {'gauche' if side == 'left' else 'droit'}",
+            filetypes=FILETYPES_ALL,
+        )
+        if filepath:
+            if side == 'left':
+                self._var_left.set(filepath)
+            else:
+                self._var_right.set(filepath)
+
+    def _analyze_files(self):
+        """Lit les deux fichiers et détecte les clés candidates."""
+        left = self._var_left.get().strip()
+        right = self._var_right.get().strip()
+        if not left or not right:
+            messagebox.showinfo("Jointure", "Sélectionnez les deux fichiers.", parent=self)
+            return
+
+        if not Path(left).exists() or not Path(right).exists():
+            messagebox.showerror("Erreur", "Un des fichiers n'existe pas.", parent=self)
+            return
+
+        self._lbl_info.config(text="Lecture des fichiers...")
+        self.update_idletasks()
+
+        try:
+            from utils.universal_reader import read_any
+            self._header_left, self._rows_left, _ = read_any(Path(left))
+            self._header_right, self._rows_right, _ = read_any(Path(right))
+        except Exception as e:
+            messagebox.showerror("Erreur de lecture", str(e), parent=self)
+            return
+
+        self._lbl_info.config(
+            text=f"Gauche: {len(self._rows_left):,} lignes, {len(self._header_left)} cols — "
+                 f"Droite: {len(self._rows_right):,} lignes, {len(self._header_right)} cols"
+        )
+
+        # Détecter les clés
+        self._candidates = detect_key_candidates(
+            self._header_left, self._rows_left,
+            self._header_right, self._rows_right,
+        )
+
+        # Remplir le treeview
+        self._keys_tree.delete(*self._keys_tree.get_children())
+        for i, c in enumerate(self._candidates[:15]):
+            self._keys_tree.insert('', 'end', iid=str(i), values=(
+                f"{c.confidence:.0%}",
+                f"[{c.left_column}] {c.left_name}",
+                f"[{c.right_column}] {c.right_name}",
+                f"{c.match_count} ({c.match_rate_left:.0%}/{c.match_rate_right:.0%})",
+                c.reason[:40],
+            ))
+
+        # Sélectionner la meilleure
+        if self._candidates:
+            self._keys_tree.selection_set('0')
+            best = self._candidates[0]
+            self._var_key_left.set(str(best.left_column))
+            self._var_key_right.set(str(best.right_column))
+
+    def _on_ok(self):
+        """Valide et retourne le résultat."""
+        left = self._var_left.get().strip()
+        right = self._var_right.get().strip()
+        if not left or not right:
+            messagebox.showinfo("Jointure", "Sélectionnez les deux fichiers.", parent=self)
+            return
+
+        # Clé : sélection dans le treeview ou champs manuels
+        key_left = None
+        key_right = None
+
+        kl = self._var_key_left.get().strip()
+        kr = self._var_key_right.get().strip()
+        if kl and kr:
+            try:
+                key_left = [int(c.strip()) for c in kl.split(',')]
+                key_right = [int(c.strip()) for c in kr.split(',')]
+            except ValueError:
+                messagebox.showerror("Erreur", "Les indices de clé doivent être des entiers.", parent=self)
+                return
+        else:
+            # Essayer la sélection du treeview
+            sel = self._keys_tree.selection()
+            if sel and self._candidates:
+                idx = int(sel[0])
+                c = self._candidates[idx]
+                key_left = [c.left_column]
+                key_right = [c.right_column]
+
+        self.result = {
+            'file_left': left,
+            'file_right': right,
+            'key_left': key_left,
+            'key_right': key_right,
+            'join_type': self._var_join_type.get(),
+            'strategy': self._var_strategy.get(),
+            'columns_left': None,
+            'columns_right': None,
+        }
+        self.destroy()
