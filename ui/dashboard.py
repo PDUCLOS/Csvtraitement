@@ -40,22 +40,27 @@ from utils.cloud import detect_cloud_locations, CloudLocation
 
 logger = logging.getLogger(__name__)
 
-# ── Palette sombre ──
+# ── Palette sombre (Catppuccin Mocha) ──
 DARK = {
     'bg': '#1e1e2e',
     'bg_alt': '#252536',
     'bg_card': '#2a2a3d',
+    'bg_hover': '#313244',
     'fg': '#cdd6f4',
     'fg_dim': '#6c7086',
+    'fg_muted': '#585b70',
     'accent': '#89b4fa',
     'accent2': '#a6e3a1',
+    'accent3': '#cba6f7',     # Mauve — pour accents secondaires
     'warning': '#fab387',
     'error': '#f38ba8',
     'success': '#a6e3a1',
     'border': '#45475a',
+    'border_subtle': '#313244',
     'select': '#313244',
     'header_bg': '#363650',
     'corrected_bg': '#3d3800',
+    'row_alt': '#232335',     # Lignes alternées treeview
 }
 
 
@@ -86,6 +91,8 @@ class DashboardApp:
         self._build_status_bar()
         self._setup_drag_drop()
 
+        self._setup_keyboard_shortcuts()
+
         if initial_file:
             self.root.after(100, lambda: self._load_file(Path(initial_file)))
 
@@ -98,8 +105,11 @@ class DashboardApp:
         style.configure('.', background=DARK['bg'], foreground=DARK['fg'])
         style.configure('TFrame', background=DARK['bg'])
         style.configure('Card.TFrame', background=DARK['bg_card'])
+        style.configure('Toolbar.TFrame', background=DARK['bg_alt'])
         style.configure('TLabel', background=DARK['bg'], foreground=DARK['fg'], font=('Segoe UI', 10))
         style.configure('Header.TLabel', font=('Segoe UI', 11, 'bold'), foreground=DARK['accent'])
+        style.configure('Title.TLabel', font=('Segoe UI', 16, 'bold'), foreground=DARK['fg'])
+        style.configure('Subtitle.TLabel', font=('Segoe UI', 10), foreground=DARK['fg_dim'])
         style.configure('KPI.TLabel', font=('JetBrains Mono', 13, 'bold'), foreground=DARK['fg'])
         style.configure('Good.TLabel', foreground=DARK['success'], font=('JetBrains Mono', 13, 'bold'))
         style.configure('Bad.TLabel', foreground=DARK['error'], font=('JetBrains Mono', 13, 'bold'))
@@ -111,33 +121,47 @@ class DashboardApp:
         style.configure('CardGood.TLabel', background=DARK['bg_card'], foreground=DARK['success'], font=('JetBrains Mono', 13, 'bold'))
         style.configure('CardBad.TLabel', background=DARK['bg_card'], foreground=DARK['error'], font=('JetBrains Mono', 13, 'bold'))
         style.configure('CardWarning.TLabel', background=DARK['bg_card'], foreground=DARK['warning'], font=('JetBrains Mono', 13, 'bold'))
+        style.configure('Shortcut.TLabel', foreground=DARK['fg_muted'], font=('JetBrains Mono', 7))
+        style.configure('StatusFile.TLabel', foreground=DARK['accent'], font=('Segoe UI', 9, 'bold'))
 
         # Buttons
         style.configure('TButton', background=DARK['bg_alt'], foreground=DARK['fg'],
                         font=('Segoe UI', 10), borderwidth=1, relief='flat', padding=(12, 6))
         style.map('TButton',
-                  background=[('active', DARK['accent']), ('pressed', DARK['accent'])],
-                  foreground=[('active', DARK['bg']), ('pressed', DARK['bg'])])
+                  background=[('active', DARK['accent']), ('pressed', DARK['accent']),
+                              ('disabled', DARK['bg'])],
+                  foreground=[('active', DARK['bg']), ('pressed', DARK['bg']),
+                              ('disabled', DARK['fg_muted'])])
         style.configure('Accent.TButton', background=DARK['accent'], foreground=DARK['bg'])
+        style.configure('Toolbar.TButton', background=DARK['bg_alt'], foreground=DARK['fg'],
+                        font=('Segoe UI', 9), padding=(8, 4))
+        style.map('Toolbar.TButton',
+                  background=[('active', DARK['accent']), ('pressed', DARK['accent']),
+                              ('disabled', DARK['bg'])],
+                  foreground=[('active', DARK['bg']), ('pressed', DARK['bg']),
+                              ('disabled', DARK['fg_muted'])])
 
         # Notebook
         style.configure('TNotebook', background=DARK['bg'], borderwidth=0)
         style.configure('TNotebook.Tab', background=DARK['bg_alt'], foreground=DARK['fg_dim'],
-                        padding=(14, 6), font=('Segoe UI', 10))
+                        padding=(14, 7), font=('Segoe UI', 10))
         style.map('TNotebook.Tab',
                   background=[('selected', DARK['bg_card'])],
                   foreground=[('selected', DARK['accent'])])
 
-        # Treeview
+        # Treeview with alternating row support
         style.configure('Treeview', background=DARK['bg_alt'], foreground=DARK['fg'],
-                        fieldbackground=DARK['bg_alt'], borderwidth=0, font=('JetBrains Mono', 9))
+                        fieldbackground=DARK['bg_alt'], borderwidth=0, rowheight=24,
+                        font=('JetBrains Mono', 9))
         style.configure('Treeview.Heading', background=DARK['header_bg'], foreground=DARK['accent'],
-                        font=('Segoe UI', 9, 'bold'))
-        style.map('Treeview', background=[('selected', DARK['select'])])
+                        font=('Segoe UI', 9, 'bold'), relief='flat')
+        style.map('Treeview',
+                  background=[('selected', DARK['accent'])],
+                  foreground=[('selected', DARK['bg'])])
 
         # Progressbar
         style.configure('TProgressbar', troughcolor=DARK['bg_alt'], background=DARK['accent'],
-                        borderwidth=0, thickness=6)
+                        borderwidth=0, thickness=8)
 
         # LabelFrame
         style.configure('TLabelframe', background=DARK['bg_card'], foreground=DARK['accent'],
@@ -148,64 +172,143 @@ class DashboardApp:
         # Checkbutton
         style.configure('TCheckbutton', background=DARK['bg_card'], foreground=DARK['fg'])
 
-        # Scrollbar
+        # Scrollbar — thinner, more modern
         style.configure('TScrollbar', background=DARK['bg_alt'], troughcolor=DARK['bg'],
-                        borderwidth=0, arrowsize=12)
+                        borderwidth=0, arrowsize=10, width=10)
 
         # Entry
         style.configure('TEntry', fieldbackground=DARK['bg_alt'], foreground=DARK['fg'],
                         insertcolor=DARK['fg'], borderwidth=1)
 
+        # Combobox
+        style.configure('TCombobox', fieldbackground=DARK['bg_alt'], foreground=DARK['fg'],
+                        selectbackground=DARK['accent'], selectforeground=DARK['bg'],
+                        arrowcolor=DARK['fg_dim'])
+        style.map('TCombobox', fieldbackground=[('readonly', DARK['bg_alt'])],
+                  foreground=[('readonly', DARK['fg'])])
+
+        # Separator
+        style.configure('TSeparator', background=DARK['border'])
+
     def _build_toolbar(self):
-        """Barre d'outils."""
-        toolbar = ttk.Frame(self.root, padding=(10, 8))
-        toolbar.pack(fill='x')
+        """Barre d'outils organisée en deux rangées thématiques."""
+        toolbar_container = ttk.Frame(self.root, style='Toolbar.TFrame')
+        toolbar_container.pack(fill='x')
 
-        buttons = [
-            ('btn_load', '📂 Charger', self._on_load, 'normal'),
-            ('btn_analyze', '🔍 Analyser', self._on_analyze, 'disabled'),
-            ('btn_stats', '📊 Stats', self._on_stats, 'disabled'),
-            ('btn_preview', '👁 Preview', self._on_preview, 'disabled'),
-            ('btn_edit', '✏ Éditer', self._on_edit_data, 'disabled'),
-            ('btn_fix', '🔧 Corriger', self._on_fix, 'disabled'),
-            ('btn_undo', '↩ Undo', self._on_undo, 'disabled'),
-            ('btn_export', '💾 Export', self._on_export, 'disabled'),
-        ]
+        # ── Rangée 1 : Fichier + Pipeline principal ──
+        row1 = ttk.Frame(toolbar_container, style='Toolbar.TFrame', padding=(10, 5, 10, 2))
+        row1.pack(fill='x')
 
-        for attr, text, cmd, state in buttons:
-            btn = ttk.Button(toolbar, text=text, command=cmd, state=state)
-            btn.pack(side='left', padx=3)
-            setattr(self, attr, btn)
+        # Groupe Fichier
+        self._add_toolbar_group(row1, 'Fichier', [
+            ('btn_load',    '📂 Charger',   self._on_load,    'normal',   'Ctrl+O'),
+            ('btn_preview', '👁 Preview',   self._on_preview, 'disabled', 'Ctrl+P'),
+            ('btn_edit',    '✏ Editer',     self._on_edit_data, 'disabled', 'Ctrl+E'),
+        ])
 
-        # Séparateur + nouveaux boutons
-        ttk.Separator(toolbar, orient='vertical').pack(side='left', padx=8, fill='y')
+        ttk.Separator(row1, orient='vertical').pack(side='left', padx=6, fill='y', pady=2)
 
-        extra_buttons = [
-            ('btn_quality', '🏆 Qualité', self._on_quality, 'disabled'),
-            ('btn_dedup', '🔗 Doublons', self._on_dedup, 'disabled'),
-            ('btn_compare', '⚡ Comparer', self._on_compare, 'disabled'),
-            ('btn_merge', '📎 Fusionner', self._on_merge, 'normal'),
-            ('btn_smart_join', '🔗 Jointure', self._on_smart_join, 'normal'),
-            ('btn_anonymize', '🔒 Anonymiser', self._on_anonymize, 'disabled'),
-            ('btn_cloud', '☁ Cloud', self._on_cloud, 'normal'),
-            ('btn_import_db', '🗄 Import DB', self._on_import_db, 'normal'),
-        ]
+        # Groupe Analyse
+        self._add_toolbar_group(row1, 'Analyse', [
+            ('btn_analyze', '🔍 Analyser',  self._on_analyze, 'disabled', 'Ctrl+A'),
+            ('btn_stats',   '📊 Stats',     self._on_stats,   'disabled', ''),
+            ('btn_quality', '🏆 Qualite',   self._on_quality, 'disabled', ''),
+            ('btn_dedup',   '🔗 Doublons',  self._on_dedup,   'disabled', ''),
+        ])
 
-        for attr, text, cmd, state in extra_buttons:
-            btn = ttk.Button(toolbar, text=text, command=cmd, state=state)
-            btn.pack(side='left', padx=2)
-            setattr(self, attr, btn)
+        ttk.Separator(row1, orient='vertical').pack(side='left', padx=6, fill='y', pady=2)
 
-        # Template buttons
-        ttk.Separator(toolbar, orient='vertical').pack(side='left', padx=8, fill='y')
-        self.btn_save_tpl = ttk.Button(toolbar, text='📑 Template', command=self._on_save_template, state='disabled')
-        self.btn_save_tpl.pack(side='left', padx=3)
-        self.btn_load_tpl = ttk.Button(toolbar, text='📄 Charger', command=self._on_load_template)
-        self.btn_load_tpl.pack(side='left', padx=3)
+        # Groupe Correction
+        self._add_toolbar_group(row1, 'Correction', [
+            ('btn_fix',    '🔧 Corriger', self._on_fix,    'disabled', 'Ctrl+F'),
+            ('btn_undo',   '↩ Undo',      self._on_undo,   'disabled', 'Ctrl+Z'),
+            ('btn_export', '💾 Export',    self._on_export, 'disabled', 'Ctrl+S'),
+        ])
 
-        # File label
-        self.lbl_file = ttk.Label(toolbar, text="Glisser-déposer un fichier CSV ici", style='Dim.TLabel')
+        # File label (right-aligned in row1)
+        self.lbl_file = ttk.Label(row1, text="Aucun fichier", style='Dim.TLabel')
         self.lbl_file.pack(side='right', padx=10)
+
+        # ── Rangée 2 : Outils avancés ──
+        row2 = ttk.Frame(toolbar_container, style='Toolbar.TFrame', padding=(10, 2, 10, 5))
+        row2.pack(fill='x')
+
+        # Groupe Multi-fichiers
+        self._add_toolbar_group(row2, 'Multi-fichiers', [
+            ('btn_compare',    '⚡ Comparer',  self._on_compare,    'disabled', ''),
+            ('btn_merge',      '📎 Fusionner', self._on_merge,      'normal',   ''),
+            ('btn_smart_join', '🔗 Jointure',  self._on_smart_join, 'normal',   ''),
+        ])
+
+        ttk.Separator(row2, orient='vertical').pack(side='left', padx=6, fill='y', pady=2)
+
+        # Groupe Transformation
+        self._add_toolbar_group(row2, 'Outils', [
+            ('btn_anonymize', '🔒 Anonymiser', self._on_anonymize, 'disabled', ''),
+        ])
+
+        ttk.Separator(row2, orient='vertical').pack(side='left', padx=6, fill='y', pady=2)
+
+        # Groupe Sources
+        self._add_toolbar_group(row2, 'Sources', [
+            ('btn_cloud',     '☁ Cloud',     self._on_cloud,     'normal', ''),
+            ('btn_import_db', '🗄 Import DB', self._on_import_db, 'normal', ''),
+        ])
+
+        ttk.Separator(row2, orient='vertical').pack(side='left', padx=6, fill='y', pady=2)
+
+        # Groupe Templates
+        self._add_toolbar_group(row2, 'Templates', [
+            ('btn_save_tpl', '📑 Sauver',  self._on_save_template,  'disabled', ''),
+            ('btn_load_tpl', '📄 Charger',  self._on_load_template,  'normal',   ''),
+        ])
+
+        # Séparateur fin toolbar
+        ttk.Separator(toolbar_container).pack(fill='x')
+
+    def _add_toolbar_group(self, parent, group_label: str, buttons: list):
+        """Ajoute un groupe de boutons avec label de section."""
+        group = ttk.Frame(parent, style='Toolbar.TFrame')
+        group.pack(side='left', padx=(0, 4))
+
+        for attr, text, cmd, state, shortcut in buttons:
+            btn = ttk.Button(group, text=text, command=cmd, state=state,
+                             style='Toolbar.TButton')
+            btn.pack(side='left', padx=1)
+            setattr(self, attr, btn)
+            # Tooltip with shortcut
+            if shortcut:
+                self._add_tooltip(btn, f"{text.split(' ', 1)[-1]}  ({shortcut})")
+            else:
+                self._add_tooltip(btn, text.split(' ', 1)[-1] if ' ' in text else text)
+
+    @staticmethod
+    def _add_tooltip(widget, text: str):
+        """Ajoute un tooltip au survol d'un widget."""
+        tip = None
+
+        def show(event):
+            nonlocal tip
+            if tip:
+                return
+            x = widget.winfo_rootx() + widget.winfo_width() // 2
+            y = widget.winfo_rooty() + widget.winfo_height() + 4
+            tip = tk.Toplevel(widget)
+            tip.wm_overrideredirect(True)
+            tip.wm_geometry(f"+{x}+{y}")
+            label = tk.Label(tip, text=text, bg=DARK['bg_card'], fg=DARK['fg'],
+                             font=('Segoe UI', 9), padx=8, pady=4, relief='solid',
+                             borderwidth=1, highlightbackground=DARK['border'])
+            label.pack()
+
+        def hide(event):
+            nonlocal tip
+            if tip:
+                tip.destroy()
+                tip = None
+
+        widget.bind('<Enter>', show)
+        widget.bind('<Leave>', hide)
 
     def _build_main_area(self):
         """Zone principale avec onglets."""
@@ -214,48 +317,87 @@ class DashboardApp:
 
         # Onglet Diagnostic
         self.tab_diag = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_diag, text='  Diagnostic  ')
+        self.notebook.add(self.tab_diag, text='  \U0001f50d Diagnostic  ')
         self._build_diagnostic_tab()
 
         # Onglet Colonnes
         self.tab_columns = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_columns, text='  Colonnes  ')
+        self.notebook.add(self.tab_columns, text='  \U0001f4cb Colonnes  ')
         self._build_columns_tab()
 
         # Onglet Anomalies
         self.tab_issues = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_issues, text='  Anomalies  ')
+        self.notebook.add(self.tab_issues, text='  \u26a0 Anomalies  ')
         self._build_issues_tab()
 
         # Onglet Statistiques
         self.tab_stats = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_stats, text='  Statistiques  ')
+        self.notebook.add(self.tab_stats, text='  \U0001f4ca Statistiques  ')
         self._build_stats_tab()
 
-        # Onglet Qualité
+        # Onglet Qualite
         self.tab_quality = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_quality, text='  Qualité  ')
+        self.notebook.add(self.tab_quality, text='  \U0001f3c6 Qualite  ')
         self._build_quality_tab()
 
         # Onglet Doublons
         self.tab_dedup = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_dedup, text='  Doublons  ')
+        self.notebook.add(self.tab_dedup, text='  \U0001f517 Doublons  ')
         self._build_dedup_tab()
 
         # Onglet Corrections
         self.tab_fixes = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_fixes, text='  Corrections  ')
+        self.notebook.add(self.tab_fixes, text='  \U0001f527 Corrections  ')
         self._build_fixes_tab()
 
         # Onglet Historique
         self.tab_history = ttk.Frame(self.notebook)
-        self.notebook.add(self.tab_history, text='  Historique  ')
+        self.notebook.add(self.tab_history, text='  \U0001f4dc Historique  ')
         self._build_history_tab()
 
     def _build_diagnostic_tab(self):
-        """KPIs en cartes."""
+        """KPIs en cartes + écran d'accueil."""
+        # ── Écran d'accueil (visible tant qu'aucun fichier n'est chargé) ──
+        self._welcome_frame = ttk.Frame(self.tab_diag, padding=40)
+        self._welcome_frame.pack(fill='both', expand=True)
+
+        ttk.Label(self._welcome_frame, text="CSV Traitement",
+                  style='Title.TLabel').pack(pady=(40, 5))
+        ttk.Label(self._welcome_frame,
+                  text="Détection et correction des anomalies dans les fichiers tabulaires",
+                  style='Subtitle.TLabel').pack(pady=(0, 30))
+
+        # Actions rapides
+        actions_frame = ttk.Frame(self._welcome_frame)
+        actions_frame.pack()
+
+        quick_actions = [
+            ("📂  Ouvrir un fichier", self._on_load, "Ctrl+O"),
+            ("📎  Fusionner des fichiers", self._on_merge, ""),
+            ("🔗  Jointure intelligente", self._on_smart_join, ""),
+            ("☁  Parcourir le cloud", self._on_cloud, ""),
+            ("🗄  Importer depuis DB", self._on_import_db, ""),
+        ]
+        for text, cmd, shortcut in quick_actions:
+            row = ttk.Frame(actions_frame)
+            row.pack(fill='x', pady=3)
+            btn = ttk.Button(row, text=text, command=cmd, width=30)
+            btn.pack(side='left')
+            if shortcut:
+                ttk.Label(row, text=shortcut, style='Shortcut.TLabel').pack(side='left', padx=8)
+
+        ttk.Label(self._welcome_frame,
+                  text="Formats : CSV, Excel (XLSX/XLS), ODS, JSON, Parquet",
+                  style='Dim.TLabel').pack(pady=(25, 5))
+        ttk.Label(self._welcome_frame,
+                  text="Glissez-déposez un fichier ou double-cliquez pour ouvrir",
+                  style='Dim.TLabel').pack()
+
+        # ── Contenu diagnostic (masqué au départ) ──
+        self._diag_content = ttk.Frame(self.tab_diag)
+
         # Grille de cartes KPI
-        cards_frame = ttk.Frame(self.tab_diag, padding=10)
+        cards_frame = ttk.Frame(self._diag_content, padding=10)
         cards_frame.pack(fill='x')
 
         self.kpi_labels = {}
@@ -265,7 +407,7 @@ class DashboardApp:
             ('total_lines', 'Lignes', '—'),
             ('expected_cols', 'Colonnes', '—'),
             ('conforming', 'Conformes', '—'),
-            ('non_conforming', 'À corriger', '—'),
+            ('non_conforming', 'A corriger', '—'),
             ('conformity_pct', 'Validées', '—'),
             ('decimal_format', 'Format déc.', '—'),
         ]
@@ -282,7 +424,7 @@ class DashboardApp:
             self.kpi_labels[key] = val_label
 
         # Distribution colonnes
-        dist_frame = ttk.LabelFrame(self.tab_diag, text="Distribution nombre de colonnes", padding=10)
+        dist_frame = ttk.LabelFrame(self._diag_content, text="Distribution nombre de colonnes", padding=10)
         dist_frame.pack(fill='both', expand=True, padx=10, pady=5)
         self.dist_text = tk.Text(dist_frame, height=6, font=('JetBrains Mono', 10),
                                 bg=DARK['bg_alt'], fg=DARK['fg'], insertbackground=DARK['fg'],
@@ -399,13 +541,27 @@ class DashboardApp:
         self.history_summary_lbl.pack(pady=5)
 
     def _build_status_bar(self):
-        """Barre de statut."""
-        status_frame = ttk.Frame(self.root, padding=(10, 4))
+        """Barre de statut enrichie."""
+        # Séparateur visuel
+        ttk.Separator(self.root).pack(fill='x', side='bottom')
+
+        status_frame = ttk.Frame(self.root, padding=(10, 5))
         status_frame.pack(fill='x', side='bottom')
-        self.progress = ttk.Progressbar(status_frame, mode='determinate', length=300)
+
+        # Gauche : barre de progression
+        self.progress = ttk.Progressbar(status_frame, mode='determinate', length=200)
         self.progress.pack(side='left', padx=(0, 10))
-        self.status_label = ttk.Label(status_frame, text="Prêt — glissez un fichier CSV", style='Dim.TLabel')
+
+        # Message de statut
+        self.status_label = ttk.Label(status_frame, text="Pret", style='Dim.TLabel')
         self.status_label.pack(side='left')
+
+        # Droite : infos fichier
+        self._status_file_label = ttk.Label(status_frame, text="", style='StatusFile.TLabel')
+        self._status_file_label.pack(side='right', padx=(10, 0))
+
+        self._status_info_label = ttk.Label(status_frame, text="", style='Dim.TLabel')
+        self._status_info_label.pack(side='right')
 
     def _setup_drag_drop(self):
         """Configure le drag & drop de fichier."""
@@ -424,6 +580,24 @@ class DashboardApp:
         # Fallback: zone de drop visuelle avec double-clic
         self.root.bind('<Double-Button-1>', lambda e: self._on_load())
         logger.info("Drag & drop non disponible — double-clic pour charger")
+
+    def _setup_keyboard_shortcuts(self):
+        """Configure les raccourcis clavier globaux."""
+        self.root.bind('<Control-o>', lambda e: self._on_load())
+        self.root.bind('<Control-O>', lambda e: self._on_load())
+        self.root.bind('<Control-s>', lambda e: self._on_export() if self.fix_result else None)
+        self.root.bind('<Control-S>', lambda e: self._on_export() if self.fix_result else None)
+        self.root.bind('<Control-z>', lambda e: self._on_undo())
+        self.root.bind('<Control-Z>', lambda e: self._on_undo())
+        self.root.bind('<Control-p>', lambda e: self._on_preview() if self.detection else None)
+        self.root.bind('<Control-P>', lambda e: self._on_preview() if self.detection else None)
+        self.root.bind('<Control-e>', lambda e: self._on_edit_data() if self.detection else None)
+        self.root.bind('<Control-E>', lambda e: self._on_edit_data() if self.detection else None)
+        self.root.bind('<Control-a>', lambda e: self._on_analyze() if self.detection else None)
+        self.root.bind('<Control-A>', lambda e: self._on_analyze() if self.detection else None)
+        self.root.bind('<Control-f>', lambda e: self._on_fix() if self.analysis else None)
+        self.root.bind('<Control-F>', lambda e: self._on_fix() if self.analysis else None)
+        self.root.bind('<F5>', lambda e: self._on_analyze() if self.detection else None)
 
     def _on_drop(self, event):
         """Callback drag & drop."""
@@ -483,6 +657,9 @@ class DashboardApp:
         ttk.Button(btn_frame, text="Ouvrir", command=on_ok, style='Accent.TButton').pack(side='left', padx=5)
         ttk.Button(btn_frame, text="Annuler", command=dialog.destroy).pack(side='left', padx=5)
 
+        dialog.bind('<Escape>', lambda e: dialog.destroy())
+        dialog.bind('<Return>', lambda e: on_ok())
+
         dialog.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() - dialog.winfo_width()) // 2
         y = self.root.winfo_y() + (self.root.winfo_height() - dialog.winfo_height()) // 2
@@ -523,6 +700,11 @@ class DashboardApp:
         self.fix_result = None
         self.file_stats = None
 
+        # Masquer l'écran d'accueil, afficher le diagnostic
+        if self._welcome_frame.winfo_ismapped():
+            self._welcome_frame.pack_forget()
+            self._diag_content.pack(fill='both', expand=True)
+
         # KPIs
         sep_display = repr(result.separator).replace("'", "")
         self.kpi_labels['separator'].config(text=sep_display, style='CardKPI.TLabel')
@@ -562,6 +744,7 @@ class DashboardApp:
                 f"{p.confidence:.0%}", f"{p.empty_ratio:.0%}",
                 p.decimal_format or '—', examples
             ))
+        self._apply_alternating_rows(self.col_tree)
 
         # Enable buttons
         for btn in [self.btn_analyze, self.btn_stats, self.btn_preview, self.btn_edit,
@@ -573,6 +756,17 @@ class DashboardApp:
 
         self._set_status(f"Détection OK — {result.total_lines:,} lignes, {result.expected_columns} colonnes")
         self.progress['value'] = 100
+
+        # Populate status bar file info
+        if self.current_file:
+            self._status_file_label.config(text=f"{self.current_file.name}")
+            size_kb = self.current_file.stat().st_size / 1024
+            if size_kb > 1024:
+                size_str = f"{size_kb / 1024:.1f} Mo"
+            else:
+                size_str = f"{size_kb:.0f} Ko"
+            self._status_info_label.config(
+                text=f"{result.total_lines:,} lignes  |  {result.expected_columns} cols  |  {size_str}  |  {result.encoding}")
 
     def _on_analyze(self):
         if not self.detection:
@@ -608,6 +802,7 @@ class DashboardApp:
                     issue.shift_start_column, issue.details)
             self._all_issues_data.append(vals)
             self.issues_tree.insert('', 'end', values=vals)
+        self._apply_alternating_rows(self.issues_tree)
 
         self.btn_fix.config(state='normal')
         self.notebook.select(self.tab_issues)
@@ -647,6 +842,7 @@ class DashboardApp:
                 f"{cs.completeness:.1f}%", f"{cs.unique_count:,}",
                 min_val, max_val, mean_val, outliers, top
             ))
+        self._apply_alternating_rows(self.stats_tree)
 
         self.stats_summary.config(
             text=f"Lignes: {result.total_rows:,} | Doublons: {result.duplicate_rows:,} | "
@@ -1104,6 +1300,7 @@ class DashboardApp:
                 f"{cq.format_homogeneity_score:.0f}%", f"{cq.uniqueness_score:.0f}%",
                 issues_str
             ))
+        self._apply_alternating_rows(self.quality_tree)
 
         self.notebook.select(self.tab_quality)
         self._set_status(f"Qualité: {report.overall_score:.1f}/100 ({report.overall_grade})")
@@ -1149,6 +1346,7 @@ class DashboardApp:
                 g.group_id, g.match_type, f"{g.similarity:.0%}",
                 lines_str, g.count, g.key[:60], diffs_str
             ))
+        self._apply_alternating_rows(self.dedup_tree)
 
         self.notebook.select(self.tab_dedup)
         self._set_status(f"Doublons: {result.total_duplicate_rows} lignes dupliquées")
@@ -1490,12 +1688,14 @@ class DashboardApp:
         for vals in self._all_issues_data:
             if query in str(vals).lower():
                 self.issues_tree.insert('', 'end', values=vals)
+        self._apply_alternating_rows(self.issues_tree)
 
     def _reset_issues_filter(self):
         self.issue_filter_var.set("")
         self.issues_tree.delete(*self.issues_tree.get_children())
         for vals in self._all_issues_data:
             self.issues_tree.insert('', 'end', values=vals)
+        self._apply_alternating_rows(self.issues_tree)
 
     def _update_history_display(self):
         self.history_tree.delete(*self.history_tree.get_children())
@@ -1504,12 +1704,22 @@ class DashboardApp:
                 entry.timestamp[:19], entry.operation,
                 entry.description, entry.lines_affected, entry.corrections_count
             ))
+        self._apply_alternating_rows(self.history_tree)
         summary = self.history.get_summary()
         self.history_summary_lbl.config(
             text=f"{summary['total_operations']} opérations | {summary['total_corrections']} corrections"
         )
 
     # ── Utils ──
+
+    @staticmethod
+    def _apply_alternating_rows(tree: ttk.Treeview):
+        """Applique les couleurs alternees sur les lignes d'un treeview."""
+        tree.tag_configure('row_even', background=DARK['bg_alt'])
+        tree.tag_configure('row_odd', background=DARK['row_alt'])
+        for i, item in enumerate(tree.get_children()):
+            tag = 'row_even' if i % 2 == 0 else 'row_odd'
+            tree.item(item, tags=(tag,))
 
     def _update_progress(self, current: int, total: int, message: str):
         def update():
@@ -1599,6 +1809,9 @@ class _ExportDialog(tk.Toplevel):
                    style='Accent.TButton').pack(side='left', padx=5)
         ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
 
+        self.bind('<Escape>', lambda e: self.destroy())
+        self.bind('<Return>', lambda e: self._on_ok())
+
         # Centrer
         self.update_idletasks()
         x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
@@ -1677,6 +1890,9 @@ class _PostgresDialog(tk.Toplevel):
                    style='Accent.TButton').pack(side='left', padx=5)
         ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
 
+        self.bind('<Escape>', lambda e: self.destroy())
+        self.bind('<Return>', lambda e: self._on_ok())
+
         self.update_idletasks()
         x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
         y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
@@ -1750,6 +1966,9 @@ class _SnowflakeDialog(tk.Toplevel):
         ttk.Button(btn_frame, text=btn_label, command=self._on_ok,
                    style='Accent.TButton').pack(side='left', padx=5)
         ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
+
+        self.bind('<Escape>', lambda e: self.destroy())
+        self.bind('<Return>', lambda e: self._on_ok())
 
         self.update_idletasks()
         x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
@@ -1842,6 +2061,9 @@ class _DatabricksDialog(tk.Toplevel):
                    style='Accent.TButton').pack(side='left', padx=5)
         ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
 
+        self.bind('<Escape>', lambda e: self.destroy())
+        self.bind('<Return>', lambda e: self._on_ok())
+
         self.update_idletasks()
         x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
         y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
@@ -1905,6 +2127,8 @@ class _ImportDBDialog(tk.Toplevel):
                    command=lambda: self._choose('databricks')).pack(side='left', padx=5, pady=10)
 
         ttk.Button(self, text="Annuler", command=self.destroy).pack(pady=(0, 12))
+
+        self.bind('<Escape>', lambda e: self.destroy())
 
         self.update_idletasks()
         x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
@@ -2036,6 +2260,8 @@ class _SmartJoinDialog(tk.Toplevel):
                    command=self._on_ok, style='Accent.TButton').pack(side='right', padx=5)
         ttk.Button(btn_frame, text="Annuler",
                    command=self.destroy).pack(side='right')
+
+        self.bind('<Escape>', lambda e: self.destroy())
 
         # Info
         self._lbl_info = ttk.Label(self, text="", style='Dim.TLabel')
