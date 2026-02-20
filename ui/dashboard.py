@@ -244,7 +244,16 @@ class DashboardApp:
 
         # Groupe Transformation
         self._add_toolbar_group(row2, 'Outils', [
-            ('btn_anonymize', '🔒 Anonymiser', self._on_anonymize, 'disabled', ''),
+            ('btn_anonymize',  '🔒 Anonymiser',  self._on_anonymize,    'disabled', ''),
+            ('btn_suggest',    '💡 Suggestions', self._on_suggestions,  'disabled', ''),
+        ])
+
+        ttk.Separator(row2, orient='vertical').pack(side='left', padx=6, fill='y', pady=2)
+
+        # Groupe Rapports
+        self._add_toolbar_group(row2, 'Rapports', [
+            ('btn_html_report', '📊 Rapport',  self._on_html_report,   'disabled', ''),
+            ('btn_recipe',      '📜 Recette',  self._on_export_recipe, 'disabled', ''),
         ])
 
         ttk.Separator(row2, orient='vertical').pack(side='left', padx=6, fill='y', pady=2)
@@ -749,7 +758,7 @@ class DashboardApp:
         # Enable buttons
         for btn in [self.btn_analyze, self.btn_stats, self.btn_preview, self.btn_edit,
                      self.btn_save_tpl, self.btn_quality, self.btn_dedup, self.btn_compare,
-                     self.btn_anonymize]:
+                     self.btn_anonymize, self.btn_suggest, self.btn_html_report, self.btn_recipe]:
             btn.config(state='normal')
         for btn in [self.btn_fix, self.btn_export, self.btn_undo]:
             btn.config(state='disabled')
@@ -827,6 +836,7 @@ class DashboardApp:
 
     def _on_stats_done(self, result: FileStats):
         self.file_stats = result
+        self._last_file_stats = result
         self.stats_tree.delete(*self.stats_tree.get_children())
 
         for cs in result.column_stats:
@@ -1275,6 +1285,7 @@ class DashboardApp:
 
     def _on_quality_done(self, report: QualityReport):
         self.quality_report = report
+        self._last_quality = report
 
         # Score global
         grade_colors = {'A': 'CardGood.TLabel', 'B': 'CardGood.TLabel',
@@ -1652,6 +1663,162 @@ class DashboardApp:
                                f"Données importées dans :\n{csv_path}\n\n"
                                f"Charger ce fichier pour analyse ?"):
             self._load_file(csv_path)
+
+    # ── Suggestions ──
+
+    def _on_suggestions(self):
+        """Affiche les suggestions de validation automatiques."""
+        if not self.detection:
+            return
+        from core.suggestions import generate_suggestions
+        quality = getattr(self, '_last_quality', None)
+        file_stats = getattr(self, '_last_file_stats', None)
+        suggestions = generate_suggestions(self.detection, quality=quality, file_stats=file_stats)
+
+        if not suggestions:
+            messagebox.showinfo("Suggestions", "Aucune suggestion de validation.\nLe fichier semble propre !")
+            return
+
+        # Show in a dialog
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Suggestions de validation")
+        dialog.configure(bg=DARK['bg'])
+        dialog.geometry("750x500")
+        dialog.transient(self.root)
+        dialog.grab_set()
+        dialog.bind('<Escape>', lambda e: dialog.destroy())
+
+        tk.Label(dialog,
+                 text=f"\U0001f4a1 {len(suggestions)} suggestion(s) de validation",
+                 bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 12, 'bold')).pack(padx=15, pady=(12, 5), anchor='w')
+
+        # Treeview
+        tree = ttk.Treeview(dialog,
+                            columns=('priority', 'column', 'message', 'action'),
+                            show='headings', height=15)
+        tree.heading('priority', text='Priorite')
+        tree.heading('column', text='Colonne')
+        tree.heading('message', text='Suggestion')
+        tree.heading('action', text='Action')
+        tree.column('priority', width=80)
+        tree.column('column', width=100)
+        tree.column('message', width=400)
+        tree.column('action', width=120)
+
+        tree.tag_configure('high', foreground='#f38ba8')
+        tree.tag_configure('medium', foreground='#fab387')
+        tree.tag_configure('low', foreground='#a6e3a1')
+
+        for s in suggestions:
+            tag = s.priority.name.lower()
+            tree.insert('', 'end', values=(
+                s.priority_label, s.column_name, s.message, s.action
+            ), tags=(tag,))
+
+        scrollbar = ttk.Scrollbar(dialog, orient='vertical', command=tree.yview)
+        tree.configure(yscrollcommand=scrollbar.set)
+        tree.pack(side='left', fill='both', expand=True, padx=(15, 0), pady=5)
+        scrollbar.pack(side='left', fill='y', padx=(0, 15), pady=5)
+
+        ttk.Button(dialog, text="Fermer", command=dialog.destroy).pack(pady=8)
+
+    # ── Rapport HTML ──
+
+    def _on_html_report(self):
+        """Genere un rapport HTML de qualite."""
+        if not self.detection:
+            return
+        output = filedialog.asksaveasfilename(
+            title="Enregistrer le rapport HTML",
+            defaultextension='.html',
+            filetypes=[('HTML', '*.html')],
+            initialfile=f"{self.detection.filepath.stem}_rapport.html",
+        )
+        if not output:
+            return
+
+        self._set_status("Generation du rapport HTML...")
+        self.progress['value'] = 30
+
+        def task():
+            try:
+                from core.reporter import export_html_report
+                from core.quality import compute_quality
+
+                quality = getattr(self, '_last_quality', None)
+                if quality is None:
+                    quality = compute_quality(self.detection)
+                    self._last_quality = quality
+
+                export_html_report(
+                    self.detection, Path(output),
+                    quality=quality,
+                    fix_result=self.fix_result,
+                    file_stats=getattr(self, '_last_file_stats', None),
+                )
+                self.root.after(0, lambda: self._on_html_report_done(output))
+            except Exception as e:
+                logger.exception("Erreur rapport HTML")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        import threading
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_html_report_done(self, output_path: str):
+        self._set_status(f"Rapport HTML genere : {Path(output_path).name}")
+        self.progress['value'] = 100
+        if messagebox.askyesno("Rapport HTML",
+                               f"Rapport genere :\n{output_path}\n\nOuvrir dans le navigateur ?"):
+            import webbrowser
+            webbrowser.open(f'file://{output_path}')
+
+    # ── Export Recette ──
+
+    def _on_export_recipe(self):
+        """Exporte la recette des transformations en multi-langage."""
+        if not self.detection:
+            return
+
+        dialog = _RecipeExportDialog(self.root, self.detection, self.fix_result)
+        self.root.wait_window(dialog)
+        if not dialog.result:
+            return
+
+        language = dialog.result['language']
+        output = dialog.result['output']
+
+        self._set_status(f"Export recette en {language}...")
+
+        try:
+            from core.recipe import (
+                Recipe, record_load, record_fix, export_recipe, save_recipe
+            )
+            recipe = Recipe(name=self.detection.filepath.stem)
+            record_load(recipe, str(self.detection.filepath),
+                       self.detection.encoding, self.detection.separator,
+                       self.detection.header, self.detection.total_lines)
+            if self.fix_result:
+                record_fix(recipe, self.fix_result)
+            recipe.total_rows_output = self.detection.total_lines
+
+            if language == 'json':
+                save_recipe(recipe, Path(output))
+            else:
+                export_recipe(recipe, language, Path(output))
+
+            self._set_status(f"Recette exportee : {Path(output).name}")
+            self.progress['value'] = 100
+
+            lang_labels = {
+                'power_query_m': 'Power Query M', 'python': 'Python/pandas',
+                'sql': 'SQL', 'dax': 'DAX', 'json': 'JSON',
+            }
+            messagebox.showinfo("Recette",
+                                f"Recette exportee en {lang_labels.get(language, language)} :\n{output}")
+        except Exception as e:
+            logger.exception("Erreur export recette")
+            messagebox.showerror("Erreur", str(e))
 
     def _on_cloud(self):
         """Détecte et affiche les emplacements cloud disponibles."""
@@ -2374,4 +2541,93 @@ class _SmartJoinDialog(tk.Toplevel):
             'columns_left': None,
             'columns_right': None,
         }
+        self.destroy()
+
+
+class _RecipeExportDialog(tk.Toplevel):
+    """Dialogue d'export de recette multi-langage."""
+
+    LANGUAGES = {
+        'power_query_m': ('Power Query M (Power BI / Excel)', '.pq'),
+        'python': ('Python / pandas', '.py'),
+        'sql': ('SQL (post-import)', '.sql'),
+        'dax': ('DAX (colonnes calculees Power BI)', '.dax'),
+        'json': ('JSON (rejeu CSV Traitement)', '.json'),
+    }
+
+    def __init__(self, parent, detection, fix_result=None):
+        super().__init__(parent)
+        self.title("Exporter la recette des transformations")
+        self.configure(bg=DARK['bg'])
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+        self.result = None
+        self._detection = detection
+        self._fix_result = fix_result
+
+        pad = {'padx': 15, 'pady': 5}
+
+        tk.Label(self, text="\U0001f4dc Exporter la recette",
+                 bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 12, 'bold')).pack(**pad, anchor='w', pady=(12, 3))
+
+        tk.Label(self,
+                 text="Exportez les transformations appliquees pour les\n"
+                      "reproduire dans un autre outil (Power BI, Python, SQL...).",
+                 bg=DARK['bg'], fg=DARK['fg'],
+                 font=('Segoe UI', 9), justify='left').pack(**pad, anchor='w')
+
+        ttk.Separator(self, orient='horizontal').pack(fill='x', padx=15, pady=5)
+
+        # Info corrections
+        if fix_result:
+            info = (f"\u2705 {fix_result.total_corrections:,} corrections enregistrees "
+                    f"({fix_result.date_fixes} dates, {fix_result.decimal_fixes} decimales, "
+                    f"{fix_result.realignment_fixes} realignements)")
+        else:
+            info = "\u2139 Aucune correction appliquee (seul le chargement sera exporte)"
+        tk.Label(self, text=info, bg=DARK['bg'],
+                 fg=DARK['fg'] if fix_result else '#6c7086',
+                 font=('Segoe UI', 9)).pack(**pad, anchor='w')
+
+        # Choix du langage
+        tk.Label(self, text="Langage cible :", bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 10, 'bold')).pack(**pad, anchor='w')
+
+        self._lang_var = tk.StringVar(value='power_query_m')
+        for lang_key, (lang_label, _) in self.LANGUAGES.items():
+            tk.Radiobutton(self, text=lang_label,
+                           variable=self._lang_var, value=lang_key,
+                           bg=DARK['bg'], fg=DARK['fg'], selectcolor=DARK['bg_alt'],
+                           activebackground=DARK['bg'], activeforeground=DARK['fg'],
+                           font=('Segoe UI', 9)).pack(padx=25, anchor='w')
+
+        # Boutons
+        btn_frame = tk.Frame(self, bg=DARK['bg'])
+        btn_frame.pack(pady=12)
+        ttk.Button(btn_frame, text="Exporter...", command=self._on_ok,
+                   style='Accent.TButton').pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
+
+        self.bind('<Escape>', lambda e: self.destroy())
+
+        self.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
+        y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
+        self.geometry(f"+{x}+{y}")
+
+    def _on_ok(self):
+        lang = self._lang_var.get()
+        _, ext = self.LANGUAGES[lang]
+        output = filedialog.asksaveasfilename(
+            title="Enregistrer la recette",
+            defaultextension=ext,
+            filetypes=[(f"Fichier {ext}", f"*{ext}")],
+            initialfile=f"{self._detection.filepath.stem}_recette{ext}",
+            parent=self,
+        )
+        if not output:
+            return
+        self.result = {'language': lang, 'output': output}
         self.destroy()

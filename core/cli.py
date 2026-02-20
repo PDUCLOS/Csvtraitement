@@ -100,6 +100,21 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
     cli_parser.add_argument('--cloud', action='store_true',
                            help='Lister les emplacements cloud détectés')
 
+    # Suggestions de validation
+    cli_parser.add_argument('--suggest', action='store_true',
+                           help='Afficher les suggestions automatiques de validation')
+
+    # Rapport HTML
+    cli_parser.add_argument('--html-report', type=str, default=None,
+                           help='Generer un rapport HTML de qualite (chemin du fichier)')
+
+    # Export recette (enregistre les transformations)
+    cli_parser.add_argument('--export-recipe', type=str, default=None,
+                           help='Exporter la recette des transformations (chemin du fichier)')
+    cli_parser.add_argument('--recipe-format', type=str, default='power_query_m',
+                           choices=['power_query_m', 'python', 'sql', 'dax', 'json'],
+                           help='Format de la recette (defaut: power_query_m)')
+
     # Jointure intelligente
     cli_parser.add_argument('--smart-join', type=str,
                            help='Jointure intelligente avec un second fichier (tout format)')
@@ -270,6 +285,10 @@ def run_single(args: argparse.Namespace) -> dict:
         for p in detection.column_profiles:
             header = detection.header[p.index].strip() if p.index < len(detection.header) else f'Col {p.index}'
             print(f"  [{p.index}] {header:20s} → {p.dominant_type.name:12s} ({p.confidence:.0%})")
+
+    # ── Variables pour les résultats intermédiaires ──
+    file_stats = None
+    quality = None
 
     # ── Statistiques ──
     if getattr(args, 'stats', False):
@@ -505,6 +524,60 @@ def run_single(args: argparse.Namespace) -> dict:
 
             if not quiet:
                 print(f"  ✅ Fichier exporté : {output_path}")
+
+    # ── Suggestions de validation ──
+    if getattr(args, 'suggest', False):
+        from core.suggestions import generate_suggestions, format_suggestions_text
+        suggestions = generate_suggestions(detection, quality=quality, file_stats=file_stats)
+        report['suggestions'] = [
+            {'priority': s.priority_label, 'column': s.column_name,
+             'message': s.message, 'action': s.action}
+            for s in suggestions
+        ]
+        if not quiet:
+            print(format_suggestions_text(suggestions))
+
+    # ── Rapport HTML ──
+    html_report_path = getattr(args, 'html_report', None)
+    if html_report_path:
+        from core.reporter import export_html_report
+        if not quiet:
+            print("\n📊 Génération du rapport HTML...")
+        # Calculate quality if not already done
+        if quality is None:
+            quality = compute_quality(detection)
+        export_html_report(
+            detection, Path(html_report_path),
+            quality=quality, fix_result=fix_result, file_stats=file_stats,
+        )
+        if not quiet:
+            print(f"  ✅ Rapport HTML : {html_report_path}")
+
+    # ── Export recette ──
+    recipe_path = getattr(args, 'export_recipe', None)
+    if recipe_path:
+        from core.recipe import (
+            Recipe, record_load, record_fix, export_recipe, save_recipe
+        )
+        recipe = Recipe(name=filepath.stem)
+        record_load(recipe, str(filepath), detection.encoding, detection.separator,
+                    detection.header, detection.total_lines)
+        if fix_result:
+            record_fix(recipe, fix_result)
+        recipe.total_rows_output = detection.total_lines
+
+        recipe_fmt = getattr(args, 'recipe_format', 'power_query_m')
+        rp = Path(recipe_path)
+        if recipe_fmt == 'json':
+            save_recipe(recipe, rp)
+        else:
+            export_recipe(recipe, recipe_fmt, rp)
+        if not quiet:
+            lang_labels = {
+                'power_query_m': 'Power Query M', 'python': 'Python/pandas',
+                'sql': 'SQL', 'dax': 'DAX', 'json': 'JSON',
+            }
+            print(f"\n📜 Recette exportée en {lang_labels.get(recipe_fmt, recipe_fmt)} : {recipe_path}")
 
     # ── Rapport JSON ──
     report_path = getattr(args, 'report', None)
