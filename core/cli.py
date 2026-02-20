@@ -115,6 +115,38 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
     cli_parser.add_argument('--pg-schema', type=str, default='public',
                            help='Schéma PostgreSQL (défaut: public)')
 
+    # Options Snowflake
+    cli_parser.add_argument('--sf-account', type=str, default=None,
+                           help='Identifiant du compte Snowflake (ex: xy12345.eu-west-1)')
+    cli_parser.add_argument('--sf-user', type=str, default=None,
+                           help='Utilisateur Snowflake')
+    cli_parser.add_argument('--sf-password', type=str, default=None,
+                           help='Mot de passe Snowflake')
+    cli_parser.add_argument('--sf-warehouse', type=str, default=None,
+                           help='Entrepôt de calcul Snowflake')
+    cli_parser.add_argument('--sf-database', type=str, default=None,
+                           help='Base de données Snowflake')
+    cli_parser.add_argument('--sf-schema', type=str, default='PUBLIC',
+                           help='Schéma Snowflake (défaut: PUBLIC)')
+    cli_parser.add_argument('--sf-role', type=str, default=None,
+                           help='Rôle Snowflake')
+    cli_parser.add_argument('--sf-query', type=str, default=None,
+                           help='Import Snowflake : requête SQL (SELECT ...)')
+
+    # Options Databricks
+    cli_parser.add_argument('--db-host', type=str, default=None,
+                           help='Hostname du workspace Databricks (ex: adb-xxx.azuredatabricks.net)')
+    cli_parser.add_argument('--db-http-path', type=str, default=None,
+                           help='Chemin HTTP du SQL warehouse (ex: /sql/1.0/warehouses/xxx)')
+    cli_parser.add_argument('--db-token', type=str, default=None,
+                           help='Token d\'accès personnel Databricks')
+    cli_parser.add_argument('--db-catalog', type=str, default=None,
+                           help='Catalogue Unity Databricks')
+    cli_parser.add_argument('--db-schema', type=str, default='default',
+                           help='Schéma Databricks (défaut: default)')
+    cli_parser.add_argument('--db-query', type=str, default=None,
+                           help='Import Databricks : requête SQL (SELECT ...)')
+
     # Verbosité
     cli_parser.add_argument('--quiet', '-q', action='store_true',
                            help='Mode silencieux')
@@ -134,9 +166,19 @@ def run_cli(args: argparse.Namespace):
         _run_merge(args)
         return
 
+    # Import Snowflake (pas besoin de fichier local)
+    if getattr(args, 'sf_query', None):
+        _run_snowflake_import(args)
+        return
+
+    # Import Databricks (pas besoin de fichier local)
+    if getattr(args, 'db_query', None):
+        _run_databricks_import(args)
+        return
+
     # Vérifier qu'un fichier ou batch est fourni
     if not getattr(args, 'file', None) and not getattr(args, 'batch', None):
-        print("❌ Veuillez spécifier --file, --batch, --merge ou --cloud")
+        print("❌ Veuillez spécifier --file, --batch, --merge, --cloud, --sf-query ou --db-query")
         sys.exit(1)
 
     if getattr(args, 'batch', None):
@@ -353,6 +395,53 @@ def run_single(args: argparse.Namespace) -> dict:
                 password=getattr(args, 'pg_password', ''),
                 table_name=getattr(args, 'table_name', None),
                 schema=getattr(args, 'pg_schema', 'public'),
+            )
+            if not quiet:
+                print(f"  ✅ Table créée : {full_table}")
+
+        elif fmt == 'snowflake':
+            # Export direct Snowflake
+            from core.exporter import export_snowflake
+            sf_account = getattr(args, 'sf_account', None)
+            sf_user = getattr(args, 'sf_user', None)
+            sf_password = getattr(args, 'sf_password', None)
+            if not sf_account or not sf_user or not sf_password:
+                print("❌ --sf-account, --sf-user et --sf-password sont requis pour l'export Snowflake")
+                sys.exit(1)
+            if not quiet:
+                print(f"\n❄ Export Snowflake → {sf_account}")
+
+            full_table = export_snowflake(
+                detection, fix_result,
+                account=sf_account, user=sf_user, password=sf_password,
+                table_name=getattr(args, 'table_name', None),
+                warehouse=getattr(args, 'sf_warehouse', None),
+                database=getattr(args, 'sf_database', None),
+                schema=getattr(args, 'sf_schema', 'PUBLIC'),
+                role=getattr(args, 'sf_role', None),
+            )
+            if not quiet:
+                print(f"  ✅ Table créée : {full_table}")
+
+        elif fmt == 'databricks':
+            # Export direct Databricks
+            from core.exporter import export_databricks
+            db_host = getattr(args, 'db_host', None)
+            db_http_path = getattr(args, 'db_http_path', None)
+            db_token = getattr(args, 'db_token', None)
+            if not db_host or not db_http_path or not db_token:
+                print("❌ --db-host, --db-http-path et --db-token sont requis pour l'export Databricks")
+                sys.exit(1)
+            if not quiet:
+                print(f"\n🔶 Export Databricks → {db_host}")
+
+            full_table = export_databricks(
+                detection, fix_result,
+                server_hostname=db_host, http_path=db_http_path,
+                access_token=db_token,
+                table_name=getattr(args, 'table_name', None),
+                catalog=getattr(args, 'db_catalog', None),
+                schema=getattr(args, 'db_schema', 'default'),
             )
             if not quiet:
                 print(f"  ✅ Table créée : {full_table}")
@@ -649,3 +738,74 @@ def _run_merge(args: argparse.Namespace):
             print(f"\n  💾 Exporté : {output_path}")
     elif not quiet:
         print("\n  Utilisez -o pour exporter le résultat.")
+
+
+def _run_snowflake_import(args: argparse.Namespace):
+    """Importe des données depuis Snowflake et les sauvegarde en CSV."""
+    quiet = getattr(args, 'quiet', False)
+    sf_account = getattr(args, 'sf_account', None)
+    sf_user = getattr(args, 'sf_user', None)
+    sf_password = getattr(args, 'sf_password', None)
+    sf_query = getattr(args, 'sf_query', None)
+
+    if not sf_account or not sf_user or not sf_password:
+        print("❌ --sf-account, --sf-user et --sf-password sont requis pour l'import Snowflake")
+        sys.exit(1)
+
+    if not quiet:
+        print(f"\n❄ Import Snowflake depuis {sf_account}...")
+        print(f"  Requête : {sf_query[:80]}...")
+
+    from utils.db_connectors import snowflake_import_to_csv
+
+    output = getattr(args, 'output', None)
+    output_path = Path(output) if output else None
+
+    csv_path = snowflake_import_to_csv(
+        account=sf_account, user=sf_user, password=sf_password,
+        query=sf_query, output_path=output_path,
+        warehouse=getattr(args, 'sf_warehouse', None),
+        database=getattr(args, 'sf_database', None),
+        schema=getattr(args, 'sf_schema', 'PUBLIC'),
+        role=getattr(args, 'sf_role', None),
+    )
+
+    if not quiet:
+        print(f"  ✅ Données importées : {csv_path}")
+        print(f"  Vous pouvez maintenant traiter ce fichier :")
+        print(f"  python main.py cli --file {csv_path} --fix -o resultat.xlsx")
+
+
+def _run_databricks_import(args: argparse.Namespace):
+    """Importe des données depuis Databricks et les sauvegarde en CSV."""
+    quiet = getattr(args, 'quiet', False)
+    db_host = getattr(args, 'db_host', None)
+    db_http_path = getattr(args, 'db_http_path', None)
+    db_token = getattr(args, 'db_token', None)
+    db_query = getattr(args, 'db_query', None)
+
+    if not db_host or not db_http_path or not db_token:
+        print("❌ --db-host, --db-http-path et --db-token sont requis pour l'import Databricks")
+        sys.exit(1)
+
+    if not quiet:
+        print(f"\n🔶 Import Databricks depuis {db_host}...")
+        print(f"  Requête : {db_query[:80]}...")
+
+    from utils.db_connectors import databricks_import_to_csv
+
+    output = getattr(args, 'output', None)
+    output_path = Path(output) if output else None
+
+    csv_path = databricks_import_to_csv(
+        server_hostname=db_host, http_path=db_http_path,
+        access_token=db_token, query=db_query,
+        output_path=output_path,
+        catalog=getattr(args, 'db_catalog', None),
+        schema=getattr(args, 'db_schema', 'default'),
+    )
+
+    if not quiet:
+        print(f"  ✅ Données importées : {csv_path}")
+        print(f"  Vous pouvez maintenant traiter ce fichier :")
+        print(f"  python main.py cli --file {csv_path} --fix -o resultat.xlsx")

@@ -34,6 +34,8 @@ CSV Traitement détecte ces problèmes, les visualise et propose des corrections
 | **SQL** | Fichier `.sql` — CREATE TABLE + INSERT INTO (PostgreSQL/MySQL) | Inclus |
 | **SQLite** | Base locale `.db` — zéro configuration | Inclus (sqlite3) |
 | **PostgreSQL** | Insertion directe sur serveur PostgreSQL | Optionnel (psycopg2) |
+| **Snowflake** | Export vers cloud data warehouse Snowflake | Optionnel (snowflake-connector-python) |
+| **Databricks** | Export vers Databricks SQL warehouse | Optionnel (databricks-sql-connector) |
 
 ## Installation
 
@@ -75,8 +77,14 @@ python main.py cli --file data.csv --fix -o out.sql --format sql              # 
 python main.py cli --file data.csv --fix -o out.sql --format sql --table-name clients  # Table nommée
 python main.py cli --file data.csv --fix -o out.db --format sqlite            # SQLite local
 python main.py cli --file data.csv --fix --format postgres --pg-host localhost --pg-database mydb  # PostgreSQL direct
+python main.py cli --file data.csv --fix --format snowflake --sf-account xy12345 --sf-user usr --sf-password pwd  # Snowflake
+python main.py cli --file data.csv --fix --format databricks --db-host adb-xxx.net --db-http-path /sql/1.0/warehouses/x --db-token tok  # Databricks
 python main.py cli --batch /exports/ --fix -o /sortie/  # Traitement batch
 python main.py cli --file export.csv --report rapport.json  # Rapport JSON
+
+# Import depuis bases de données cloud
+python main.py cli --sf-query "SELECT * FROM table" --sf-account xy12345 --sf-user usr --sf-password pwd -o data.csv
+python main.py cli --db-query "SELECT * FROM table" --db-host adb-xxx.net --db-http-path /path --db-token tok -o data.csv
 
 # Qualité et doublons
 python main.py cli --file data.csv --quality            # Score de qualité 0-100
@@ -104,7 +112,8 @@ python main.py cli --cloud                              # Lister les emplacement
 - Détection et localisation des décalages colonne par colonne
 - Nettoyage : dates invalides, décimales FR/US, parenthèses comptables, valeurs masquées
 - Statistiques : min/max/moyenne/médiane, outliers IQR, doublons, taux de remplissage
-- **Export multi-format** : XLSX, CSV, JSON, ODS, Parquet, SQL, SQLite, PostgreSQL
+- **Export multi-format** : XLSX, CSV, JSON, ODS, Parquet, SQL, SQLite, PostgreSQL, Snowflake, Databricks
+- **Import depuis bases de données** : Snowflake, Databricks (requête SQL → CSV)
 - Export XLSX typé avec cellules corrigées en surbrillance + onglet rapport
 - Export CSV avec séparateur configurable (§ par défaut — rare, évite les conflits)
 - Écriture via fichier temporaire local (compatible lecteurs réseau/cloud)
@@ -181,10 +190,12 @@ python main.py cli --cloud                              # Lister les emplacement
 ### Interface
 - Thème sombre (Catppuccin Mocha)
 - 8 onglets : Diagnostic, Colonnes, Anomalies, Statistiques, Qualité, Doublons, Corrections, Historique
+- **Éditeur de données** : grille éditable comme Excel (double-clic, Tab, Entrée)
 - Preview avec pagination, recherche par contenu, filtre par statut
 - Drag & drop de fichier
 - Undo/redo des corrections
-- Dialogue d'export : choix du format (XLSX/CSV/JSON/ODS/Parquet) et du séparateur CSV
+- Dialogue d'export : choix du format (10 formats) et du séparateur CSV
+- Import depuis Snowflake/Databricks (dialogue de connexion intégré)
 - Ouverture automatique du fichier exporté (optionnel)
 - Templates de profil réutilisables (JSON)
 - Mode CLI + batch multi-fichiers
@@ -195,6 +206,7 @@ python main.py cli --cloud                              # Lister les emplacement
 - Gestion BOM UTF-8/UTF-16 + encodages exotiques
 - Règles de validation custom par colonne
 - Aucune dépendance externe pour le fuzzy matching (difflib standard)
+- **Sécurité** : validation des identifiants SQL, requêtes import en lecture seule, requêtes paramétrées
 
 ## Architecture
 
@@ -218,7 +230,8 @@ core/
 
 ui/
 ├── dashboard.py      → Dashboard Tkinter dark theme + 8 onglets
-└── preview.py        → Preview avec recherche/filtre/pagination
+├── preview.py        → Preview avec recherche/filtre/pagination
+└── editable_grid.py  → Grille éditable (modification des données)
 
 utils/
 ├── patterns.py       → Regex + types (date/nombre/booléen/masqué)
@@ -231,7 +244,8 @@ utils/
 ├── validators.py     → Validation par colonne + validation croisée inter-colonnes
 ├── templates.py      → Templates profil JSON réutilisables
 ├── history.py        → Undo/redo historique corrections
-└── cloud.py          → Connecteurs cloud (OneDrive, SharePoint, pCloud, etc.)
+├── cloud.py          → Connecteurs cloud (OneDrive, SharePoint, pCloud, etc.)
+└── db_connectors.py  → Connecteurs Snowflake + Databricks (import/export)
 ```
 
 ## Dépendances
@@ -247,11 +261,13 @@ utils/
 - odfpy (lecture/écriture ODS)
 - pyarrow (lecture/écriture Parquet)
 - psycopg2-binary (export PostgreSQL direct)
+- snowflake-connector-python (import/export Snowflake)
+- databricks-sql-connector (import/export Databricks)
 - tkinterdnd2 (drag & drop GUI)
 
 ```bash
 # Installation complète
-pip install xlsxwriter chardet openpyxl xlrd odfpy pyarrow psycopg2-binary
+pip install xlsxwriter chardet openpyxl xlrd odfpy pyarrow psycopg2-binary snowflake-connector-python databricks-sql-connector
 ```
 
 ## Licence

@@ -162,6 +162,7 @@ class DashboardApp:
             ('btn_analyze', '🔍 Analyser', self._on_analyze, 'disabled'),
             ('btn_stats', '📊 Stats', self._on_stats, 'disabled'),
             ('btn_preview', '👁 Preview', self._on_preview, 'disabled'),
+            ('btn_edit', '✏ Éditer', self._on_edit_data, 'disabled'),
             ('btn_fix', '🔧 Corriger', self._on_fix, 'disabled'),
             ('btn_undo', '↩ Undo', self._on_undo, 'disabled'),
             ('btn_export', '💾 Export', self._on_export, 'disabled'),
@@ -182,6 +183,7 @@ class DashboardApp:
             ('btn_merge', '📎 Fusionner', self._on_merge, 'normal'),
             ('btn_anonymize', '🔒 Anonymiser', self._on_anonymize, 'disabled'),
             ('btn_cloud', '☁ Cloud', self._on_cloud, 'normal'),
+            ('btn_import_db', '🗄 Import DB', self._on_import_db, 'normal'),
         ]
 
         for attr, text, cmd, state in extra_buttons:
@@ -557,8 +559,9 @@ class DashboardApp:
             ))
 
         # Enable buttons
-        for btn in [self.btn_analyze, self.btn_stats, self.btn_preview, self.btn_save_tpl,
-                     self.btn_quality, self.btn_dedup, self.btn_compare, self.btn_anonymize]:
+        for btn in [self.btn_analyze, self.btn_stats, self.btn_preview, self.btn_edit,
+                     self.btn_save_tpl, self.btn_quality, self.btn_dedup, self.btn_compare,
+                     self.btn_anonymize]:
             btn.config(state='normal')
         for btn in [self.btn_fix, self.btn_export, self.btn_undo]:
             btn.config(state='disabled')
@@ -701,6 +704,69 @@ class DashboardApp:
         from ui.preview import PreviewWindow
         PreviewWindow(self.root, self.detection, self.fix_result, dark_theme=DARK)
 
+    def _on_edit_data(self):
+        """Ouvre l'éditeur de données (grille éditable comme Excel)."""
+        if not self.detection:
+            return
+
+        from utils.universal_reader import read_any
+        from ui.editable_grid import EditableGrid
+
+        self._set_status("Chargement des données pour édition...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                source = self.detection.original_filepath or self.detection.filepath
+                header, rows, _ = read_any(source)
+                # Use corrected data if available
+                if self.fix_result and self.fix_result.corrected_lines:
+                    expected = self.detection.expected_columns
+                    for line_num, corrected in self.fix_result.corrected_lines.items():
+                        idx = line_num - 2  # line_num starts at 2 (1 is header)
+                        if 0 <= idx < len(rows):
+                            rows[idx] = corrected[:expected]
+                self.root.after(0, lambda: self._open_editor(header, rows))
+            except Exception as e:
+                logger.exception("Erreur chargement données pour édition")
+                self.root.after(0, lambda: messagebox.showerror("Erreur", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _open_editor(self, header: list[str], rows: list[list[str]]):
+        """Ouvre la fenêtre d'édition."""
+        from ui.editable_grid import EditableGrid
+        self._set_status("Éditeur de données ouvert")
+        self.progress['value'] = 100
+
+        def on_save(new_header, new_rows, changes):
+            """Callback quand l'utilisateur sauvegarde les modifications."""
+            if not changes and len(new_rows) == len(rows):
+                return
+
+            # Re-detect from modified data
+            import csv
+            import tempfile
+            import os
+
+            fd, tmp_path = tempfile.mkstemp(suffix='.csv', prefix='csvtraitement_edited_')
+            os.close(fd)
+
+            sep = self.detection.separator
+            with open(tmp_path, 'w', encoding='utf-8', newline='') as f:
+                writer = csv.writer(f, delimiter=sep, quoting=csv.QUOTE_MINIMAL)
+                writer.writerow(new_header)
+                for row in new_rows:
+                    writer.writerow(row)
+
+            # Reload the modified file
+            from pathlib import Path
+            self._load_file(Path(tmp_path))
+            self._set_status(f"Données modifiées : {len(changes)} cellule(s) éditée(s)")
+
+        EditableGrid(self.root, header, rows, on_save=on_save,
+                     title=f"Éditeur — {self.current_file.name}" if self.current_file else "Éditeur")
+
     def _on_export(self):
         if not self.detection or not self.analysis or not self.fix_result:
             return
@@ -733,12 +799,64 @@ class DashboardApp:
                         progress_callback=self._update_progress,
                         **pg_params,
                     )
-                    self.root.after(0, lambda: self._on_pg_export_done(full_table))
+                    self.root.after(0, lambda: self._on_db_export_done("PostgreSQL", full_table))
                 except Exception as e:
                     logger.exception("Erreur export PostgreSQL")
                     self.root.after(0, lambda: messagebox.showerror("Erreur PostgreSQL", str(e)))
 
             threading.Thread(target=pg_task, daemon=True).start()
+            return
+
+        # Snowflake : dialogue de connexion
+        if fmt == 'snowflake':
+            sf_dialog = _SnowflakeDialog(self.root, mode='export')
+            self.root.wait_window(sf_dialog)
+            if not sf_dialog.result:
+                return
+            sf_params = sf_dialog.result
+            self._set_status("Export Snowflake en cours...")
+            self.progress['value'] = 0
+
+            def sf_task():
+                try:
+                    from core.exporter import export_snowflake
+                    full_table = export_snowflake(
+                        self.detection, self.fix_result,
+                        progress_callback=self._update_progress,
+                        **sf_params,
+                    )
+                    self.root.after(0, lambda: self._on_db_export_done("Snowflake", full_table))
+                except Exception as e:
+                    logger.exception("Erreur export Snowflake")
+                    self.root.after(0, lambda: messagebox.showerror("Erreur Snowflake", str(e)))
+
+            threading.Thread(target=sf_task, daemon=True).start()
+            return
+
+        # Databricks : dialogue de connexion
+        if fmt == 'databricks':
+            db_dialog = _DatabricksDialog(self.root, mode='export')
+            self.root.wait_window(db_dialog)
+            if not db_dialog.result:
+                return
+            db_params = db_dialog.result
+            self._set_status("Export Databricks en cours...")
+            self.progress['value'] = 0
+
+            def db_task():
+                try:
+                    from core.exporter import export_databricks
+                    full_table = export_databricks(
+                        self.detection, self.fix_result,
+                        progress_callback=self._update_progress,
+                        **db_params,
+                    )
+                    self.root.after(0, lambda: self._on_db_export_done("Databricks", full_table))
+                except Exception as e:
+                    logger.exception("Erreur export Databricks")
+                    self.root.after(0, lambda: messagebox.showerror("Erreur Databricks", str(e)))
+
+            threading.Thread(target=db_task, daemon=True).start()
             return
 
         ext_map = {
@@ -784,10 +902,10 @@ class DashboardApp:
 
         threading.Thread(target=task, daemon=True).start()
 
-    def _on_pg_export_done(self, full_table: str):
-        self._set_status(f"PostgreSQL OK : {full_table}")
+    def _on_db_export_done(self, provider: str, full_table: str):
+        self._set_status(f"{provider} OK : {full_table}")
         self.progress['value'] = 100
-        messagebox.showinfo("Export PostgreSQL", f"Table créée avec succès :\n{full_table}")
+        messagebox.showinfo(f"Export {provider}", f"Table créée avec succès :\n{full_table}")
 
     def _on_export_done(self, path: Path, fmt: str, csv_sep: str = '§'):
         self._set_status(f"Export OK : {path.name}")
@@ -810,6 +928,14 @@ class DashboardApp:
         """Ouvre un fichier avec l'application par défaut du système."""
         import subprocess
         import sys
+
+        # Valider l'extension pour éviter l'exécution de fichiers dangereux
+        safe_extensions = {'.xlsx', '.csv', '.json', '.ods', '.parquet', '.pq',
+                          '.sql', '.db', '.txt', '.tsv', '.xls', '.xlsm'}
+        if path.suffix.lower() not in safe_extensions:
+            logger.warning(f"Extension non autorisée pour ouverture automatique : {path.suffix}")
+            return
+
         try:
             if sys.platform == 'win32':
                 import os
@@ -1201,6 +1327,41 @@ class DashboardApp:
         self._set_status(f"Anonymisation: {len(rules)} colonnes sensibles détectées")
         self.progress['value'] = 100
 
+    def _on_import_db(self):
+        """Importe des données depuis Snowflake ou Databricks."""
+        dialog = _ImportDBDialog(self.root)
+        self.root.wait_window(dialog)
+        if not dialog.result:
+            return
+
+        provider = dialog.result['provider']
+        params = dialog.result['params']
+        self._set_status(f"Import {provider} en cours...")
+        self.progress['value'] = 0
+
+        def task():
+            try:
+                if provider == 'snowflake':
+                    from utils.db_connectors import snowflake_import_to_csv
+                    csv_path = snowflake_import_to_csv(**params)
+                else:
+                    from utils.db_connectors import databricks_import_to_csv
+                    csv_path = databricks_import_to_csv(**params)
+                self.root.after(0, lambda: self._on_import_db_done(provider, csv_path))
+            except Exception as e:
+                logger.exception(f"Erreur import {provider}")
+                self.root.after(0, lambda: messagebox.showerror(f"Erreur {provider}", str(e)))
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def _on_import_db_done(self, provider: str, csv_path):
+        self._set_status(f"Import {provider} OK : {csv_path.name}")
+        self.progress['value'] = 100
+        if messagebox.askyesno(f"Import {provider}",
+                               f"Données importées dans :\n{csv_path}\n\n"
+                               f"Charger ce fichier pour analyse ?"):
+            self._load_file(csv_path)
+
     def _on_cloud(self):
         """Détecte et affiche les emplacements cloud disponibles."""
         locations = detect_cloud_locations()
@@ -1439,3 +1600,230 @@ class _PostgresDialog(tk.Toplevel):
             'table_name': self.entries['table_name'].get() or None,
         }
         self.destroy()
+
+
+class _SnowflakeDialog(tk.Toplevel):
+    """Dialogue de connexion Snowflake."""
+
+    def __init__(self, parent, mode: str = 'export'):
+        super().__init__(parent)
+        self.title(f"Connexion Snowflake — {mode.capitalize()}")
+        self.configure(bg=DARK['bg'])
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+        self.result = None
+        self._mode = mode
+
+        pad = {'padx': 15, 'pady': 3}
+
+        tk.Label(self, text="Paramètres Snowflake",
+                 bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 10, 'bold')).pack(**pad, anchor='w', pady=(10, 5))
+
+        fields = [
+            ('Compte :', 'account', '', True),
+            ('Utilisateur :', 'user', '', True),
+            ('Mot de passe :', 'password', '', True),
+            ('Warehouse :', 'warehouse', '', False),
+            ('Database :', 'database', '', False),
+            ('Schéma :', 'schema', 'PUBLIC', False),
+            ('Rôle :', 'role', '', False),
+        ]
+        if mode == 'export':
+            fields.append(('Table :', 'table_name', '', False))
+        else:
+            fields.append(('Requête SQL :', 'query', 'SELECT * FROM ...', True))
+
+        self.entries = {}
+        for label, key, default, required in fields:
+            row = tk.Frame(self, bg=DARK['bg'])
+            row.pack(fill='x', padx=15, pady=2)
+            lbl_text = f"{label} *" if required else label
+            tk.Label(row, text=lbl_text, bg=DARK['bg'], fg=DARK['fg'],
+                     width=16, anchor='e', font=('Segoe UI', 9)).pack(side='left')
+            width = 40 if key == 'query' else 25
+            entry = tk.Entry(row, bg=DARK['bg_alt'], fg=DARK['fg'],
+                           insertbackground=DARK['fg'], width=width, font=('Segoe UI', 9))
+            if key == 'password':
+                entry.config(show='*')
+            entry.insert(0, default)
+            entry.pack(side='left', padx=5)
+            self.entries[key] = entry
+
+        btn_label = "Connecter & Exporter" if mode == 'export' else "Importer"
+        btn_frame = tk.Frame(self, bg=DARK['bg'])
+        btn_frame.pack(pady=12)
+        ttk.Button(btn_frame, text=btn_label, command=self._on_ok,
+                   style='Accent.TButton').pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
+
+        self.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
+        y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
+        self.geometry(f"+{x}+{y}")
+
+    def _on_ok(self):
+        account = self.entries['account'].get().strip()
+        user = self.entries['user'].get().strip()
+        password = self.entries['password'].get()
+        if not account or not user or not password:
+            messagebox.showwarning("Champs requis",
+                                   "Compte, utilisateur et mot de passe sont obligatoires.",
+                                   parent=self)
+            return
+
+        self.result = {
+            'account': account,
+            'user': user,
+            'password': password,
+            'warehouse': self.entries['warehouse'].get().strip() or None,
+            'database': self.entries['database'].get().strip() or None,
+            'schema': self.entries['schema'].get().strip() or 'PUBLIC',
+            'role': self.entries['role'].get().strip() or None,
+        }
+
+        if self._mode == 'export':
+            self.result['table_name'] = self.entries['table_name'].get().strip() or None
+        else:
+            query = self.entries['query'].get().strip()
+            if not query:
+                messagebox.showwarning("Requête", "La requête SQL est obligatoire.", parent=self)
+                return
+            self.result['query'] = query
+
+        self.destroy()
+
+
+class _DatabricksDialog(tk.Toplevel):
+    """Dialogue de connexion Databricks."""
+
+    def __init__(self, parent, mode: str = 'export'):
+        super().__init__(parent)
+        self.title(f"Connexion Databricks — {mode.capitalize()}")
+        self.configure(bg=DARK['bg'])
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+        self.result = None
+        self._mode = mode
+
+        pad = {'padx': 15, 'pady': 3}
+
+        tk.Label(self, text="Paramètres Databricks",
+                 bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 10, 'bold')).pack(**pad, anchor='w', pady=(10, 5))
+
+        fields = [
+            ('Hostname :', 'server_hostname', 'adb-xxx.azuredatabricks.net', True),
+            ('HTTP Path :', 'http_path', '/sql/1.0/warehouses/xxx', True),
+            ('Token :', 'access_token', '', True),
+            ('Catalogue :', 'catalog', '', False),
+            ('Schéma :', 'schema', 'default', False),
+        ]
+        if mode == 'export':
+            fields.append(('Table :', 'table_name', '', False))
+        else:
+            fields.append(('Requête SQL :', 'query', 'SELECT * FROM ...', True))
+
+        self.entries = {}
+        for label, key, default, required in fields:
+            row = tk.Frame(self, bg=DARK['bg'])
+            row.pack(fill='x', padx=15, pady=2)
+            lbl_text = f"{label} *" if required else label
+            tk.Label(row, text=lbl_text, bg=DARK['bg'], fg=DARK['fg'],
+                     width=16, anchor='e', font=('Segoe UI', 9)).pack(side='left')
+            width = 40 if key == 'query' else 30
+            entry = tk.Entry(row, bg=DARK['bg_alt'], fg=DARK['fg'],
+                           insertbackground=DARK['fg'], width=width, font=('Segoe UI', 9))
+            if key == 'access_token':
+                entry.config(show='*')
+            entry.insert(0, default)
+            entry.pack(side='left', padx=5)
+            self.entries[key] = entry
+
+        btn_label = "Connecter & Exporter" if mode == 'export' else "Importer"
+        btn_frame = tk.Frame(self, bg=DARK['bg'])
+        btn_frame.pack(pady=12)
+        ttk.Button(btn_frame, text=btn_label, command=self._on_ok,
+                   style='Accent.TButton').pack(side='left', padx=5)
+        ttk.Button(btn_frame, text="Annuler", command=self.destroy).pack(side='left', padx=5)
+
+        self.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
+        y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
+        self.geometry(f"+{x}+{y}")
+
+    def _on_ok(self):
+        hostname = self.entries['server_hostname'].get().strip()
+        http_path = self.entries['http_path'].get().strip()
+        token = self.entries['access_token'].get().strip()
+        if not hostname or not http_path or not token:
+            messagebox.showwarning("Champs requis",
+                                   "Hostname, HTTP path et token sont obligatoires.",
+                                   parent=self)
+            return
+
+        self.result = {
+            'server_hostname': hostname,
+            'http_path': http_path,
+            'access_token': token,
+            'catalog': self.entries['catalog'].get().strip() or None,
+            'schema': self.entries['schema'].get().strip() or 'default',
+        }
+
+        if self._mode == 'export':
+            self.result['table_name'] = self.entries['table_name'].get().strip() or None
+        else:
+            query = self.entries['query'].get().strip()
+            if not query:
+                messagebox.showwarning("Requête", "La requête SQL est obligatoire.", parent=self)
+                return
+            self.result['query'] = query
+
+        self.destroy()
+
+
+class _ImportDBDialog(tk.Toplevel):
+    """Dialogue de choix du fournisseur pour l'import depuis une base de données."""
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Importer depuis une base de données")
+        self.configure(bg=DARK['bg'])
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+        self.result = None
+        self._parent = parent
+
+        pad = {'padx': 15, 'pady': 5}
+
+        tk.Label(self, text="Choisir la source de données :",
+                 bg=DARK['bg'], fg=DARK['accent'],
+                 font=('Segoe UI', 10, 'bold')).pack(**pad, anchor='w', pady=(10, 5))
+
+        btn_frame = tk.Frame(self, bg=DARK['bg'])
+        btn_frame.pack(**pad)
+
+        ttk.Button(btn_frame, text="❄ Snowflake",
+                   command=lambda: self._choose('snowflake')).pack(side='left', padx=5, pady=10)
+        ttk.Button(btn_frame, text="🔶 Databricks",
+                   command=lambda: self._choose('databricks')).pack(side='left', padx=5, pady=10)
+
+        ttk.Button(self, text="Annuler", command=self.destroy).pack(pady=(0, 12))
+
+        self.update_idletasks()
+        x = parent.winfo_x() + (parent.winfo_width() - self.winfo_width()) // 2
+        y = parent.winfo_y() + (parent.winfo_height() - self.winfo_height()) // 2
+        self.geometry(f"+{x}+{y}")
+
+    def _choose(self, provider: str):
+        self.destroy()
+        if provider == 'snowflake':
+            dialog = _SnowflakeDialog(self._parent, mode='import')
+        else:
+            dialog = _DatabricksDialog(self._parent, mode='import')
+        self._parent.wait_window(dialog)
+        if dialog.result:
+            self.result = {'provider': provider, 'params': dialog.result}

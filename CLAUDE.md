@@ -1,7 +1,7 @@
 # CSV Traitement - Claude Code Project
 
 ## Objectif
-Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers tabulaires volumineux (500K+ lignes). Supporte en entrée : CSV, XLSX, XLS, ODS, JSON, Parquet. En sortie : XLSX, CSV, JSON, ODS, Parquet. Inclut : score de qualité, fuzzy dedup, comparaison/diff, rapprochement, fusion, anonymisation, normalisation texte, gestion colonnes et connexion cloud.
+Outil Python avec GUI (Tkinter dark theme) et CLI pour détecter et corriger les anomalies dans des fichiers tabulaires volumineux (500K+ lignes). Supporte en entrée : CSV, XLSX, XLS, ODS, JSON, Parquet, Snowflake, Databricks. En sortie : XLSX, CSV, JSON, ODS, Parquet, SQL, SQLite, PostgreSQL, Snowflake, Databricks. Inclut : score de qualité, fuzzy dedup, comparaison/diff, rapprochement, fusion, anonymisation, normalisation texte, gestion colonnes, éditeur de données et connexion cloud.
 
 ## Architecture
 
@@ -32,7 +32,8 @@ Csvtraitement/
 ├── ui/
 │   ├── __init__.py
 │   ├── dashboard.py           # Dashboard Tkinter dark theme + 8 onglets
-│   └── preview.py             # Preview avec recherche/filtre/pagination
+│   ├── preview.py             # Preview avec recherche/filtre/pagination
+│   └── editable_grid.py       # Grille éditable (double-clic, Tab, Entrée)
 ├── utils/
 │   ├── __init__.py
 │   ├── patterns.py            # Regex + types (date/nombre/booléen/masqué)
@@ -45,7 +46,8 @@ Csvtraitement/
 │   ├── validators.py          # Validation par colonne + validation croisée inter-colonnes
 │   ├── templates.py           # Templates profil JSON réutilisables
 │   ├── history.py             # Undo/redo historique corrections
-│   └── cloud.py               # Connecteurs cloud (OneDrive, SharePoint, pCloud, etc.)
+│   ├── cloud.py               # Connecteurs cloud (OneDrive, SharePoint, pCloud, etc.)
+│   └── db_connectors.py       # Connecteurs Snowflake + Databricks (import/export)
 ├── tests/
 │   ├── fixtures/
 │   ├── test_detector.py
@@ -122,7 +124,8 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 ### Interface
 - Thème sombre (palette Catppuccin Mocha)
 - 8 onglets : Diagnostic, Colonnes, Anomalies, Statistiques, Qualité, Doublons, Corrections, Historique
-- Boutons : Charger, Analyser, Stats, Preview, Corriger, Undo, Export, Qualité, Doublons, Comparer, Fusionner, Anonymiser, Cloud
+- Boutons : Charger, Analyser, Stats, Preview, Éditer, Corriger, Undo, Export, Qualité, Doublons, Comparer, Fusionner, Anonymiser, Cloud, Import DB
+- Éditeur de données : grille éditable (double-clic, Tab, Entrée, ajout/suppression lignes)
 - Drag & drop (si tkinterdnd2 installé, sinon double-clic)
 - Preview avec pagination, recherche, filtre (conformes/non conformes/corrigées)
 - Undo/redo sur les corrections
@@ -145,6 +148,8 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 - SQL : fichier .sql avec CREATE TABLE + INSERT INTO par batch
 - SQLite : sqlite3 stdlib, zéro dépendance externe
 - PostgreSQL : psycopg2 (optionnel), connexion directe, INSERT par batch
+- Snowflake : snowflake-connector-python (optionnel), requêtes paramétrées
+- Databricks : databricks-sql-connector (optionnel), requêtes paramétrées
 
 ### Modules data
 - `quality.py` : Score 0-100 pondéré (remplissage 30%, types 25%, formats 20%, outliers 15%, diversité 10%)
@@ -158,6 +163,13 @@ DATE, INTEGER, DECIMAL, TEXT_SHORT, TEXT_LONG, EMPTY, DATE_INVALID, MASKED_EMPTY
 - `anonymizer.py` : Détection (email, tel, IBAN, CB, sécu) + masquage (partiel/complet/hash/pseudonyme)
 - `validators.py` : Validation croisée (dates, arithmétique, conditionnel, exclusion mutuelle)
 - `cloud.py` : Détection auto des chemins sync (OneDrive, SharePoint, pCloud, Google Drive, Dropbox)
+- `db_connectors.py` : Import/export Snowflake + Databricks (requêtes paramétrées, validation identifiants)
+
+### Sécurité SQL (CRITIQUE)
+- TOUJOURS valider les identifiants SQL via `_sanitize_sql_name()` ou `_validate_identifier()`
+- TOUJOURS utiliser des requêtes paramétrées (%s ou ?) pour les données — JAMAIS de f-string pour les valeurs
+- Les requêtes import (--sf-query, --db-query) sont validées en lecture seule (SELECT/WITH uniquement)
+- Les types SQL sont vérifiés contre une allowlist de types connus
 
 ### Templates JSON (~/.csvtraitement/templates/)
 - Sauvegarde/rechargement de profils pour exports récurrents

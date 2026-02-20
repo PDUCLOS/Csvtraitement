@@ -48,6 +48,8 @@ EXPORT_FORMATS = {
     'sql': 'SQL (fichier .sql — CREATE TABLE + INSERT)',
     'sqlite': 'SQLite (base locale .db — zéro config)',
     'postgres': 'PostgreSQL (insertion directe sur serveur)',
+    'snowflake': 'Snowflake (cloud data warehouse)',
+    'databricks': 'Databricks (lakehouse / SQL warehouse)',
 }
 
 # Types SQL déduits depuis les profils de colonnes
@@ -739,6 +741,8 @@ def export_sql(
     if not table_name:
         source = detection.original_filepath or detection.filepath
         table_name = _sanitize_sql_name(source.stem)
+    else:
+        table_name = _sanitize_sql_name(table_name)
 
     if progress_callback:
         progress_callback(0, detection.total_lines, "Collecte des données...")
@@ -831,6 +835,8 @@ def export_sqlite(
     if not table_name:
         source = detection.original_filepath or detection.filepath
         table_name = _sanitize_sql_name(source.stem)
+    else:
+        table_name = _sanitize_sql_name(table_name)
 
     if progress_callback:
         progress_callback(0, detection.total_lines, "Collecte des données...")
@@ -935,7 +941,10 @@ def export_postgres(
     if not table_name:
         source = detection.original_filepath or detection.filepath
         table_name = _sanitize_sql_name(source.stem)
+    else:
+        table_name = _sanitize_sql_name(table_name)
 
+    schema = _sanitize_sql_name(schema)
     full_table = f"{schema}.{table_name}"
 
     if progress_callback:
@@ -1005,6 +1014,121 @@ def export_postgres(
     return full_table
 
 
+def export_snowflake(
+    detection: DetectionResult,
+    fix_result: FixResult,
+    account: str,
+    user: str,
+    password: str,
+    table_name: Optional[str] = None,
+    warehouse: Optional[str] = None,
+    database: Optional[str] = None,
+    schema: str = 'PUBLIC',
+    role: Optional[str] = None,
+    drop_existing: bool = True,
+    progress_callback=None,
+) -> str:
+    """Export vers Snowflake.
+
+    Args:
+        detection: Résultat de détection.
+        fix_result: Résultat des corrections.
+        account: Identifiant du compte Snowflake.
+        user: Utilisateur.
+        password: Mot de passe.
+        table_name: Nom de la table (déduit du fichier si None).
+        warehouse: Entrepôt de calcul.
+        database: Base de données Snowflake.
+        schema: Schéma (défaut: PUBLIC).
+        role: Rôle Snowflake.
+        drop_existing: Supprimer la table existante.
+        progress_callback: Fonction de suivi.
+
+    Returns:
+        Nom complet de la table créée.
+    """
+    from utils.db_connectors import snowflake_export
+
+    header = [h.strip() for h in detection.header[:detection.expected_columns]]
+    col_types = [_SQL_TYPE_MAP.get(p.dominant_type, 'VARCHAR') for p in detection.column_profiles]
+    while len(col_types) < detection.expected_columns:
+        col_types.append('VARCHAR')
+    col_types = col_types[:detection.expected_columns]
+    # Snowflake uses VARCHAR instead of TEXT/VARCHAR(255)
+    col_types = [t.replace('VARCHAR(255)', 'VARCHAR').replace('TEXT', 'VARCHAR') for t in col_types]
+
+    if not table_name:
+        source = detection.original_filepath or detection.filepath
+        table_name = _sanitize_sql_name(source.stem)
+
+    if progress_callback:
+        progress_callback(0, detection.total_lines, "Collecte des données...")
+
+    rows = _collect_rows(detection, fix_result)
+
+    return snowflake_export(
+        header, rows, account, user, password, table_name,
+        warehouse=warehouse, database=database, schema=schema,
+        role=role, drop_existing=drop_existing, col_types=col_types,
+        progress_callback=progress_callback,
+    )
+
+
+def export_databricks(
+    detection: DetectionResult,
+    fix_result: FixResult,
+    server_hostname: str,
+    http_path: str,
+    access_token: str,
+    table_name: Optional[str] = None,
+    catalog: Optional[str] = None,
+    schema: str = 'default',
+    drop_existing: bool = True,
+    progress_callback=None,
+) -> str:
+    """Export vers Databricks.
+
+    Args:
+        detection: Résultat de détection.
+        fix_result: Résultat des corrections.
+        server_hostname: Hostname du workspace Databricks.
+        http_path: Chemin HTTP du SQL warehouse.
+        access_token: Token d'accès personnel.
+        table_name: Nom de la table (déduit du fichier si None).
+        catalog: Catalogue Unity.
+        schema: Schéma (défaut: default).
+        drop_existing: Supprimer la table existante.
+        progress_callback: Fonction de suivi.
+
+    Returns:
+        Nom complet de la table créée.
+    """
+    from utils.db_connectors import databricks_export
+
+    header = [h.strip() for h in detection.header[:detection.expected_columns]]
+    col_types = [_SQL_TYPE_MAP.get(p.dominant_type, 'STRING') for p in detection.column_profiles]
+    while len(col_types) < detection.expected_columns:
+        col_types.append('STRING')
+    col_types = col_types[:detection.expected_columns]
+    # Databricks uses STRING instead of TEXT/VARCHAR(255)
+    col_types = [t.replace('VARCHAR(255)', 'STRING').replace('TEXT', 'STRING') for t in col_types]
+
+    if not table_name:
+        source = detection.original_filepath or detection.filepath
+        table_name = _sanitize_sql_name(source.stem)
+
+    if progress_callback:
+        progress_callback(0, detection.total_lines, "Collecte des données...")
+
+    rows = _collect_rows(detection, fix_result)
+
+    return databricks_export(
+        header, rows, server_hostname, http_path, access_token, table_name,
+        catalog=catalog, schema=schema, drop_existing=drop_existing,
+        col_types=col_types, progress_callback=progress_callback,
+    )
+
+
 def export_any(
     detection: DetectionResult,
     analysis: AnalysisResult,
@@ -1014,7 +1138,7 @@ def export_any(
     csv_separator: str = '§',
     progress_callback=None,
 ) -> Path:
-    """Export unifié vers n'importe quel format supporté.
+    """Export unifié vers n'importe quel format fichier supporté.
 
     Args:
         detection: Résultat de détection.
@@ -1029,7 +1153,8 @@ def export_any(
         Chemin du fichier créé.
 
     Note:
-        Pour PostgreSQL direct, utiliser export_postgres() avec les paramètres de connexion.
+        Pour PostgreSQL/Snowflake/Databricks, utiliser les fonctions dédiées
+        export_postgres(), export_snowflake(), export_databricks().
     """
     if fmt == 'xlsx':
         return export_xlsx(detection, analysis, fix_result, output_path, progress_callback)
