@@ -126,6 +126,18 @@ class TestAnonymisation:
         assert detect_sensitive_type("j.dupont@exemple.fr") == SensitiveType.EMAIL
         assert detect_sensitive_type("06 12 34 56 78") == SensitiveType.PHONE_FR
         assert detect_sensitive_type("Lyon") is None
+        # valeurs fabriquées (format valide, aucune personne réelle)
+        assert detect_sensitive_type("FR76 3000 6000 0112 3456 7890 189") == SensitiveType.IBAN
+        assert detect_sensitive_type("1 85 05 78 006 084 36") == SensitiveType.SSN_FR
+
+    def test_colonnes_pii_de_l_export(self, pipeline):
+        from core.anonymizer import detect_column_sensitivity
+        det, _, _ = pipeline
+        found = {det.header[p.index].strip(): detect_column_sensitivity(p.sample_values)
+                 for p in det.column_profiles}
+        assert found["Email_Contact"] == SensitiveType.EMAIL
+        assert found["Telephone"] == SensitiveType.PHONE_FR
+        assert found["Raison_Sociale"] is None
 
     def test_masquage(self):
         assert mask_email("jean.dupont@mail.com") == "j***@m***.com"

@@ -75,20 +75,29 @@ def main() -> None:
 
     def s5():
         grab(root, "gui-corrections")
-        before = set(root.winfo_children())
-        app._on_preview()
-        root.update()
-        new = [w for w in root.winfo_children() if w not in before and isinstance(w, tk.Toplevel)]
-        if new:
-            preview["w"] = new[0]
-            new[0].attributes("-topmost", True)
-            new[0].geometry("1440x860+40+40")
-            root.after(1200, s6)
-        else:
-            root.after(200, root.destroy)
+        from ui.dashboard import DARK
+        from ui.preview import PreviewWindow
+        pw = PreviewWindow(root, app.detection, app.fix_result, dark_theme=DARK)
+        preview["pw"] = pw
+        pw.window.attributes("-topmost", True)
+        pw.window.geometry("1440x860+40+40")
+        root.after(1200, s6)
 
     def s6():
-        grab(preview["w"], "gui-preview")
+        pw = preview["pw"]
+        grab(pw.window, "gui-preview")
+        pw.filter_var.set("issues")  # filtre « Non conformes » : les lignes décalées
+        pw._load_page(0)
+        root.after(800, s7)
+
+    def s7():
+        pw = preview["pw"]
+        grab(pw.window, "gui-preview-avant")
+        pw.notebook.select(1)
+        root.after(800, s8)
+
+    def s8():
+        grab(preview["pw"].window, "gui-preview-apres")
         root.after(200, root.destroy)
 
     wait_for("detection", s1)
