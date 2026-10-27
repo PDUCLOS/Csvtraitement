@@ -156,7 +156,8 @@ def compare_files(
     result.total_a = rows_a
 
     # Parcourir fichier B et comparer
-    matched_keys_a: set[str] = set()
+    # Clés non uniques : la k-ième occurrence dans B est appariée à la k-ième dans A
+    consumed_a: dict[str, int] = defaultdict(int)
     rows_b = 0
 
     for chunk in read_chunks(
@@ -171,11 +172,10 @@ def compare_files(
                 padded_b.append('')
             key = _build_key(padded_b, key_columns)
 
-            if key in index_a:
-                # Ligne trouvée dans A — comparer les valeurs
-                entries_a = index_a[key]
-                line_num_a, padded_a = entries_a[0]  # Prendre la première occurrence
-                matched_keys_a.add(key)
+            if consumed_a[key] < len(index_a.get(key, ())):
+                # Ligne trouvée dans A — comparer avec l'occurrence de même rang
+                line_num_a, padded_a = index_a[key][consumed_a[key]]
+                consumed_a[key] += 1
 
                 # Comparer cellule par cellule
                 cell_diffs = []
@@ -228,8 +228,8 @@ def compare_files(
 
     # Lignes de A non trouvées dans B → supprimées
     for key, entries in index_a.items():
-        if key not in matched_keys_a:
-            for line_num_a, padded_a in entries:
+        if consumed_a[key] < len(entries):
+            for line_num_a, padded_a in entries[consumed_a[key]:]:
                 result.removed += 1
                 if len(result.diffs) < max_diffs:
                     result.diffs.append(RowDiff(
