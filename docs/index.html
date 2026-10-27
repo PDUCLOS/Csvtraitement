@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Csvtraitement — exports ERP propres</title>
+<meta name="description" content="Csvtraitement : détecter et corriger les défauts des exports ERP (colonnes décalées, décimales FR/US, dates invalides, doublons, données personnelles) avec validation humaine. Testé sur 1 million de lignes synthétiques, chiffres mesurés.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Même grammaire que la vitrine de référence (Plex, colonne de 1080 px), teinte « tableur » : vert de grille. */
+:root {
+  --bg: #f4f6f5; --surface: #ffffff; --ink: #14201b; --muted: #55635d; --line: #d9e1dd;
+  --accent: #1f7a5a; --accent-ink: #ffffff; --accent-soft: #e0f1ea;
+  --good: #1f7a4d; --good-soft: #e1f2e8; --warn: #9a6200; --warn-soft: #fbefd9; --bad: #b3261e; --bad-soft: #fbe3e1;
+  --hero: #0f1f1a; --hero-ink: #e7f1ec; --hero-muted: #a2b8ae; --hero-accent: #7fd6b0;
+  --code-bg: #0e1714; --code-ink: #dcebe4;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1311; --surface: #151d1a; --ink: #e5ece8; --muted: #9bada5; --line: #26332e;
+  --accent: #6fcfa5; --accent-ink: #0d1311; --accent-soft: #173027;
+  --good: #5cc78f; --good-soft: #14301f; --warn: #e3a948; --warn-soft: #33270f; --bad: #f08079; --bad-soft: #3a1a18;
+  --hero: #08110e; --code-bg: #08100d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0d1311; --surface: #151d1a; --ink: #e5ece8; --muted: #9bada5; --line: #26332e;
+  --accent: #6fcfa5; --accent-ink: #0d1311; --accent-soft: #173027;
+  --good: #5cc78f; --good-soft: #14301f; --warn: #e3a948; --warn-soft: #33270f; --bad: #f08079; --bad-soft: #3a1a18;
+  --hero: #08110e; --code-bg: #08100d; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.62 var(--f-body); }
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--accent); text-underline-offset: 3px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); font-weight: 600; line-height: 1.15; }
+h3 { font-size: 1.15rem; font-weight: 600; line-height: 1.3; }
+p { margin: 0; }
+code { font-family: var(--f-mono); font-size: 0.86em; background: var(--accent-soft); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font: 500 0.74rem var(--f-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 1.08rem; color: var(--muted); max-width: 68ch; }
+.muted { color: var(--muted); }
+section { padding-block: 72px 8px; }
+section > .wrap { display: grid; gap: 22px; }
+nav.top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--hero) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.08); }
+nav.top .wrap { display: flex; align-items: center; gap: 18px; min-height: 52px; overflow-x: auto; scrollbar-width: none; }
+nav.top .brand { font: 600 1rem var(--f-display); color: var(--hero-ink); white-space: nowrap; text-decoration: none; }
+nav.top a.l { color: var(--hero-muted); text-decoration: none; font-size: 0.88rem; white-space: nowrap; }
+nav.top a.l:hover, nav.top a.l:focus-visible { color: var(--hero-ink); }
+nav.top .gh { margin-left: auto; color: var(--hero-ink); border: 1px solid rgba(255,255,255,0.25); padding: 4px 12px; border-radius: 4px; font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
+.hero { background: var(--hero); color: var(--hero-ink); padding-block: 64px 56px; }
+.hero .wrap { display: grid; gap: 28px; }
+.hero h1 { font-size: clamp(2.1rem, 5.4vw, 3.6rem); font-weight: 700; line-height: 1.04; max-width: 19ch; }
+.hero h1 em { font-style: normal; color: var(--hero-accent); }
+.hero .lead { color: var(--hero-muted); font-size: 1.15rem; }
+.hero .eyebrow { color: var(--hero-muted); }
+.hero code { background: rgba(127,214,176,0.16); color: var(--hero-ink); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; overflow: hidden; }
+.kpi { background: var(--hero); padding: 16px 18px; display: grid; gap: 2px; }
+.kpi b { font: 600 1.8rem var(--f-display); font-variant-numeric: tabular-nums; color: #fff; }
+.kpi span { font-size: 0.82rem; color: var(--hero-muted); }
+.shot { border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 24px 60px rgba(0,0,0,0.35); }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 0.95rem; }
+.btn.primary { background: var(--hero-accent); color: #0f1f1a; }
+.btn.ghost { border: 1px solid rgba(255,255,255,0.3); color: var(--hero-ink); }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+figure { margin: 0; display: grid; gap: 10px; min-width: 0; }
+figure img { border-radius: 6px; border: 1px solid var(--line); }
+figcaption { font-size: 0.9rem; color: var(--muted); }
+figcaption b { color: var(--ink); }
+.wide { overflow-x: auto; border-radius: 6px; }
+.wide img { min-width: 760px; }
+.steps { display: grid; gap: 14px; counter-reset: step; }
+.step { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; }
+.step::before { counter-increment: step; content: counter(step); font: 600 1.6rem var(--f-display); color: var(--accent); background: var(--accent-soft); border-radius: 6px; height: 56px; display: grid; place-items: center; }
+.step .body { display: grid; gap: 10px; min-width: 0; }
+.step dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 14px; margin: 0; font-size: 0.94rem; }
+.step dt { font: 500 0.72rem var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.step dd { margin: 0; }
+@media (max-width: 560px) { .step { grid-template-columns: 1fr; } .step::before { width: 44px; height: 44px; font-size: 1.2rem; } .step dl { grid-template-columns: 1fr; } }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button { font: 500 0.88rem var(--f-body); padding: 7px 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 4px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tabs button:focus-visible, .copy:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.diagram { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px; overflow-x: auto; }
+.diagram img { min-width: 760px; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 500; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+td.num, th.num { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.pill { font: 500 0.72rem var(--f-mono); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.journal { display: grid; border-left: 2px solid var(--line); margin-left: 8px; }
+.entry { position: relative; padding: 0 0 22px 26px; display: grid; gap: 4px; }
+.entry::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--accent); }
+.entry.fix::before { border-color: var(--warn); }
+.entry .tag { font: 500 0.72rem var(--f-mono); color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.code { position: relative; background: var(--code-bg); color: var(--code-ink); border-radius: 8px; min-width: 0; }
+.code pre { margin: 0; padding: 16px 18px; overflow-x: auto; font: 0.85rem/1.6 var(--f-mono); }
+.code pre .c { color: #86a397; }
+.copy { position: absolute; top: 8px; right: 8px; font: 500 0.75rem var(--f-mono); background: rgba(255,255,255,0.08); color: var(--code-ink); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; padding: 3px 8px; cursor: pointer; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.callout { border: 1px solid var(--line); border-left: 4px solid var(--warn); background: var(--surface); border-radius: 6px; padding: 14px 16px; display: grid; gap: 6px; }
+.callout.ok { border-left-color: var(--good); }
+dl.gloss { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin: 0; }
+dl.gloss div { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; }
+dl.gloss dt { font: 600 1rem var(--f-display); }
+dl.gloss dd { margin: 4px 0 0; color: var(--muted); font-size: 0.94rem; }
+footer { margin-top: 72px; padding-block: 32px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.9rem; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+</style>
+</head>
+<body>
+<nav class="top" aria-label="Sommaire">
+  <div class="wrap">
+    <a class="brand" href="#top">Csvtraitement</a>
+    <a class="l" href="#video">Vidéo</a>
+    <a class="l" href="#probleme">Problème</a>
+    <a class="l" href="#demo">Démo</a>
+    <a class="l" href="#fonctionnement">Fonctionnement</a>
+    <a class="l" href="#architecture">Architecture</a>
+    <a class="l" href="#mesures">Mesures</a>
+    <a class="l" href="#demarche">Démarche</a>
+    <a class="l" href="#deploiement">Déploiement</a>
+    <a class="l" href="#limites">Limites</a>
+    <a class="gh" href="https://github.com/PDUCLOS/Csvtraitement">GitHub</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="eyebrow">Outil Python · Qualité de données · Exports SAP et autres ERP</span>
+    <h1>Des exports ERP <em>propres</em>, même à un million de lignes.</h1>
+    <p class="lead">Une colonne décalée, des montants « 1.234,56 » et « 1,234.56 » mélangés, des dates <code>00.00.0000</code>, des <code>#REF!</code>, des doublons : Csvtraitement repère chaque défaut à la ligne et à la colonne près, propose la correction et laisse l'analyste valider avant d'exporter. Interface de bureau pour la revue, ligne de commande pour l'automatisation.</p>
+    <div class="kpis" role="list">
+      <div class="kpi" role="listitem"><b>1 000 000</b><span>lignes traitées en 63,5 s (détection → export CSV)</span></div>
+      <div class="kpi" role="listitem"><b>100 %</b><span>des décalages trouvés, 0 faux positif (vérité terrain)</span></div>
+      <div class="kpi" role="listitem"><b>100 %</b><span>des lignes décalées retrouvent leurs valeurs d'origine</span></div>
+      <div class="kpi" role="listitem"><b>×120</b><span>plus rapide sur les doublons flous après correctif</span></div>
+      <div class="kpi" role="listitem"><b>84</b><span>tests pytest verts (59 à l'origine)</span></div>
+    </div>
+    <div class="shot"><img src="img/gui-anomalies.png" alt="Interface Csvtraitement, onglet Anomalies : liste des lignes décalées avec le numéro de ligne, le nombre de colonnes trouvé et la colonne où commence le décalage" width="1440" height="900"></div>
+    <div class="cta">
+      <a class="btn primary" href="#mesures">Voir les mesures</a>
+      <a class="btn ghost" href="https://github.com/PDUCLOS/Csvtraitement">Voir le code</a>
+      <a class="btn ghost" href="#limites">Ce qui n'est pas vérifié</a>
+    </div>
+  </div>
+</header>
+
+<section id="video">
+  <div class="wrap">
+    <span class="eyebrow">En moins de deux minutes</span>
+    <h2>Le projet en vidéo</h2>
+    <video controls preload="metadata" poster="video/poster.png" style="width:100%;border-radius:8px;border:1px solid var(--line);background:#0f1f1a">
+      <source src="video/csvtraitement-promo.mp4" type="video/mp4">
+      Votre navigateur ne lit pas la vidéo : <a href="video/csvtraitement-promo.mp4">la télécharger</a>.
+    </video>
+    <p class="muted">Vidéo générée par <code>scripts/promo_video.py</code> à partir des vraies captures et des chiffres mesurés : narration de synthèse (voix Windows), fond sonore synthétisé.</p>
+  </div>
+</section>
+
+<section id="probleme">
+  <div class="wrap">
+    <span class="eyebrow">Le problème</span>
+    <h2>Un export ERP « presque bon » coûte des heures</h2>
+    <div class="duo">
+      <div class="card">
+        <h3>Ce que reçoit l'analyste</h3>
+        <ul>
+          <li>Une raison sociale « Martinez; SARL » : le <code>;</code> non échappé décale toute la fin de ligne.</li>
+          <li>Une cellule perdue : la quantité se retrouve dans la colonne statut.</li>
+          <li>Des montants FR, US et comptables <code>(1.234,56)</code> dans la même colonne.</li>
+          <li><code>00.00.0000</code>, <code>#REF!</code>, <code>N/A</code>, des doublons, des e-mails clients.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Ce que fait Excel</h3>
+        <ul>
+          <li>Il importe sans broncher : la ligne décalée passe inaperçue.</li>
+          <li>Il interprète « 1.234 » comme une date ou un millier selon la langue du poste.</li>
+          <li>Il plafonne à 1 048 576 lignes et rame bien avant.</li>
+          <li>Il ne dit pas <em>où</em> sont les problèmes.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Ce que fait Csvtraitement</h3>
+        <ul>
+          <li><b>Localise</b> chaque anomalie : ligne, colonne, type.</li>
+          <li><b>Propose</b> une correction (réalignement, ISO, float, cellule vidée).</li>
+          <li><b>Montre</b> l'avant / après, avec undo / redo, avant tout export.</li>
+          <li><b>Note</b> la qualité de 0 à 100 et repère les données personnelles.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <span class="eyebrow">Démo réelle</span>
+    <h2>Captures de l'interface, prises sur cette machine</h2>
+    <p class="lead">Ce ne sont pas des maquettes : <code>scripts/capture_gui.py</code> lance la vraie application Tkinter, charge un export de 1 000 lignes et déclenche les mêmes actions que les boutons. Les données sont <b>synthétiques</b> (<code>scripts/generate_sample.py</code>, graine fixe) : aucune donnée d'entreprise.</p>
+    <figure>
+      <div class="wide"><img src="img/avant-apres.png" alt="Ligne 30 avant correction : la quantité manque et les colonnes sont décalées ; après : cellule vide insérée, colonnes réalignées, dates au format ISO et montants en nombre" width="1410" height="258"></div>
+      <figcaption><b>Avant / après sur une ligne.</b> La ligne 30 a perdu sa quantité : « FACTURE » est tombé dans la colonne Quantite. Après correction, une cellule vide est insérée au bon endroit, les dates passent en ISO et les montants en nombre.</figcaption>
+    </figure>
+    <div class="gallery">
+      <figure>
+        <img src="img/gui-diagnostic.png" alt="Onglet Diagnostic : encodage, séparateur, nombre de lignes et de colonnes détectés" width="1440" height="900" loading="lazy">
+        <figcaption><b>Diagnostic.</b> Encodage, séparateur, nombre de colonnes et format décimal détectés automatiquement.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/gui-colonnes.png" alt="Onglet Colonnes : type dominant de chaque colonne et taux de confiance" width="1440" height="900" loading="lazy">
+        <figcaption><b>Profil des colonnes.</b> Chaque colonne reçoit un type (date, décimal, entier, texte…) calculé sur 2 000 lignes échantillonnées.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/gui-qualite.png" alt="Onglet Qualité : score global et score par colonne avec remplissage, types, outliers, format" width="1440" height="900" loading="lazy">
+        <figcaption><b>Score qualité.</b> Note A→F par colonne. À lire avec recul : un fichier avec 6,5 % de lignes défectueuses obtient encore « A » (voir <a href="#limites">limites</a>).</figcaption>
+      </figure>
+      <figure>
+        <img src="img/gui-doublons.png" alt="Onglet Doublons : groupes de doublons exacts et approchés avec les différences" width="1440" height="900" loading="lazy">
+        <figcaption><b>Doublons.</b> Exacts (hash) et approchés (similarité ≥ 85 %), avec la cellule qui diffère.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/gui-corrections.png" alt="Onglet Corrections : options et compteurs de corrections" width="1440" height="900" loading="lazy">
+        <figcaption><b>Corrections.</b> Chaque famille se désactive. Deux de ces cases n'étaient reliées à rien : corrigé (voir <a href="#demarche">démarche</a>).</figcaption>
+      </figure>
+      <figure>
+        <img src="img/gui-preview.png" alt="Fenêtre de prévisualisation des données originales, page 1 sur 10" width="1440" height="860" loading="lazy">
+        <figcaption><b>Prévisualisation.</b> Données originales et après correction, pagination, recherche, filtre.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="fonctionnement">
+  <div class="wrap">
+    <span class="eyebrow">Comment ça marche</span>
+    <h2>Le trajet d'un fichier, en six étapes</h2>
+    <p class="lead">Chaque étape relit le fichier par blocs de 10 000 lignes avec le module <code>csv</code> de Python : guillemets et retours à la ligne dans les champs sont gérés, et aucune étape ne fait de <code>split(";")</code> naïf.</p>
+    <div class="steps">
+      <article class="step"><div class="body">
+        <h3>Lire n'importe quel format</h3>
+        <dl>
+          <dt>En clair</dt><dd>CSV, TXT et TSV sont lus directement. XLSX, XLS, ODS, JSON et Parquet sont d'abord convertis en CSV temporaire, puis traités de la même façon.</dd>
+          <dt>Code</dt><dd><code>utils/universal_reader.py</code> · <code>utils/parquet_reader.py</code> (<code>iter_batches</code>)</dd>
+          <dt>Pourquoi</dt><dd>Un seul moteur d'analyse : chaque correctif profite à tous les formats.</dd>
+        </dl>
+      </div></article>
+      <article class="step"><div class="body">
+        <h3>Deviner l'encodage, le séparateur et les types</h3>
+        <dl>
+          <dt>En clair</dt><dd>Pour chaque séparateur candidat, on compte ses occurrences par ligne : le bon est fréquent et <em>régulier</em> (score moyenne / (1 + écart-type)). Les types de colonnes sont votés sur 1 000 premières lignes + 1 000 lignes au hasard.</dd>
+          <dt>Code</dt><dd><code>core/detector.py</code> · <code>utils/patterns.py</code> (9 types)</dd>
+          <dt>Pourquoi</dt><dd>Un export SAP n'annonce ni son séparateur ni sa langue ; le profil de référence sert ensuite à repérer les cellules « hors type ».</dd>
+        </dl>
+      </div></article>
+      <article class="step"><div class="body">
+        <h3>Localiser les décalages</h3>
+        <dl>
+          <dt>En clair</dt><dd>Une ligne de 12 cellules au lieu de 11 a une cellule en trop. On avance cellule par cellule en comparant au type attendu : là où une date est attendue mais qu'on lit « SARL », le décalage commence.</dd>
+          <dt>Code</dt><dd><code>core/analyzer.py</code> — <code>find_shift_start</code></dd>
+          <dt>Pourquoi</dt><dd>Savoir <em>où</em> commence le décalage permet de réparer la ligne au lieu de la jeter.</dd>
+        </dl>
+      </div></article>
+      <article class="step"><div class="body">
+        <h3>Réparer</h3>
+        <dl>
+          <dt>En clair</dt><dd>Cellule en trop après un texte : on recolle les deux morceaux (« Martinez » + « ; » + « SARL »). Cellule manquante : on insère une case vide. Puis dates → ISO, <code>00.00.0000</code> → vide, décimales FR/US → nombre, <code>(1,50)</code> → -1.5, <code>#REF!</code> / <code>N/A</code> → vide.</dd>
+          <dt>Code</dt><dd><code>core/fixer.py</code> — <code>realign_row</code>, <code>fix_row_types</code>, <code>apply_fixes</code></dd>
+          <dt>Pourquoi</dt><dd>Une donnée perdue ne se devine pas : on préfère une case vide <em>signalée</em> à une valeur inventée.</dd>
+        </dl>
+      </div></article>
+      <article class="step"><div class="body">
+        <h3>Faire valider par un humain</h3>
+        <dl>
+          <dt>En clair</dt><dd>L'interface montre l'avant / après, chaque correction est annulable (undo / redo). En automatique, la CLI écrit un rapport JSON de tout ce qui a été changé.</dd>
+          <dt>Code</dt><dd><code>ui/dashboard.py</code> · <code>ui/preview.py</code> · <code>utils/history.py</code> · <code>core/cli.py</code></dd>
+          <dt>Pourquoi</dt><dd>Une correction automatique fausse dans un fichier comptable est pire qu'une anomalie visible.</dd>
+        </dl>
+      </div></article>
+      <article class="step"><div class="body">
+        <h3>Exporter</h3>
+        <dl>
+          <dt>En clair</dt><dd>XLSX typé, cellules corrigées surlignées et onglet « rapport » ; ou CSV (séparateur au choix), JSON, ODS, Parquet. L'écriture passe par un fichier temporaire local puis une copie, ce qui évite les erreurs sur lecteurs réseau et dossiers synchronisés.</dd>
+          <dt>Code</dt><dd><code>core/exporter.py</code> (xlsxwriter <code>constant_memory</code>)</dd>
+          <dt>Pourquoi</dt><dd>Le fichier propre repart vers Excel, Power BI ou un entrepôt sans retouche.</dd>
+        </dl>
+      </div></article>
+    </div>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <span class="eyebrow">Architecture</span>
+    <h2>Quatre schémas</h2>
+    <p class="lead">Source éditable : <code>docs/architecture.drawio</code> (généré par <code>scripts/build_drawio.py</code>, exporté en PNG par draw.io).</p>
+    <div class="tabs" role="tablist" aria-label="Schémas d'architecture">
+      <button role="tab" aria-selected="true" aria-controls="arch-img" data-src="img/architecture-1.png" data-alt="Pipeline en six étapes : entrée, détection, analyse, correction, validation, export">Pipeline</button>
+      <button role="tab" aria-selected="false" aria-controls="arch-img" data-src="img/architecture-2.png" data-alt="Ce qui est lu en flux et ce qui reste en mémoire">Mémoire</button>
+      <button role="tab" aria-selected="false" aria-controls="arch-img" data-src="img/architecture-3.png" data-alt="Doublons flous : ancien blocage contre blocage multi-clés">Doublons flous</button>
+      <button role="tab" aria-selected="false" aria-controls="arch-img" data-src="img/architecture-4.png" data-alt="Déploiement batch : dépôt SFTP, volume, CronJob Kubernetes, fichiers corrigés">Déploiement</button>
+    </div>
+    <div class="diagram" role="tabpanel"><img id="arch-img" src="img/architecture-1.png" alt="Pipeline en six étapes : entrée, détection, analyse, correction, validation, export" width="2965" height="1150"></div>
+  </div>
+</section>
+
+<section id="mesures">
+  <div class="wrap">
+    <span class="eyebrow">Mesures</span>
+    <h2>Tester sur des fichiers dont on connaît la réponse</h2>
+    <p class="lead">Pour mesurer la qualité des contrôles, il faut savoir ce qui est faux. <code>scripts/generate_sample.py</code> fabrique un export ERP synthétique (11 colonnes façon SAP) et y injecte des anomalies <em>en notant où</em>. <code>scripts/benchmark.py</code> passe le vrai pipeline dessus et compare. Machine : Ryzen 9 3900X, Python 3.12, Windows 11, un seul cœur utilisé, d'autres traitements tournant en parallèle.</p>
+    <div class="scroll"><table>
+      <caption class="muted" style="text-align:left;padding:10px 14px">Qualité des contrôles — fichier de 100 000 lignes (taux identiques à 10 000, 500 000 et 1 000 000 lignes)</caption>
+      <thead><tr><th>Anomalie injectée</th><th class="num">Injectées</th><th>Trouvées / corrigées</th><th class="num">Faux positifs</th><th>Verdict</th></tr></thead>
+      <tbody><tr><td>Colonne en trop (<code>;</code> non échappé dans un texte)</td><td class="num">990</td><td>990 détectées, recollées</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr><tr><td>Colonne manquante (cellule perdue)</td><td class="num">513</td><td>513 détectées, cellule vide insérée</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr><tr><td>Ligne décalée restituée à l'identique (aux espaces près)</td><td class="num">1 503</td><td>1503 (100 %)</td><td class="num">—</td><td><span class="pill ok">OK</span></td></tr><tr><td>Date invalide <code>00.00.0000</code></td><td class="num">974</td><td>974 vidées</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr><tr><td>Valeur masquée (<code>#REF!</code>, <code>N/A</code>, <code>NULL</code>, <code>-</code>, <code>??</code>)</td><td class="num">994</td><td>994 vidées</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr><tr><td>Montant au format US dans une colonne FR</td><td class="num">1 963</td><td>1963 au bon format (4 l'étaient déjà, ex. <code>912.79</code>)</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr><tr><td>Parenthèses comptables <code>(1.234,56)</code></td><td class="num">520</td><td>520 → négatif</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr><tr><td>Doublon exact</td><td class="num">464</td><td>464 trouvés</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr><tr><td>Quasi-doublon (2 lettres inversées)</td><td class="num">197</td><td>197 trouvés</td><td class="num">0</td><td><span class="pill ok">OK</span></td></tr></tbody>
+    </table></div>
+    <div class="scroll"><table>
+      <caption class="muted" style="text-align:left;padding:10px 14px">Temps et mémoire par taille de fichier (secondes, processus séparé par taille)</caption>
+      <thead><tr><th class="num">Lignes</th><th class="num">Fichier</th><th class="num">Détection</th><th class="num">Analyse</th><th class="num">Corrections</th><th class="num">Export CSV</th><th class="num">Cœur total</th><th class="num">Qualité</th><th class="num">Export XLSX</th><th class="num">Doublons</th><th class="num">Pic mémoire</th></tr></thead>
+      <tbody><tr><td class="num">10 000</td><td class="num">1,4 Mo</td><td class="num">0,23</td><td class="num">0,40</td><td class="num">0,26</td><td class="num">0,07</td><td class="num"><b>0,97</b></td><td class="num">0,61</td><td class="num">1,77</td><td class="num">3,54</td><td class="num">110 Mo</td></tr><tr><td class="num">100 000</td><td class="num">14 Mo</td><td class="num">0,46</td><td class="num">2,98</td><td class="num">3,18</td><td class="num">0,66</td><td class="num"><b>7,28</b></td><td class="num">6,12</td><td class="num">13,8</td><td class="num">24,0</td><td class="num">516 Mo</td></tr><tr><td class="num">500 000</td><td class="num">71 Mo</td><td class="num">1,41</td><td class="num">15,2</td><td class="num">16,1</td><td class="num">2,58</td><td class="num"><b>35,3</b></td><td class="num">31,3</td><td class="num">69,2</td><td class="num">39,8</td><td class="num">2,22 Go</td></tr><tr><td class="num">1 000 000</td><td class="num">142 Mo</td><td class="num">2,57</td><td class="num">29,2</td><td class="num">25,2</td><td class="num">6,51</td><td class="num"><b>63,5</b></td><td class="num">52,3</td><td class="num">133,8</td><td class="num">—</td><td class="num">2,42 Go</td></tr><tr><td colspan="11" class="muted">Pic mémoire = peak working set du processus (inclut doublons et XLSX quand ils sont mesurés ; à 1 M, doublons non mesurés). « Cœur » = détection + analyse + corrections + export CSV.</td></tr></tbody>
+    </table></div>
+    <div class="grid2">
+      <div class="callout ok"><b>Chiffres du portfolio reproduits</b><span>« 500 K+ lignes » : 500 000 et 1 000 000 traités. « 59 tests » : 59 verts au clonage (84 aujourd'hui). « Score A→F », « 8 onglets », « 27 modules journalisés », Parquet en <code>iter_batches</code>, détection e-mail / téléphone / IBAN / NIR : vérifiés.</span></div>
+      <div class="callout"><b>Écarts signalés</b><span>« 6 formats lus / écrits » : 6 en lecture, <b>5</b> en écriture (pas de XLS). La lecture XLS n'a pas été testée (aucun fichier .xls ici). « Pas de saturation mémoire » : vrai pour la lecture, mais le pipeline complet garde les corrections en mémoire (pic de 2,2 Go à 500 000 lignes avec doublons et XLSX).</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="demarche">
+  <div class="wrap">
+    <span class="eyebrow">Démarche</span>
+    <h2>Lancer, mesurer, corriger : sept problèmes réels trouvés</h2>
+    <p class="lead">Les 59 tests d'origine passaient tous. Ils ne couvraient ni la CLI de bout en bout, ni les gros volumes, ni la vérité terrain. Voici ce que les essais ont révélé, et ce qui a été corrigé.</p>
+    <div class="journal">
+      <div class="entry fix"><span class="tag">CLI · plantage</span><b>Toute analyse en ligne de commande plantait.</b><span class="muted"><code>run_single</code> lisait <code>sheet_name</code> avant de le définir (<code>UnboundLocalError</code>). Corrigé, test de non-régression ajouté.</span></div>
+      <div class="entry fix"><span class="tag">Doublons · performance</span><b>240 s pour 10 000 lignes, puis 2,0 s.</b><span class="muted">Le « blocage » sur les 3 premiers caractères mettait toutes les lignes dans le même bloc dès que la 1re colonne commence pareil (<code>CMD…</code>). Remplacé par un blocage multi-clés et un préfiltre <code>quick_ratio</code> qui ne change pas la décision (testé sur 3 000 paires).</span></div>
+      <div class="entry fix"><span class="tag">Réalignement · perte de données</span><b>32 % → 100 % des lignes décalées restituées à l'identique.</b><span class="muted">Une raison sociale coupée par un <code>;</code> perdait sa fin (« SARL » supprimé). Le correctif recolle les deux morceaux quand la colonne précédente est du texte.</span></div>
+      <div class="entry fix"><span class="tag">Nettoyage · promesse non tenue</span><b><code>#REF!</code> et <code>N/A</code> ressortaient tels quels.</b><span class="muted">Les cases « valeurs masquées » et « espaces » de l'interface n'étaient reliées à aucune fonction. Implémenté (<code>fix_masked</code>, <code>fix_whitespace</code>) : 100 % des valeurs masquées injectées sont vidées.</span></div>
+      <div class="entry fix"><span class="tag">Comparaison · faux résultats</span><b>Une ligne modifiée apparaissait « supprimée + ajoutée ».</b><span class="muted">La CLI n'exposait pas la clé primaire, et les clés non uniques étaient toujours comparées à leur 1re occurrence. Ajout de <code>--key-columns</code> et appariement occurrence par occurrence.</span></div>
+      <div class="entry fix"><span class="tag">Rapprochement · écarts invisibles</span><b>0 écart détecté sur 2 injectés.</b><span class="muted">Les colonnes de montant n'étaient pas transmises. Ajout de <code>--amount-columns</code> et <code>--tolerance</code> : 2 / 2 écarts trouvés.</span></div>
+      <div class="entry fix"><span class="tag">Documentation</span><b>README « Licence MIT », fichier LICENSE « tous droits réservés ».</b><span class="muted">README aligné sur LICENSE.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="deploiement">
+  <div class="wrap">
+    <span class="eyebrow">Déploiement</span>
+    <h2>Un traitement par lots, pas un serveur</h2>
+    <p class="lead">Csvtraitement n'expose pas d'API : sur un poste, c'est une application de bureau. Le cas serveur réaliste est un <b>nettoyage nocturne</b> du dossier où l'ERP dépose ses exports. D'où une image Docker « CLI seule » et un <b>CronJob</b> Kubernetes, sans Deployment ni Service.</p>
+    <div class="grid2">
+      <div class="code"><button class="copy" type="button">Copier</button><pre><span class="c"># Image : CLI seule, utilisateur non root</span>
+docker build -t csvtraitement:0.2.0 .
+docker run --rm -v "$PWD/in:/data/in" \
+  -v "$PWD/out:/data/out" csvtraitement:0.2.0
+
+<span class="c"># Kubernetes (kustomize) : local ou cloud</span>
+kubectl apply -k deploy/k8s/overlays/local
+kubectl -n csvtraitement create job --from=cronjob/nettoyage-exports essai</pre></div>
+      <div class="code"><button class="copy" type="button">Copier</button><pre><span class="c"># deploy/k8s/base/cronjob.yaml (extrait)</span>
+schedule: "0 2 * * *"
+timeZone: "Europe/Paris"
+concurrencyPolicy: Forbid
+args: [--batch, /data/in, --fix, -o, /data/out,
+       --format, csv, --report, /data/out/rapport.json]
+resources:
+  limits: { cpu: "1", memory: 2Gi }
+securityContext:
+  readOnlyRootFilesystem: true</pre></div>
+    </div>
+    <div class="callout"><b>Ce qui est vérifié, ce qui ne l'est pas</b><span>Vérifié : <code>kubectl kustomize</code> rend les deux overlays (3 objets chacun) ; la commande exacte de l'image a tourné en local sur un dossier d'exports (fichiers corrigés + rapport JSON). <b>Non vérifié</b> : <code>docker build</code> (VM Docker de la machine saturée par un autre projet) et déploiement sur un cluster (aucun cluster disponible). La limite mémoire de 2 Gi est déduite des pics mesurés, pas d'un essai en Pod.</span></div>
+  </div>
+</section>
+
+<section id="limites">
+  <div class="wrap">
+    <span class="eyebrow">Limites honnêtes</span>
+    <h2>Ce qu'il faut savoir avant de l'utiliser</h2>
+    <div class="duo">
+      <div class="card"><h3>Mémoire</h3><p>La lecture est en flux, mais chaque ligne corrigée et chaque correction restent en mémoire pour la prévisualisation et l'undo. Comme la normalisation des dates touche presque toutes les lignes, la mémoire croît avec le fichier : pic mesuré de 0,5 Go à 100 000 lignes, 2,2 Go à 500 000 et 2,4 Go à 1 000 000 (1,5 Go dès la fin des corrections).</p></div>
+      <div class="card"><h3>Ambiguïtés</h3><p>Une cellule manquante juste à côté d'une valeur masquée (<code>#REF!</code>) ne peut pas être placée avec certitude : l'outil choisit une colonne, et les deux cellules finissent vides après nettoyage. Les espaces qui suivent un séparateur sont supprimés à la lecture (<code>skipinitialspace</code>).</p></div>
+      <div class="card"><h3>Score qualité</h3><p>Le score est une moyenne pondérée par colonne : un fichier avec 6,5 % de lignes défectueuses obtient « A » (92,7 / 100 sur le fichier de 100 000 lignes, dont 6 483 lignes (6,5 %) portent au moins une anomalie injectée). Il sert à comparer des fichiers entre eux, pas à certifier qu'un fichier est propre : le nombre de lignes non conformes est l'indicateur à suivre.</p></div>
+      <div class="card"><h3>Données de test</h3><p>Toutes les mesures portent sur des fichiers synthétiques à anomalies connues. Un vrai export a d'autres défauts (encodages mixtes, en-têtes multiples, sous-totaux) qui n'ont pas été testés ici.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="glossaire">
+  <div class="wrap">
+    <span class="eyebrow">Glossaire</span>
+    <h2>Les mots du projet</h2>
+    <dl class="gloss">
+      <div><dt>Décalage de colonnes</dt><dd>Une ligne avec une cellule en trop ou en moins : toutes les valeurs suivantes glissent d'une colonne.</dd></div>
+      <div><dt>Vérité terrain</dt><dd>La liste exacte des anomalies injectées, qui permet de calculer combien l'outil en trouve et combien il en invente.</dd></div>
+      <div><dt>Rappel / précision</dt><dd>Rappel : part des vraies anomalies trouvées. Précision : part des alertes qui sont de vraies anomalies.</dd></div>
+      <div><dt>Blocage (blocking)</dt><dd>Technique de déduplication : ne comparer que des lignes qui partagent déjà quelque chose, au lieu de toutes les paires.</dd></div>
+      <div><dt>Streaming par blocs</dt><dd>Lire le fichier 10 000 lignes à la fois plutôt que d'un coup, pour traiter des fichiers plus gros que la mémoire.</dd></div>
+      <div><dt>CronJob</dt><dd>Objet Kubernetes qui lance un conteneur à heure fixe, le laisse finir, puis libère les ressources.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Patrice Duclos · Analytics Engineer · Architecte IA (RNCP 38777)</span>
+    <span><a href="https://github.com/PDUCLOS/Csvtraitement">github.com/PDUCLOS/Csvtraitement</a> · tous droits réservés</span>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.tabs button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.tabs button').forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+    b.setAttribute('aria-selected', 'true');
+    var img = document.getElementById('arch-img');
+    img.src = b.dataset.src; img.alt = b.dataset.alt;
+  });
+});
+document.querySelectorAll('.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var text = btn.parentElement.querySelector('pre').innerText;
+    try { navigator.clipboard.writeText(text).then(function () { btn.textContent = 'Copié'; setTimeout(function () { btn.textContent = 'Copier'; }, 1500); }); } catch (e) {}
+  });
+});
+</script>
+</body>
+</html>
