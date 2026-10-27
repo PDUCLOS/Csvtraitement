@@ -172,6 +172,8 @@ def main() -> None:
     # Dates invalides et montants
     date_fixed = {c.line_number for c in fix.corrections if c.correction_type == "date_invalid"}
     res["invalid_date_fix"] = prf(date_fixed, set(truth["invalid_date"]))
+    masked_fixed = {c.line_number for c in fix.corrections if c.correction_type == "masked_clean"}
+    res["masked_clean"] = prf(masked_fixed, set(truth["masked_value"]))
     amt_col = 5
     us_ok = us_tot = 0
     for c in fix.corrections:

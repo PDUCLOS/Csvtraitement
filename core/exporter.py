@@ -307,6 +307,8 @@ def _write_report_sheet(ws, detection, analysis, fix_result, fmt_header):
         ('Dates corrigées', str(fix_result.date_fixes)),
         ('Décimales normalisées', str(fix_result.decimal_fixes)),
         ('Réalignements', str(fix_result.realignment_fixes)),
+        ('Valeurs masquées vidées', str(fix_result.masked_fixes)),
+        ('Espaces normalisés', str(fix_result.whitespace_fixes)),
     ]
 
     for label, value in info:

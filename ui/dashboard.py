@@ -367,6 +367,8 @@ class DashboardApp:
             ('dates', 'Dates corrigées'),
             ('decimals', 'Décimales normalisées'),
             ('realignments', 'Réalignements'),
+            ('masked', 'Valeurs masquées vidées'),
+            ('whitespace', 'Espaces normalisés'),
         ]):
             ttk.Label(summary_frame, text=f"{label} :").grid(row=i, column=0, sticky='w', padx=10, pady=2)
             val = ttk.Label(summary_frame, text="—", style='KPI.TLabel')
@@ -662,6 +664,8 @@ class DashboardApp:
                     fix_dates=self.var_fix_dates.get(),
                     fix_decimals=self.var_fix_decimals.get(),
                     fix_shifts=self.var_fix_shifts.get(),
+                    fix_masked=self.var_fix_masked.get(),
+                    fix_whitespace=self.var_fix_whitespace.get(),
                     progress_callback=self._update_progress
                 )
                 self.root.after(0, lambda: self._on_fix_done(result))

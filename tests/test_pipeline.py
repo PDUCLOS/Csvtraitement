@@ -191,3 +191,21 @@ def test_rapprochement_detecte_les_ecarts_de_montant(tmp_path):
                     join_columns=[0], amount_columns=(5, 1))
     assert rec.summary["mismatched"] == 2
     assert rec.summary["matched"] == n - 2
+
+
+def test_valeurs_masquees_videes(pipeline):
+    """#REF!, N/A, NULL, -, ?? injectés dans Montant_HT doivent être vidés (fix_masked=True par défaut)."""
+    _, _, fix = pipeline
+    cleaned = {c.line_number for c in fix.corrections if c.correction_type == "masked_clean"}
+    assert set(TRUTH["masked_value"]) <= cleaned
+    for ln in TRUTH["masked_value"]:
+        assert fix.corrected_lines[ln][5] == ""
+
+
+def test_normalisation_des_espaces(tmp_path):
+    src = tmp_path / "esp.csv"
+    src.write_text("A;B;C\n1;Jean   Dupont ;x\n2;Marie;y\n3;Paul;z\n", encoding="utf-8")
+    det = run_detection(src)
+    fix = apply_fixes(det, analyze_file(det), fix_whitespace=True)
+    assert fix.corrected_lines[2][1] == "Jean Dupont"
+    assert fix.whitespace_fixes == 1

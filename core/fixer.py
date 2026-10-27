@@ -4,6 +4,7 @@ Applique les corrections validées par l'utilisateur :
 - Remplacement des dates invalides (00.00.0000) par vide
 - Normalisation des décimales
 - Réalignement des colonnes décalées
+- Nettoyage des valeurs masquées (N/A, NULL, #REF!...) et des espaces
 """
 
 import logging
@@ -15,15 +16,15 @@ from core.analyzer import AnalysisResult, ShiftInfo
 from utils.patterns import (
     CellType, detect_cell_type, normalize_decimal,
     normalize_integer, parse_date, get_type_category,
-    DATE_INVALID
+    DATE_INVALID, MASKED_EMPTY_VALUES
 )
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
+@dataclass(slots=True)
 class CellCorrection:
-    """Correction appliquée à une cellule."""
+    """Correction appliquée à une cellule (slots : ~3 objets par ligne sur 1 M de lignes)."""
     line_number: int
     column_index: int
     original_value: str
@@ -40,6 +41,8 @@ class FixResult:
     date_fixes: int = 0
     decimal_fixes: int = 0
     realignment_fixes: int = 0
+    masked_fixes: int = 0
+    whitespace_fixes: int = 0
 
     @property
     def summary(self) -> dict[str, int]:
@@ -48,6 +51,8 @@ class FixResult:
             'dates': self.date_fixes,
             'decimals': self.decimal_fixes,
             'realignments': self.realignment_fixes,
+            'masked': self.masked_fixes,
+            'whitespace': self.whitespace_fixes,
         }
 
 
@@ -296,6 +301,8 @@ def apply_fixes(
     fix_dates: bool = True,
     fix_decimals: bool = True,
     fix_shifts: bool = True,
+    fix_masked: bool = True,
+    fix_whitespace: bool = False,
     progress_callback=None
 ) -> FixResult:
     """Applique toutes les corrections au fichier.
@@ -306,6 +313,8 @@ def apply_fixes(
         fix_dates: Corriger les dates invalides.
         fix_decimals: Normaliser les décimales.
         fix_shifts: Réaligner les lignes décalées.
+        fix_masked: Vider les valeurs masquées (N/A, NULL, #REF!, ?? ...).
+        fix_whitespace: Supprimer les espaces de début/fin et réduire les espaces multiples.
         progress_callback: Fonction de suivi de progression.
 
     Returns:
@@ -353,7 +362,29 @@ def apply_fixes(
             if len(current_cells) > expected:
                 current_cells = current_cells[:expected]
 
-            # 2. Corrections de types (dates, décimales)
+            # 2. Valeurs masquées et espaces
+            if fix_masked or fix_whitespace:
+                for i, cell in enumerate(current_cells):
+                    new_val, ctype = cell, None
+                    if fix_masked and cell.strip().lower() in MASKED_EMPTY_VALUES:
+                        new_val, ctype = '', 'masked_clean'
+                    elif fix_whitespace:
+                        squeezed = ' '.join(cell.split())
+                        if squeezed != cell:
+                            new_val, ctype = squeezed, 'whitespace'
+                    if ctype:
+                        line_corrections.append(CellCorrection(
+                            line_number=line_num, column_index=i,
+                            original_value=cell, corrected_value=new_val,
+                            correction_type=ctype,
+                        ))
+                        current_cells[i] = new_val
+                        if ctype == 'masked_clean':
+                            result.masked_fixes += 1
+                        else:
+                            result.whitespace_fixes += 1
+
+            # 3. Corrections de types (dates, décimales)
             if fix_dates or fix_decimals:
                 type_fixed, type_corr = fix_row_types(
                     current_cells, profiles, line_num

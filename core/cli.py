@@ -67,6 +67,10 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
                            help='Ne pas normaliser les décimales')
     cli_parser.add_argument('--no-fix-shifts', action='store_true',
                            help='Ne pas réaligner les colonnes')
+    cli_parser.add_argument('--no-fix-masked', action='store_true',
+                           help='Ne pas vider les valeurs masquées (N/A, NULL, #REF!...)')
+    cli_parser.add_argument('--fix-whitespace', action='store_true',
+                           help='Supprimer les espaces superflus dans toutes les cellules')
 
     # Format de sortie
     cli_parser.add_argument('--format', choices=list(EXPORT_FORMATS.keys()), default='xlsx',
@@ -319,6 +323,8 @@ def run_single(args: argparse.Namespace) -> dict:
             fix_dates=not getattr(args, 'no_fix_dates', False),
             fix_decimals=not getattr(args, 'no_fix_decimals', False),
             fix_shifts=not getattr(args, 'no_fix_shifts', False),
+            fix_masked=not getattr(args, 'no_fix_masked', False),
+            fix_whitespace=getattr(args, 'fix_whitespace', False),
         )
 
         report['corrections'] = fix_result.summary
