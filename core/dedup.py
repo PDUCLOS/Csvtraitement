@@ -50,6 +50,7 @@ class DedupResult:
     exact_duplicate_rows: int = 0
     fuzzy_duplicate_groups: int = 0
     fuzzy_duplicate_rows: int = 0
+    fuzzy_comparisons: int = 0
     groups: list[DuplicateGroup] = field(default_factory=list)
     lines_to_keep: set[int] = field(default_factory=set)
     lines_to_remove: set[int] = field(default_factory=set)
@@ -90,13 +91,27 @@ def _row_completeness(cells: list[str]) -> int:
     return sum(1 for c in cells if c.strip())
 
 
-def _compute_similarity(s1: str, s2: str) -> float:
-    """Calcule la similarité entre deux strings (0-1)."""
+def _compute_similarity(s1: str, s2: str, threshold: float = 0.0) -> float:
+    """Calcule la similarité entre deux strings (0-1).
+
+    Si ``threshold`` est fourni, les bornes supérieures bon marché de difflib
+    (``real_quick_ratio`` puis ``quick_ratio``) écartent d'abord les paires qui ne
+    peuvent pas l'atteindre : la valeur renvoyée est alors une borne < threshold,
+    et le résultat (paire retenue ou non) est identique au calcul complet.
+    """
     if s1 == s2:
         return 1.0
     if not s1 or not s2:
         return 0.0
-    return SequenceMatcher(None, s1, s2).ratio()
+    sm = SequenceMatcher(None, s1, s2)
+    if threshold > 0.0:
+        bound = sm.real_quick_ratio()
+        if bound < threshold:
+            return bound
+        bound = sm.quick_ratio()
+        if bound < threshold:
+            return bound
+    return sm.ratio()
 
 
 def _build_key(cells: list[str], key_columns: list[int], normalize: bool = True) -> str:
@@ -110,6 +125,50 @@ def _build_key(cells: list[str], key_columns: list[int], normalize: bool = True)
     return '|'.join(parts)
 
 
+def _build_blocks(
+    entries: list[tuple[str, tuple[int, list[str]]]],
+    key_columns: list[int],
+    max_block_size: int = 200,
+) -> list[list[int]]:
+    """Blocage multi-clés : candidats = lignes partageant une valeur exacte sur une colonne discriminante.
+
+    Deux quasi-doublons (une faute de frappe dans une cellule) partagent forcément les
+    autres cellules à l'identique. On indexe donc chaque ligne par la valeur normalisée
+    de chaque colonne à forte cardinalité (identifiant, e-mail, téléphone...) et l'on ne
+    compare que les lignes d'un même bloc. Repli : préfixe de 3 caractères de la clé
+    (comportement historique) si aucune colonne n'est discriminante.
+
+    Returns:
+        Liste de blocs (indices dans ``entries``) de taille 2..max_block_size.
+    """
+    n = len(entries)
+    if n < 2:
+        return []
+    parts = [key.split('|') for key, _ in entries]
+    n_parts = len(parts[0])
+    discriminant = []
+    for c in range(n_parts):
+        values = [p[c] for p in parts if c < len(p) and p[c]]
+        if values and len(set(values)) / n >= 0.3:
+            discriminant.append(c)
+
+    index: dict[tuple, list[int]] = defaultdict(list)
+    if discriminant:
+        for idx, p in enumerate(parts):
+            for c in discriminant:
+                if c < len(p) and p[c]:
+                    index[(c, p[c])].append(idx)
+    else:
+        for idx, (key, _) in enumerate(entries):
+            index[('prefix', key[:3])].append(idx)
+
+    blocks = [ids for ids in index.values() if 2 <= len(ids) <= max_block_size]
+    skipped = sum(1 for ids in index.values() if len(ids) > max_block_size)
+    if skipped:
+        logger.info(f"Fuzzy: {skipped} blocs trop larges ignorés (> {max_block_size} lignes)")
+    return blocks
+
+
 def find_duplicates(
     detection: DetectionResult,
     key_columns: Optional[list[int]] = None,
@@ -118,6 +177,8 @@ def find_duplicates(
     normalize: bool = True,
     strategy: str = SelectionStrategy.FIRST,
     max_groups: int = 10_000,
+    fuzzy_max_rows: int = 1_000_000,
+    max_block_size: int = 200,
     progress_callback=None
 ) -> DedupResult:
     """Détecte les doublons exacts et fuzzy dans un fichier CSV.
@@ -130,6 +191,9 @@ def find_duplicates(
         normalize: Normaliser avant comparaison (accents, casse).
         strategy: Stratégie de sélection ('first', 'last', 'most_complete').
         max_groups: Nombre max de groupes à retourner.
+        fuzzy_max_rows: Nombre max de lignes uniques soumises au fuzzy matching.
+        max_block_size: Taille max d'un bloc de candidats (au-delà, le bloc est ignoré
+            car la valeur partagée n'est pas discriminante).
         progress_callback: Fonction de suivi.
 
     Returns:
@@ -184,37 +248,32 @@ def find_duplicates(
             group_id += 1
             exact_keys_with_dups.append(key)
 
-    # Phase 2 : Fuzzy matching sur les lignes uniques
+    # Phase 2 : Fuzzy matching (un représentant par clé exacte)
     if enable_fuzzy and fuzzy_threshold < 1.0:
-        unique_entries = [(key, entries[0]) for key, entries in exact_groups.items()
-                          if len(entries) == 1]
+        unique_entries = [(key, entries[0]) for key, entries in exact_groups.items()]
 
-        # Limiter le fuzzy matching aux 50K premières lignes uniques
-        if len(unique_entries) > 50_000:
-            unique_entries = unique_entries[:50_000]
-            logger.warning("Fuzzy matching limité aux 50K premières lignes uniques")
+        if len(unique_entries) > fuzzy_max_rows:
+            unique_entries = unique_entries[:fuzzy_max_rows]
+            logger.warning(f"Fuzzy matching limité aux {fuzzy_max_rows:,} premières lignes uniques")
 
-        # Comparer par blocs pour limiter la complexité
-        # Grouper par les 3 premiers caractères de la clé (blocking)
-        blocks: dict[str, list[tuple[str, int, list[str]]]] = defaultdict(list)
-        for key, (line_num, cells) in unique_entries:
-            block_key = key[:3] if len(key) >= 3 else key
-            blocks[block_key].append((key, line_num, cells))
+        blocks = _build_blocks(unique_entries, key_columns, max_block_size)
 
         fuzzy_checked = 0
-        for block_key, block_entries in blocks.items():
-            if len(block_entries) < 2:
-                continue
-
-            for i in range(len(block_entries)):
-                for j in range(i + 1, len(block_entries)):
+        seen_pairs: set[tuple[int, int]] = set()
+        for block in blocks:
+            for a in range(len(block)):
+                for b in range(a + 1, len(block)):
                     if len(result.groups) >= max_groups:
                         break
+                    i, j = block[a], block[b]
+                    if (i, j) in seen_pairs:
+                        continue
+                    seen_pairs.add((i, j))
 
-                    key_i, line_i, cells_i = block_entries[i]
-                    key_j, line_j, cells_j = block_entries[j]
+                    key_i, (line_i, cells_i) = unique_entries[i]
+                    key_j, (line_j, cells_j) = unique_entries[j]
 
-                    sim = _compute_similarity(key_i, key_j)
+                    sim = _compute_similarity(key_i, key_j, fuzzy_threshold)
                     fuzzy_checked += 1
 
                     if sim >= fuzzy_threshold:
@@ -240,6 +299,8 @@ def find_duplicates(
                         result.fuzzy_duplicate_rows += 1
                         group_id += 1
 
+        result.fuzzy_comparisons = fuzzy_checked
+        logger.info(f"Fuzzy: {fuzzy_checked:,} comparaisons sur {len(blocks):,} blocs")
         if progress_callback:
             progress_callback(total_rows, total_rows,
                               f"Fuzzy: {fuzzy_checked} comparaisons")
