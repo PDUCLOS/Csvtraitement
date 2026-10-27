@@ -138,12 +138,15 @@ def realign_row(
     cells: list[str],
     shift_info: ShiftInfo,
     profiles: list[ColumnProfile],
-    expected_columns: int
+    expected_columns: int,
+    separator: str = ';',
+    merge_text: bool = True,
 ) -> tuple[list[str], list[CellCorrection]]:
     """Réaligne une ligne décalée.
 
     Stratégies selon le type de décalage :
-    - extra_column : supprimer la cellule en trop
+    - extra_column : si la cellule précédente est une colonne texte, recoller les deux
+      morceaux avec le séparateur d'origine (``merge_text``) ; sinon supprimer la cellule en trop
     - missing_column : insérer une cellule vide
     - type_mismatch : garder tel quel (correction de type seulement)
 
@@ -152,6 +155,8 @@ def realign_row(
         shift_info: Information sur le décalage.
         profiles: Profils de référence.
         expected_columns: Nombre de colonnes attendu.
+        separator: Séparateur d'origine, utilisé pour recoller un champ texte coupé.
+        merge_text: Recoller plutôt que supprimer quand la colonne précédente est du texte.
 
     Returns:
         Tuple (cellules réalignées, liste des corrections).
@@ -160,6 +165,25 @@ def realign_row(
 
     if shift_info.shift_type == 'extra_column':
         col = shift_info.shift_start_column
+        if (merge_text and 0 < col < len(cells)
+                and profiles[col - 1].dominant_category == 'text'):
+            # Cas typique ERP : séparateur non échappé dans un champ texte
+            # ("Dupont;Fils") -> on recolle les deux morceaux au lieu d'en perdre un.
+            merged = cells[col - 1] + separator + cells[col]
+            new_cells = cells[:col - 1] + [merged] + cells[col + 1:]
+            if len(new_cells) > expected_columns:
+                new_cells = new_cells[:expected_columns]
+            while len(new_cells) < expected_columns:
+                new_cells.append('')
+            corrections.append(CellCorrection(
+                line_number=shift_info.line_number,
+                column_index=col - 1,
+                original_value=cells[col - 1],
+                corrected_value=merged,
+                correction_type='realign'
+            ))
+            return new_cells, corrections
+
         if 0 <= col < len(cells):
             removed = cells[col]
             new_cells = cells[:col] + cells[col + 1:]
@@ -318,7 +342,7 @@ def apply_fixes(
             if line_num in issues_by_line and fix_shifts:
                 shift_info = issues_by_line[line_num]
                 current_cells, realign_corr = realign_row(
-                    current_cells, shift_info, profiles, expected
+                    current_cells, shift_info, profiles, expected, separator=sep
                 )
                 line_corrections.extend(realign_corr)
                 result.realignment_fixes += len(realign_corr)
