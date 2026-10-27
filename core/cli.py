@@ -90,6 +90,14 @@ def setup_cli_parser(subparsers) -> argparse.ArgumentParser:
                            help='Rapprocher avec un second fichier CSV')
     cli_parser.add_argument('--join-columns', type=str, default='0',
                            help='Colonnes de jointure (indices séparés par virgule, défaut: 0)')
+    cli_parser.add_argument('--key-columns', type=str, default=None,
+                           help='Clé primaire pour --compare (indices séparés par virgule). '
+                                'Sans clé, toute la ligne sert de clé : une modification '
+                                'apparaît alors comme une suppression + un ajout.')
+    cli_parser.add_argument('--amount-columns', type=str, default=None,
+                           help='Montants à rapprocher pour --reconcile : "col_gauche,col_droite" (ex. 5,1)')
+    cli_parser.add_argument('--tolerance', type=float, default=0.01,
+                           help='Tolérance absolue sur les montants rapprochés (défaut: 0.01)')
     cli_parser.add_argument('--merge', type=str, nargs='+',
                            help='Fusionner plusieurs fichiers CSV')
     cli_parser.add_argument('--cloud', action='store_true',
@@ -137,6 +145,7 @@ def run_single(args: argparse.Namespace) -> dict:
         sys.exit(1)
 
     quiet = getattr(args, 'quiet', False)
+    sheet_name = getattr(args, 'sheet', None)
     report = {}
 
     # ── Détection ──
@@ -150,7 +159,6 @@ def run_single(args: argparse.Namespace) -> dict:
         print("─" * 50)
         print("🔍 Détection en cours...")
 
-    sheet_name = getattr(args, 'sheet', None)
     detection = run_detection(filepath, sheet_name=sheet_name)
     report['detection'] = {
         'file': str(filepath),
@@ -260,7 +268,9 @@ def run_single(args: argparse.Namespace) -> dict:
         if not quiet:
             print(f"\n⚡ Comparaison avec {Path(compare_file).name}...")
         detection_b = run_detection(Path(compare_file))
-        comparison = compare_files(detection, detection_b)
+        key_arg = getattr(args, 'key_columns', None)
+        key_cols = [int(c.strip()) for c in key_arg.split(',')] if key_arg else None
+        comparison = compare_files(detection, detection_b, key_columns=key_cols)
         report['comparison'] = {
             'unchanged': comparison.unchanged,
             'added': comparison.added,
@@ -279,7 +289,14 @@ def run_single(args: argparse.Namespace) -> dict:
             print(f"\n🔄 Rapprochement avec {Path(reconcile_file).name}...")
         detection_r = run_detection(Path(reconcile_file))
         join_cols = [int(c.strip()) for c in getattr(args, 'join_columns', '0').split(',')]
-        recon = reconcile(detection, detection_r, join_columns=join_cols)
+        amount_arg = getattr(args, 'amount_columns', None)
+        amount_cols = tuple(int(c.strip()) for c in amount_arg.split(',')) if amount_arg else None
+        if amount_cols is not None and len(amount_cols) != 2:
+            print("❌ --amount-columns attend deux indices : col_gauche,col_droite")
+            sys.exit(1)
+        recon = reconcile(detection, detection_r, join_columns=join_cols,
+                          amount_columns=amount_cols,
+                          tolerance=getattr(args, 'tolerance', 0.01))
         report['reconciliation'] = recon.summary
         if not quiet:
             _print_reconciliation(recon)
