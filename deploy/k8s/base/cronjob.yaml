@@ -1,0 +1,73 @@
+# Nettoyage nocturne des exports ERP : un Pod éphémère, sans port ni Service.
+# L'outil est un traitement par lots, pas un serveur : CronJob plutôt que Deployment.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nettoyage-exports
+spec:
+  schedule: "0 2 * * *"
+  timeZone: "Europe/Paris"
+  concurrencyPolicy: Forbid          # jamais deux nettoyages sur le même dossier
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: csvtraitement
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            fsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: csvtraitement
+              image: csvtraitement:0.2.0
+              imagePullPolicy: IfNotPresent
+              args:
+                - --batch
+                - /data/in
+                - --pattern
+                - "*.csv"
+                - --fix
+                - -o
+                - /data/out
+                - --format
+                - csv
+                - --csv-separator
+                - ";"
+                - --report
+                - /data/out/rapport.json
+                - --quiet
+              resources:
+                # Mesuré : ~0,5 Go de pic pour 100 000 lignes, ~1,4 Go pour 500 000 (voir docs/PORTFOLIO.md)
+                requests:
+                  cpu: 500m
+                  memory: 768Mi
+                limits:
+                  cpu: "1"
+                  memory: 2Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: exports
+                  mountPath: /data
+                - name: tmp
+                  mountPath: /tmp          # fichiers temporaires d'écriture (exporter._safe_write)
+          volumes:
+            - name: exports
+              persistentVolumeClaim:
+                claimName: exports-erp
+            - name: tmp
+              emptyDir:
+                sizeLimit: 2Gi

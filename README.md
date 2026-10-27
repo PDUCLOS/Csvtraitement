@@ -74,8 +74,12 @@ python main.py cli --file data.csv --quality            # Score de qualité 0-10
 python main.py cli --file data.csv --dedup              # Détection doublons (exact + fuzzy)
 
 # Comparaison et rapprochement (tous formats)
-python main.py cli --file v1.csv --compare v2.xlsx      # Diff CSV vs Excel
-python main.py cli --file factures.csv --reconcile paiements.csv --join-columns 0,1  # Rapprochement
+python main.py cli --file v1.csv --compare v2.xlsx --key-columns 0   # Diff avec clé primaire (col 0)
+python main.py cli --file factures.csv --reconcile paiements.csv --join-columns 0 --amount-columns 5,1 --tolerance 0.01  # Rapprochement des montants
+
+# Options de nettoyage
+python main.py cli --file export.csv --fix --no-fix-masked -o out.xlsx  # garder N/A, #REF! tels quels
+python main.py cli --file export.csv --fix --fix-whitespace -o out.xlsx # réduire les espaces multiples
 
 # Fusion de fichiers (tous formats)
 python main.py cli --merge fichier1.csv fichier2.xlsx fichier3.ods -o fusionne.csv
@@ -83,6 +87,22 @@ python main.py cli --merge fichier1.csv fichier2.xlsx fichier3.ods -o fusionne.c
 # Cloud
 python main.py cli --cloud                              # Lister les emplacements cloud détectés
 ```
+
+## Démo et mesures (données synthétiques)
+
+Aucun fichier d'entreprise n'est fourni : `scripts/generate_sample.py` fabrique des exports ERP
+**synthétiques** (graine fixe) avec 8 types d'anomalies injectées et leur vérité terrain.
+`scripts/benchmark.py` passe le vrai pipeline dessus et compare au résultat attendu.
+
+```bash
+python scripts/generate_sample.py --rows 100000 --out samples/erp_100000
+python scripts/benchmark.py samples/erp_100000.csv --xlsx --dedup   # -> bench_out/results.jsonl
+bash scripts/run_bench.sh                                            # campagne complète 10 K -> 1 M
+python main.py --file samples/erp_demo_1k.csv                        # interface sur la démo 1 000 lignes
+```
+
+Résultats, limites et ce qui n'a pas été vérifié : [docs/PORTFOLIO.md](docs/PORTFOLIO.md) ·
+vitrine : [docs/index.html](docs/index.html) · déploiement batch : `Dockerfile`, `deploy/k8s/`.
 
 ## Fonctionnalités
 
@@ -246,4 +266,4 @@ pip install xlsxwriter chardet openpyxl xlrd odfpy pyarrow
 
 ## Licence
 
-MIT
+Tous droits réservés — voir [LICENSE](LICENSE). (Une version antérieure de ce README indiquait « MIT » par erreur.)

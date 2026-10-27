@@ -1,0 +1,11 @@
+# Un seul volume : /data/in (exports ERP déposés) et /data/out (fichiers corrigés + rapport).
+# ReadWriteMany : le dépôt (SFTP, partage, autre Job) et le nettoyage peuvent monter le même volume.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: exports-erp
+spec:
+  accessModes: ["ReadWriteMany"]
+  resources:
+    requests:
+      storage: 5Gi

@@ -21,6 +21,7 @@ from core.detector import run_detection
 from core.exporter import export_any
 from core.fixer import apply_fixes, fix_row_types
 from core.quality import _score_to_grade, compute_quality
+from utils.patterns import MASKED_EMPTY_VALUES
 
 ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "samples" / "erp_demo_1k.csv"
@@ -66,6 +67,7 @@ class TestCorrections:
             clean = list(clean)
             if ln in TRUTH["missing_column"]:
                 clean[6] = ""
+            clean = ["" if c.strip().lower() in MASKED_EMPTY_VALUES else c for c in clean]
             expected, _ = fix_row_types(clean, det.column_profiles, ln)
             got = fix.corrected_lines[ln]
             # aux espaces près (skipinitialspace du lecteur CSV)

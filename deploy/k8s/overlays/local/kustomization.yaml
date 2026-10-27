@@ -1,0 +1,23 @@
+# Docker Desktop / kind / minikube : image construite localement, volume RWO local,
+# planification toutes les 15 min pour la démonstration.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+images:
+  - name: csvtraitement
+    newTag: 0.2.0
+patches:
+  - target: { kind: PersistentVolumeClaim, name: exports-erp }
+    patch: |-
+      - op: replace
+        path: /spec/accessModes
+        value: ["ReadWriteOnce"]
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 1Gi
+  - target: { kind: CronJob, name: nettoyage-exports }
+    patch: |-
+      - op: replace
+        path: /spec/schedule
+        value: "*/15 * * * *"

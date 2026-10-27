@@ -30,7 +30,7 @@ from core.exporter import export_csv_clean, export_xlsx  # noqa: E402
 from core.fixer import apply_fixes, fix_row_types  # noqa: E402
 from core.quality import compute_quality  # noqa: E402
 from core.anonymizer import detect_column_sensitivity  # noqa: E402
-from utils.patterns import normalize_decimal  # noqa: E402
+from utils.patterns import MASKED_EMPTY_VALUES, normalize_decimal  # noqa: E402
 
 PROC = psutil.Process()
 
@@ -126,13 +126,15 @@ def main() -> None:
     }
 
     # ── Qualité des contrôles : décalages ──
+    us_set, neg_set, extra_set, missing_set_ = (set(truth["us_decimal"]), set(truth["accounting_neg"]),
+                                                set(truth["extra_column"]), set(truth["missing_column"]))
     shift_truth = set(truth["extra_column"]) | set(truth["missing_column"])
     shift_found = {s.line_number for s in ana.shifts}
     res["shift_detection"] = prf(shift_found, shift_truth)
     res["shift_type_ok"] = sum(
         1 for s in ana.shifts
-        if (s.shift_type == "extra_column" and s.line_number in set(truth["extra_column"]))
-        or (s.shift_type == "missing_column" and s.line_number in set(truth["missing_column"]))
+        if (s.shift_type == "extra_column" and s.line_number in extra_set)
+        or (s.shift_type == "missing_column" and s.line_number in missing_set_)
     )
     res["type_mismatch_lines"] = len(ana.type_mismatches)
     res["conformity_pct"] = round(ana.conformity_percentage, 2)
@@ -150,6 +152,7 @@ def main() -> None:
         clean = list(clean)
         if ln in missing_set:
             clean[6] = ""  # la Quantite perdue est irrécupérable : l'idéal est une cellule vide
+        clean = ["" if c.strip().lower() in MASKED_EMPTY_VALUES else c for c in clean]
         expected, _ = fix_row_types(clean, profiles, ln)
         # comparaison aux espaces près : le lecteur CSV du projet (skipinitialspace=True)
         # supprime l'espace qui suit un séparateur, y compris dans un champ recollé
@@ -177,14 +180,14 @@ def main() -> None:
     amt_col = 5
     us_ok = us_tot = 0
     for c in fix.corrections:
-        if c.column_index == amt_col and c.line_number in set(truth["us_decimal"]):
+        if c.column_index == amt_col and c.line_number in us_set:
             us_tot += 1
             if abs(float(c.corrected_value) - normalize_decimal(c.original_value)) < 1e-6 \
                     and "," not in c.corrected_value:
                 us_ok += 1
     res["us_decimal_normalized"] = {"truth": len(truth["us_decimal"]), "converted": us_tot, "exact": us_ok}
     neg = sum(1 for c in fix.corrections if c.column_index == amt_col
-              and c.line_number in set(truth["accounting_neg"]) and c.corrected_value.startswith("-"))
+              and c.line_number in neg_set and c.corrected_value.startswith("-"))
     res["accounting_neg_to_negative"] = {"truth": len(truth["accounting_neg"]), "ok": neg}
     res["fix_summary"] = fix.summary
 

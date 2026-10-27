@@ -106,6 +106,8 @@ def generate(rows: int, out: Path, seed: int = 42, encoding: str = "utf-8") -> d
                     # faute de frappe : deux lettres voisines inversées dans la raison sociale
                     name = row[2]
                     k = rng.randint(1, len(name) - 3)
+                    while name[k] == name[k + 1]:  # inverser « ss » ne changerait rien
+                        k = rng.randint(1, len(name) - 3)
                     row[2] = name[:k] + name[k + 1] + name[k] + name[k + 2:]
                     truth["near_duplicate"].append(line_no)
                 for tag in prev_tags:  # le doublon hérite des anomalies de sa source

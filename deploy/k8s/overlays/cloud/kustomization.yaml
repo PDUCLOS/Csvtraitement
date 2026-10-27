@@ -1,0 +1,24 @@
+# Cluster managé (ex. AKS) : image poussée sur un registre privé, partage de fichiers
+# RWX (Azure Files) alimenté par le dépôt SFTP des exports ERP, nettoyage à 2 h.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+images:
+  - name: csvtraitement
+    newName: monregistre.azurecr.io/csvtraitement
+    newTag: 0.2.0
+patches:
+  - target: { kind: PersistentVolumeClaim, name: exports-erp }
+    patch: |-
+      - op: add
+        path: /spec/storageClassName
+        value: azurefile-csi
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 50Gi
+  - target: { kind: CronJob, name: nettoyage-exports }
+    patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/imagePullPolicy
+        value: Always
