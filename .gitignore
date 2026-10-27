@@ -6,3 +6,11 @@ __pycache__/
 dist/
 build/
 .eggs/
+
+# Données générées (synthétiques, reproductibles)
+samples/*
+!samples/README.md
+!samples/erp_demo_1k.csv
+!samples/erp_demo_1k.truth.json
+bench_out/
+.venv/

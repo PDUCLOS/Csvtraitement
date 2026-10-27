@@ -1,0 +1,1001 @@
+Num_Commande;Code_Client;Raison_Sociale;Date_Commande;Date_Livraison;Montant_HT;Quantite;Statut;Email_Contact;Telephone;Ville
+CMD4500000000;C28289;Industries Morel SA;24.02.2024;24.09.2019;147.627,22;17;LIVRE;m.morel29@exemple-fictif.fr;02 37 39 74 87;Lyon
+CMD4500000001;C30926;Transports Blanc Services;23.07.2021;09.03.2020;239.303,70;173;LIVRE;j.blanc98@exemple-fictif.fr;02 58 22 55 54;Rennes
+CMD4500000002;C85674;Comptoir Garnier SA;07.12.2019;02.11.2020;193.269,35;41;EN_COURS;s.garnier47@exemple-fictif.fr;02 58 45 68 91;Nantes
+CMD4500000003;C42087;Comptoir Garnier Distribution;06.08.2022;09.11.2024;139.241,87;351;FACTURE;m.garnier69@exemple-fictif.fr;01 39 14 50 61;Lille
+CMD4500000004;C44718;Ets Chevalier Distribution;05.04.2024;18.09.2021;186.755,98;220;ANNULE;p.chevalier19@exemple-fictif.fr;06 38 27 75 73;Paris
+CMD4500000005;C71348;Atelier Bonnet & Cie;17.05.2023;28.01.2024;180,525.79;350;FACTURE;p.bonnet77@exemple-fictif.fr;06 24 47 65 30;Grenoble
+CMD4500000006;C76540;Atelier Lambert Services;20.04.2020;12.03.2023;238.375,40;473;LIVRE;a.lambert82@exemple-fictif.fr;06 72 12 24 56;Lille
+CMD4500000007;C26483;Atelier Gauthier Services;05.11.2022;18.03.2021;131.923,17;311;ANNULE;s.gauthier99@exemple-fictif.fr;04 79 98 35 49;Bordeaux
+CMD4500000008;C82603;Atelier Rousseau SA;08.10.2020;01.02.2024;157.779,43;118;LIVRE;j.rousseau76@exemple-fictif.fr;01 52 19 75 40;Lille
+CMD4500000009;C34957;Groupe Chevalier Services;04.02.2024;14.06.2022;102.781,46;443;LIVRE;p.chevalier53@exemple-fictif.fr;02 17 61 53 23;Toulouse
+CMD4500000010;C16630;Atelier Gauthier & Cie;21.09.2025;01.02.2025;212.175,45;86;ANNULE;s.gauthier13@exemple-fictif.fr;08 71 37 61 17;Marseille
+CMD4500000011;C73788;Industries Boyer Distribution;05.04.2021;07.01.2023;183.936,94;32;FACTURE;s.boyer85@exemple-fictif.fr;01 16 84 71 74;Strasbourg
+CMD4500000012;C84668;Transports Francois SAS;08.10.2023;02.10.2019;104.812,04;299;FACTURE;p.francois16@exemple-fictif.fr;05 36 95 50 40;Lille
+CMD4500000013;C23104;Atelier Garnier & Cie;03.09.2020;17.05.2020;233.315,51;452;LIVRE;s.garnier73@exemple-fictif.fr;04 57 46 30 66;Strasbourg
+CMD4500000014;C44664;Comptoir Gauthier SA;04.02.2024;18.03.2021;70.446,25;108;FACTURE;j.gauthier18@exemple-fictif.fr;04 97 91 43 74;Grenoble
+CMD4500000015;C44335;Atelier Morel SA;06.12.2022;18.12.2022;140.231,11;58;LIVRE;m.morel82@exemple-fictif.fr;03 79 14 57 84;Strasbourg
+CMD4500000016;C42706;Atelier Gauthier SA;22.02.2021;25.09.2025;101.600,28;318;EN_COURS;m.gauthier88@exemple-fictif.fr;04 30 32 62 13;Marseille
+CMD4500000017;C24168;Groupe Legrand SA;13.01.2025;16.04.2020;204.148,49;236;FACTURE;m.legrand90@exemple-fictif.fr;05 39 38 13 94;Toulouse
+CMD4500000018;C13617;Ets Lambert Distribution;04.05.2020;19.05.2019;27.109,55;223;FACTURE;s.lambert43@exemple-fictif.fr;06 65 87 75 24;Bordeaux
+CMD4500000019;C66531;Comptoir Legrand Distribution;03.11.2021;20.06.2024;212.005,34;369;FACTURE;m.legrand47@exemple-fictif.fr;09 49 95 62 51;Bordeaux
+CMD4500000020;C63225;Groupe Martinez Frères;18.01.2021;10.04.2022;196.441,85;311;FACTURE;s.martinez39@exemple-fictif.fr;08 66 66 96 37;Strasbourg
+CMD4500000021;C22240;Industries Lambert Distribution;27.04.2024;10.04.2025;49.790,49;13;LIVRE;s.lambert43@exemple-fictif.fr;04 70 88 19 68;Bordeaux
+CMD4500000022;C23970;Industries Faure Distribution;25.07.2020;06.12.2023;116.142,83;286;EN_COURS;j.faure97@exemple-fictif.fr;02 68 27 69 95;Strasbourg
+CMD4500000023;C30861;Comptoir Martinez & Cie;24.08.2022;09.04.2025;159.418,98;393;ANNULE;s.martinez58@exemple-fictif.fr;04 45 66 19 46;Toulouse
+CMD4500000024;C64377;Groupe Martinez Distribution;14.06.2023;15.07.2019;51.716,53;216;ANNULE;m.martinez9@exemple-fictif.fr;01 83 58 71 10;Nantes
+CMD4500000025;C73993;Comptoir Martinez Services;08.05.2022;16.01.2022;84.039,02;348;ANNULE;s.martinez29@exemple-fictif.fr;03 69 26 89 78;Lyon
+CMD4500000026;C59689;Ets Gauthier SAS;11.04.2022;11.06.2025;219.911,20;143;ANNULE;j.gauthier34@exemple-fictif.fr;05 20 70 12 79;Lyon
+CMD4500000027;C91439;Atelier Legrand SAS;05.04.2020;16.11.2019;140.996,76;112;ANNULE;m.legrand3@exemple-fictif.fr;05 57 31 87 87;Villeurbanne
+CMD4500000028;C35995;Société Perrin Frères;03.10.2024;27.11.2020;25.484,31;FACTURE;p.perrin51@exemple-fictif.fr;02 82 15 54 78;Bordeaux
+CMD4500000029;C70258;Atelier Chevalier & Cie;23.03.2022;06.12.2023;241.368,78;139;ANNULE;a.chevalier82@exemple-fictif.fr;08 65 85 44 51;Toulouse
+CMD4500000030;C74789;Industries Bonnet & Cie;28.06.2020;16.04.2021;199.460,11;175;FACTURE;a.bonnet4@exemple-fictif.fr;05 81 11 76 34;Paris
+CMD4500000031;C48566;Ets Martinez & Cie;08.07.2024;08.05.2024;145.393,08;243;FACTURE;j.martinez12@exemple-fictif.fr;07 80 52 55 99;Grenoble
+CMD4500000032;C38361;Transports Lambert Distribution;24.08.2021;24.10.2025;133,538.43;145;LIVRE;m.lambert25@exemple-fictif.fr;04 47 39 56 32;Lille
+CMD4500000033;C11607;Groupe Martinez Distribution;19.05.2022;16.08.2021;46.099,07;27;FACTURE;p.martinez14@exemple-fictif.fr;08 24 18 61 72;Paris
+CMD4500000034;C64548;Groupe Garnier SARL;20.10.2025;20.04.2025;130.647,91;231;ANNULE;s.garnier98@exemple-fictif.fr;05 85 64 49 82;Rennes
+CMD4500000035;C32782;Industries Blanc SARL;18.02.2020;01.07.2022;172.345,89;241;FACTURE;m.blanc31@exemple-fictif.fr;01 39 46 46 99;Grenoble
+CMD4500000036;C39466;Groupe Legrand & Cie;21.03.2021;27.03.2019;14.918,91;406;FACTURE;j.legrand70@exemple-fictif.fr;05 66 25 69 98;Lille
+CMD4500000037;C42816;Ets Morel Distribution;01.02.2020;22.10.2023;237.697,06;392;FACTURE;a.morel78@exemple-fictif.fr;01 32 70 76 93;Grenoble
+CMD4500000038;C52081;Ets Garnier SA;22.02.2025;06.06.2022;173.421,48;148;ANNULE;p.garnier43@exemple-fictif.fr;09 14 68 21 50;Lille
+CMD4500000039;C17104;Transports Francois Frères;07.09.2021;20.08.2024;110.515,82;27;EN_COURS;p.francois53@exemple-fictif.fr;05 80 26 46 66;Villeurbanne
+CMD4500000040;C22217;Comptoir Blanc SARL;08.02.2022;04.11.2025;38.501,24;478;FACTURE;s.blanc53@exemple-fictif.fr;09 44 63 71 70;Toulouse
+CMD4500000041;C64387;Transports Faure SARL;11.09.2021;27.01.2021;181.515,49;429;ANNULE;a.faure99@exemple-fictif.fr;03 67 78 71 54;Nantes
+CMD4500000042;C63841;Groupe Martinez Frères;02.06.2024;16.12.2025;95.313,97;340;EN_COURS;p.martinez30@exemple-fictif.fr;08 14 26 74 85;Nantes
+CMD4500000043;C71537;Groupe Martinez & Cie;26.05.2021;20.12.2022;162.462,66;437;FACTURE;m.martinez10@exemple-fictif.fr;09 58 50 90 72;Strasbourg
+CMD4500000044;C93066;Atelier Martinez & Cie;23.02.2022;06.12.2021;225.856,98;24;FACTURE;j.martinez98@exemple-fictif.fr;01 47 55 57 65;Marseille
+CMD4500000045;C41566;Transports Bonnet & Cie;16.10.2020;08.08.2024;63.501,80;131;LIVRE;s.bonnet88@exemple-fictif.fr;08 46 96 79 30;Paris
+CMD4500000046;C60422;Ets Blanc Services;28.08.2019;08.07.2023;89.746,20;152;FACTURE;a.blanc26@exemple-fictif.fr;01 94 60 45 11;Rennes
+CMD4500000047;C56179;Société Gauthier Services;08.11.2020;20.05.2024;N/A;393;EN_COURS;m.gauthier78@exemple-fictif.fr;02 90 92 15 49;Grenoble
+CMD4500000048;C79579;Groupe Faure SAS;17.05.2025;06.05.2025;236.047,51;496;FACTURE;s.faure47@exemple-fictif.fr;06 24 69 19 28;Toulouse
+CMD4500000049;C44663;Atelier Guerin Services;18.02.2022;12.11.2024;168.088,48;300;ANNULE;p.guerin2@exemple-fictif.fr;06 23 96 39 70;Lyon
+CMD4500000050;C63516;Transports Francois & Cie;04.03.2019;02.05.2022;29.038,96;121;EN_COURS;a.francois84@exemple-fictif.fr;07 68 57 95 99;Strasbourg
+CMD4500000051;C58566;Comptoir Chevalier & Cie;07.08.2022;08.06.2019;245.232,12;189;FACTURE;a.chevalier5@exemple-fictif.fr;01 60 45 34 25;Grenoble
+CMD4500000052;C18992;Groupe Guerin SAS;27.09.2020;19.04.2025;217.425,16;169;EN_COURS;s.guerin27@exemple-fictif.fr;01 45 28 26 79;Lille
+CMD4500000053;C32838;Groupe Legrand Frères;09.01.2020;24.07.2023;28.421,19;33;ANNULE;a.legrand3@exemple-fictif.fr;08 56 75 85 23;Grenoble
+CMD4500000054;C72781;Société Lambert & Cie;28.07.2022;22.02.2022;178.103,20;228;LIVRE;j.lambert8@exemple-fictif.fr;02 51 87 28 18;Marseille
+CMD4500000055;C66387;Société Lambert & Cie;04.12.2019;28.11.2024;219.427,78;283;EN_COURS;s.lambert78@exemple-fictif.fr;07 67 39 62 53;Grenoble
+CMD4500000056;C21188;Industries Faure & Cie;03.07.2019;24.12.2021;202.944,20;285;LIVRE;j.faure12@exemple-fictif.fr;09 81 52 95 25;Bordeaux
+CMD4500000057;C85748;Comptoir Blanc SA;17.04.2020;22.08.2020;211.820,24;180;FACTURE;a.blanc14@exemple-fictif.fr;02 45 83 38 64;Strasbourg
+CMD4500000058;C33647;Industries Perrin Services;09.12.2025;10.06.2021;1.536,39;446;EN_COURS;a.perrin4@exemple-fictif.fr;07 18 28 91 13;Paris
+CMD4500000059;C21135;Société Martinez Services;02.03.2020;25.10.2019;168.495,44;140;ANNULE;s.martinez77@exemple-fictif.fr;07 72 87 66 63;Lille
+CMD4500000060;C38903;Ets Bonnet Frères;13.10.2019;01.04.2021;236.331,57;393;EN_COURS;a.bonnet6@exemple-fictif.fr;05 47 51 25 10;Grenoble
+CMD4500000061;C62044;Industries Gauthier Services;28.12.2019;14.01.2022;230.291,40;442;FACTURE;a.gauthier10@exemple-fictif.fr;07 83 61 91 63;Lille
+CMD4500000062;C23875;Industries Gauthier SA;08.07.2023;13.09.2019;98.947,72;159;FACTURE;j.gauthier56@exemple-fictif.fr;04 52 31 19 75;Saint-Étienne
+CMD4500000063;C23474;Industries Gauthier Services;05.05.2020;06.10.2020;190.056,22;336;LIVRE;m.gauthier31@exemple-fictif.fr;03 90 73 69 82;Rennes
+CMD4500000064;C18950;Industries Gauthier SA;16.08.2024;10.05.2023;14.052,47;260;LIVRE;m.gauthier57@exemple-fictif.fr;05 69 67 14 17;Nantes
+CMD4500000065;C15376;Ets Lambert & Cie;15.10.2024;07.06.2023;118.912,50;78;LIVRE;s.lambert71@exemple-fictif.fr;08 23 53 20 74;Saint-Étienne
+CMD4500000066;C63578;Société Faure SA;25.06.2024;20.01.2025;157.725,33;172;LIVRE;a.faure50@exemple-fictif.fr;06 22 81 96 59;Lille
+CMD4500000067;C50662;Comptoir Garnier Distribution;21.12.2024;13.03.2023;177.211,42;44;FACTURE;m.garnier45@exemple-fictif.fr;09 58 92 52 26;Saint-Étienne
+CMD4500000068;C57526;Ets Francois Frères;10.03.2020;11.08.2020;56.643,50;71;EN_COURS;a.francois3@exemple-fictif.fr;02 47 22 74 79;Villeurbanne
+CMD4500000069;C91885;Groupe Boyer SAS;26.03.2024;15.01.2022;91.081,21;369;EN_COURS;m.boyer89@exemple-fictif.fr;08 88 46 67 39;Strasbourg
+CMD4500000070;C46932;Comptoir Francois & Cie;25.07.2023;17.07.2020;204.224,64;411;EN_COURS;p.francois99@exemple-fictif.fr;05 16 92 71 57;Strasbourg
+CMD4500000071;C67340;Société Faure & Cie;03.04.2025;15.06.2019;103.730,08;203;FACTURE;s.faure19@exemple-fictif.fr;04 59 20 57 38;Lyon
+CMD4500000072;C28191;Société Morel Services;25.12.2022;15.10.2019;226.465,31;10;FACTURE;p.morel90@exemple-fictif.fr;04 29 80 87 77;Bordeaux
+CMD4500000073;C75513;Comptoir Legrand & Cie;20.09.2019;21.09.2023;60.492,11;74;FACTURE;j.legrand15@exemple-fictif.fr;07 10 88 55 40;Rennes
+CMD4500000074;C12665;Comptoir Lambert Frères;13.08.2019;21.07.2021;63.420,03;9;FACTURE;s.lambert71@exemple-fictif.fr;02 54 40 94 90;Paris
+CMD4500000075;C72722;Industries Gauthier SAS;21.03.2025;05.02.2024;194.049,84;235;LIVRE;p.gauthier90@exemple-fictif.fr;05 35 15 35 15;Nantes
+CMD4500000076;C16265;Industries Legrand SAS;28.11.2021;09.02.2025;92.011,11;456;ANNULE;a.legrand46@exemple-fictif.fr;08 59 53 33 73;Villeurbanne
+CMD4500000077;C48504;Ets Garnier Frères;11.02.2019;11.11.2021;76.630,90;309;ANNULE;m.garnier70@exemple-fictif.fr;03 98 66 54 67;Lyon
+CMD4500000078;C77251;Atelier Legrand SARL;26.12.2024;06.01.2020;212.168,84;348;ANNULE;p.legrand47@exemple-fictif.fr;01 26 18 40 92;Nantes
+CMD4500000079;C28047;Société Guerin & Cie;17.06.2022;11.11.2021;62.410,42;59;LIVRE;j.guerin74@exemple-fictif.fr;03 73 76 59 81;Paris
+CMD4500000080;C19706;Ets Perrin SAS;15.03.2024;15.02.2025;170.485,50;433;FACTURE;j.perrin18@exemple-fictif.fr;06 18 80 79 47;Lille
+CMD4500000081;C41029;Groupe Lambert SARL;26.08.2019;12.09.2023;92.234,10;412;EN_COURS;m.lambert18@exemple-fictif.fr;02 18 49 60 71;Strasbourg
+CMD4500000082;C26821;Ets Garnier & Cie;27.09.2024;19.03.2025;241.566,49;222;LIVRE;s.garnier45@exemple-fictif.fr;02 76 29 48 31;Marseille
+CMD4500000083;C82199;Atelier Gauthier SA;09.03.2024;10.10.2023;23.366,17;329;EN_COURS;m.gauthier82@exemple-fictif.fr;03 31 94 89 87;Nantes
+CMD4500000084;C37631;Transports Francois Frères;25.10.2022;20.11.2019;124.514,53;322;FACTURE;a.francois84@exemple-fictif.fr;05 71 41 97 61;Lille
+CMD4500000085;C51853;Comptoir Guerin SAS;24.06.2022;05.06.2023;140.417,19;164;EN_COURS;a.guerin92@exemple-fictif.fr;08 25 44 67 41;Marseille
+CMD4500000086;C50988;Groupe Gauthier Services;07.03.2022;17.08.2022;219.770,13;255;LIVRE;a.gauthier74@exemple-fictif.fr;02 60 74 68 40;Toulouse
+CMD4500000087;C24089;Ets Francois SA;14.03.2021;24.06.2025;100.819,49;24;ANNULE;s.francois2@exemple-fictif.fr;01 82 81 34 56;Strasbourg
+CMD4500000088;C22672;Industries Bonnet Frères;13.06.2025;11.09.2021;188.743,74;102;ANNULE;j.bonnet17@exemple-fictif.fr;09 15 15 14 27;Villeurbanne
+CMD4500000089;C90805;Comptoir Guerin SA;24.05.2023;11.09.2025;127.433,43;251;FACTURE;m.guerin51@exemple-fictif.fr;08 12 57 52 96;Paris
+CMD4500000090;C85821;Comptoir Morel & Cie;19.04.2024;02.10.2022;42.636,31;323;ANNULE;a.morel84@exemple-fictif.fr;03 97 41 14 83;Villeurbanne
+CMD4500000091;C18163;Comptoir Boyer Services;23.03.2023;07.09.2021;249.530,74;245;ANNULE;s.boyer61@exemple-fictif.fr;06 32 68 78 53;Strasbourg
+CMD4500000092;C83149;Ets Bonnet SAS;10.04.2021;25.05.2024;51.827,38;361;ANNULE;m.bonnet36@exemple-fictif.fr;06 71 54 81 45;Lille
+CMD4500000093;C47700;Transports Legrand SAS;23.02.2021;15.11.2021;186.837,15;110;EN_COURS;a.legrand6@exemple-fictif.fr;09 44 81 99 44;Marseille
+CMD4500000094;C64172;Industries Rousseau SAS;11.12.2022;04.11.2025;34.375,38;494;EN_COURS;j.rousseau13@exemple-fictif.fr;07 93 70 71 93;Toulouse
+CMD4500000095;C14888;Comptoir Francois SAS;06.07.2025;06.01.2025;99.254,67;254;EN_COURS;s.francois95@exemple-fictif.fr;05 14 11 48 82;Rennes
+CMD4500000096;C45761;Groupe Chevalier Services;07.02.2021;06.12.2022;162.074,85;368;EN_COURS;s.chevalier60@exemple-fictif.fr;01 53 47 82 96;Toulouse
+CMD4500000097;C28430;Ets Garnier Distribution;16.06.2020;01.05.2022;58.887,96;386;FACTURE;j.garnier24@exemple-fictif.fr;06 48 84 83 11;Lille
+CMD4500000098;C25389;Industries Boyer Frères;21.05.2021;20.04.2020;239.340,56;245;EN_COURS;a.boyer89@exemple-fictif.fr;08 87 57 63 99;Strasbourg
+CMD4500000099;C68556;Transports Francois Frères;17.12.2021;03.10.2019;15.448,89;281;EN_COURS;j.francois68@exemple-fictif.fr;09 29 31 51 76;Grenoble
+CMD4500000100;C64450;Atelier Legrand & Cie;15.10.2019;18.08.2024;201.730,77;371;LIVRE;m.legrand66@exemple-fictif.fr;07 42 10 37 84;Paris
+CMD4500000101;C33590;Ets Garnier SARL;25.03.2025;21.12.2024;240.946,00;192;ANNULE;a.garnier53@exemple-fictif.fr;08 58 58 20 97;Saint-Étienne
+CMD4500000102;C12979;Comptoir Boyer SAS;10.08.2024;24.09.2022;132.988,08;422;EN_COURS;m.boyer1@exemple-fictif.fr;04 68 54 29 45;Toulouse
+CMD4500000103;C23224;Atelier Legrand SAS;20.01.2022;20.11.2024;218.054,38;126;LIVRE;m.legrand9@exemple-fictif.fr;07 66 39 79 37;Lyon
+CMD4500000104;C49552;Comptoir Bonnet Services;05.11.2023;08.07.2021;68.795,73;286;EN_COURS;a.bonnet31@exemple-fictif.fr;07 81 73 16 54;Saint-Étienne
+CMD4500000105;C41584;Groupe Boyer Services;28.04.2021;28.12.2020;201.445,98;469;LIVRE;s.boyer61@exemple-fictif.fr;09 62 63 81 77;Marseille
+CMD4500000106;C45187;Atelier Guerin Frères;13.11.2023;20.01.2025;18.205,35;412;EN_COURS;m.guerin7@exemple-fictif.fr;08 36 52 48 11;Toulouse
+CMD4500000107;C41369;Industries Rousseau Frères;18.06.2025;10.07.2022;133.417,20;184;FACTURE;m.rousseau51@exemple-fictif.fr;05 56 75 73 69;Paris
+CMD4500000108;C29126;Ets Guerin SARL;01.05.2023;19.10.2024;104.400,34;79;EN_COURS;s.guerin29@exemple-fictif.fr;06 39 58 82 41;Grenoble
+CMD4500000109;C32050;Industries Martinez Distribution;24.06.2020;05.12.2023;122.084,20;470;LIVRE;p.martinez59@exemple-fictif.fr;09 14 19 95 16;Lyon
+CMD4500000110;C93588;Ets Lambert SA;22.10.2022;22.08.2019;203,291.17;283;ANNULE;j.lambert80@exemple-fictif.fr;01 12 77 45 78;Lille
+CMD4500000111;C35156;Atelier Garnier Frères;20.09.2021;27.06.2021;198.736,13;41;FACTURE;m.garnier31@exemple-fictif.fr;07 68 82 41 99;Toulouse
+CMD4500000112;C82443;Atelier Morel & Cie;16.01.2024;01.12.2020;20.680,70;433;ANNULE;p.morel49@exemple-fictif.fr;06 82 22 77 15;Toulouse
+CMD4500000113;C96259;Industries Garnier SA;02.03.2025;11.01.2020;146.763,16;386;ANNULE;s.garnier73@exemple-fictif.fr;02 48 30 82 40;Rennes
+CMD4500000114;C55332;Transports Faure Distribution;02.02.2022;08.02.2021;151.296,13;315;ANNULE;j.faure65@exemple-fictif.fr;06 13 91 44 67;Grenoble
+CMD4500000115;C42302;Atelier Boyer Services;23.02.2019;09.03.2022;177.922,17;325;EN_COURS;s.boyer38@exemple-fictif.fr;07 50 56 23 21;Lyon
+CMD4500000116;C63483;Ets Boyer Frères;04.01.2019;12.09.2019;149.235,17;402;FACTURE;s.boyer66@exemple-fictif.fr;07 11 47 62 59;Paris
+CMD4500000117;C49469;Ets Francois SAS;09.08.2020;03.03.2022;68.997,71;154;ANNULE;m.francois35@exemple-fictif.fr;02 56 42 41 90;Grenoble
+CMD4500000118;C67700;Transports Guerin Frères;11.07.2025;27.11.2023;34.039,76;165;EN_COURS;p.guerin43@exemple-fictif.fr;08 50 32 60 50;Lille
+CMD4500000119;C24927;Transports Blanc Services;19.04.2023;18.03.2024;191.906,80;14;ANNULE;p.blanc47@exemple-fictif.fr;04 66 47 98 18;Bordeaux
+CMD4500000120;C88372;Transports Boyer & Cie;16.10.2022;18.09.2025;172.930,30;279;LIVRE;j.boyer58@exemple-fictif.fr;06 99 78 86 91;Paris
+CMD4500000121;C53463;Industries Bonnet Distribution;26.07.2019;01.02.2021;55.508,05;383;EN_COURS;p.bonnet97@exemple-fictif.fr;08 57 60 69 96;Rennes
+CMD4500000122;C50880;Atelier Perrin SARL;11.08.2025;07.09.2022;87.081,59;50;ANNULE;m.perrin45@exemple-fictif.fr;08 50 18 48 15;Villeurbanne
+CMD4500000123;C30989;Groupe Martinez Frères;11.09.2022;15.04.2025;101.267,81;95;EN_COURS;m.martinez71@exemple-fictif.fr;07 60 13 88 35;Grenoble
+CMD4500000124;C80371;Transports Legrand SARL;06.06.2021;07.08.2019;65.595,73;442;ANNULE;s.legrand14@exemple-fictif.fr;09 91 50 86 59;Rennes
+CMD4500000125;C87354;Industries Francois Services;03.11.2020;11.02.2020;76.351,95;94;FACTURE;a.francois79@exemple-fictif.fr;03 75 59 63 86;Marseille
+CMD4500000126;C47858;Groupe Perrin Frères;05.03.2021;27.08.2023;13.412,28;184;LIVRE;m.perrin63@exemple-fictif.fr;08 27 34 59 81;Strasbourg
+CMD4500000127;C38905;Atelier Faure Frères;10.01.2021;08.09.2021;42.060,56;235;ANNULE;j.faure98@exemple-fictif.fr;09 75 24 83 24;Lille
+CMD4500000128;C23423;Ets Martinez Frères;24.11.2025;08.05.2025;249.828,17;231;FACTURE;m.martinez55@exemple-fictif.fr;06 21 66 25 40;Toulouse
+CMD4500000129;C17780;Comptoir Faure SAS;19.06.2023;09.10.2023;42.102,66;361;FACTURE;m.faure27@exemple-fictif.fr;05 83 44 75 96;Paris
+CMD4500000130;C29168;Groupe Francois Distribution;23.06.2025;08.11.2022;122.369,79;296;FACTURE;m.francois32@exemple-fictif.fr;07 58 67 19 91;Paris
+CMD4500000131;C22208;Société Chevalier Frères;24.08.2024;22.12.2021;212.528,06;408;ANNULE;j.chevalier94@exemple-fictif.fr;04 64 37 73 44;Nantes
+CMD4500000132;C23051;Industries Guerin Services;21.08.2019;04.03.2022;114.134,97;491;ANNULE;j.guerin6@exemple-fictif.fr;04 98 26 93 48;Marseille
+CMD4500000133;C91999;Industries Francois SAS;10.12.2024;00.00.0000;163.874,75;361;LIVRE;j.francois51@exemple-fictif.fr;01 37 71 19 26;Rennes
+CMD4500000134;C19283;Ets Gauthier Distribution;08.07.2019;24.02.2019;78.344,74;452;FACTURE;m.gauthier62@exemple-fictif.fr;03 58 27 92 96;Marseille
+CMD4500000135;C90750;Industries Rousseau Distribution;22.08.2025;07.02.2019;35.011,89;64;ANNULE;m.rousseau53@exemple-fictif.fr;06 64 50 27 41;Lille
+CMD4500000136;C77862;Atelier Martinez Services;20.09.2020;24.07.2021;161.545,98;402;EN_COURS;a.martinez27@exemple-fictif.fr;08 59 24 40 73;Saint-Étienne
+CMD4500000137;C57895;Ets Faure Services;18.11.2020;25.08.2025;18.257,23;301;LIVRE;s.faure54@exemple-fictif.fr;01 43 37 15 17;Bordeaux
+CMD4500000138;C30012;Industries Garnier Frères;09.02.2021;03.09.2020;243.578,60;80;FACTURE;s.garnier79@exemple-fictif.fr;07 85 91 93 97;Saint-Étienne
+CMD4500000139;C89800;Ets Garnier SARL;02.05.2024;24.11.2024;43.919,72;7;EN_COURS;p.garnier79@exemple-fictif.fr;01 30 73 54 76;Strasbourg
+CMD4500000140;C66272;Industries Blanc SARL;09.09.2019;09.12.2023;156.886,93;255;ANNULE;j.blanc43@exemple-fictif.fr;09 56 17 73 82;Marseille
+CMD4500000141;C11610;Industries Rousseau Frères;08.01.2022;12.07.2020;44.748,44;492;LIVRE;j.rousseau6@exemple-fictif.fr;09 93 63 38 51;Toulouse
+CMD4500000142;C77603;Industries Lambert SARL;02.07.2019;15.05.2025;211.213,18;168;LIVRE;m.lambert29@exemple-fictif.fr;09 68 11 57 35;Lille
+CMD4500000143;C81638;Transports Chevalier Services;25.04.2020;01.07.2019;58.257,11;178;LIVRE;m.chevalier94@exemple-fictif.fr;06 10 94 58 49;Paris
+CMD4500000144;C40339;Industries Faure SA;28.09.2022;23.06.2022;243.638,95;44;LIVRE;j.faure6@exemple-fictif.fr;09 27 91 60 19;Rennes
+CMD4500000145;C69343;Transports Guerin & Cie;09.04.2019;07.03.2025;192.538,95;56;EN_COURS;a.guerin41@exemple-fictif.fr;02 31 67 69 50;Bordeaux
+CMD4500000146;C49874;Atelier Gauthier SARL;27.12.2024;20.01.2020;208.982,83;168;EN_COURS;m.gauthier88@exemple-fictif.fr;02 41 55 60 75;Lyon
+CMD4500000147;C22415;Comptoir Chevalier Distribution;15.02.2025;26.03.2019;2.999,11;426;EN_COURS;s.chevalier32@exemple-fictif.fr;03 35 61 57 97;Saint-Étienne
+CMD4500000148;C22055;Groupe Garnier Distribution;28.06.2019;02.08.2019;42.005,62;294;ANNULE;p.garnier17@exemple-fictif.fr;07 73 13 58 97;Bordeaux
+CMD4500000149;C94840;Comptoir Morel Frères;10.08.2022;18.08.2019;21.939,51;197;EN_COURS;s.morel32@exemple-fictif.fr;07 35 92 77 41;Saint-Étienne
+CMD4500000150;C84141;Comptoir Chevalier Services;17.06.2022;09.03.2019;79.726,20;113;LIVRE;p.chevalier45@exemple-fictif.fr;05 17 70 77 55;Rennes
+CMD4500000151;C38758;Transports Gauthier Distribution;19.07.2021;27.03.2020;59.145,42;163;FACTURE;j.gauthier98@exemple-fictif.fr;01 99 55 82 82;Marseille
+CMD4500000152;C17362;Groupe Blanc & Cie;08.10.2020;01.09.2022;180,87;470;EN_COURS;j.blanc12@exemple-fictif.fr;03 53 32 51 17;Lyon
+CMD4500000153;C23242;Atelier Guerin SA;11.05.2021;05.03.2024;237.173,90;406;ANNULE;p.guerin76@exemple-fictif.fr;06 32 81 98 88;Nantes
+CMD4500000154;C85082;Groupe Faure Distribution;13.10.2019;06.10.2021;230.260,34;496;EN_COURS;j.faure90@exemple-fictif.fr;02 73 28 52 19;Toulouse
+CMD4500000155;C11493;Industries Francois Distribution;09.04.2020;23.02.2021;64.171,92;56;LIVRE;a.francois58@exemple-fictif.fr;01 59 66 63 31;Bordeaux
+CMD4500000156;C69151;Comptoir Gauthier Distribution;03.01.2021;01.06.2021;237.916,02;38;FACTURE;m.gauthier21@exemple-fictif.fr;03 58 30 19 80;Paris
+CMD4500000157;C17019;Groupe Francois Frères;04.06.2020;07.07.2024;138.532,57;474;FACTURE;p.francois21@exemple-fictif.fr;05 48 40 22 16;Bordeaux
+CMD4500000158;C36171;Transports Blanc Distribution;04.01.2020;06.11.2021;244.264,65;243;LIVRE;s.blanc62@exemple-fictif.fr;05 60 70 72 94;Lille
+CMD4500000159;C44524;Atelier Chevalier SA;08.05.2023;02.03.2025;174.120,77;50;LIVRE;p.chevalier60@exemple-fictif.fr;06 79 62 85 39;Strasbourg
+CMD4500000160;C49171;Ets Perrin Frères;03.07.2025;23.01.2023;142.809,27;265;EN_COURS;m.perrin61@exemple-fictif.fr;02 67 32 31 37;Toulouse
+CMD4500000161;C51910;Groupe Francois Services;24.02.2019;13.09.2022;138.018,03;439;FACTURE;s.francois34@exemple-fictif.fr;09 68 11 99 89;Rennes
+CMD4500000162;C47498;Atelier Legrand SARL;28.09.2021;14.05.2022;163.700,37;293;ANNULE;s.legrand13@exemple-fictif.fr;01 32 45 61 28;Rennes
+CMD4500000163;C58816;Atelier Rousseau Distribution;01.06.2025;26.05.2021;70.093,86;252;LIVRE;p.rousseau35@exemple-fictif.fr;04 27 48 66 51;Lille
+CMD4500000164;C17367;Industries Boyer & Cie;17.03.2019;10.12.2023;100.852,25;400;LIVRE;s.boyer48@exemple-fictif.fr;03 34 35 17 41;Lyon
+CMD4500000165;C14005;Ets Lambert Distribution;08.06.2022;20.08.2020;??;243;FACTURE;j.lambert88@exemple-fictif.fr;06 30 43 98 21;Lille
+CMD4500000166;C63674;Industries Rousseau SAS;17.01.2025;25.11.2019;118.529,56;68;EN_COURS;a.rousseau84@exemple-fictif.fr;01 38 42 87 49;Villeurbanne
+CMD4500000167;C78241;Groupe Blanc & Cie;27.10.2022;19.02.2019;127.883,31;340;FACTURE;a.blanc87@exemple-fictif.fr;09 92 86 87 46;Lille
+CMD4500000168;C29651;Société Blanc Distribution;17.04.2019;26.10.2022;165.135,98;349;EN_COURS;a.blanc25@exemple-fictif.fr;01 93 73 47 43;Bordeaux
+CMD4500000169;C80075;Industries Guerin Distribution;21.08.2024;12.09.2021;211.356,36;431;EN_COURS;m.guerin88@exemple-fictif.fr;05 22 70 26 43;Villeurbanne
+CMD4500000170;C50250;Groupe Garnier SA;14.06.2021;09.10.2021;115.945,52;61;ANNULE;m.garnier96@exemple-fictif.fr;01 91 84 84 89;Paris
+CMD4500000171;C36253;Atelier Boyer Services;11.07.2023;15.03.2021;215.599,86;93;LIVRE;m.boyer18@exemple-fictif.fr;08 52 90 32 50;Saint-Étienne
+CMD4500000172;C90541;Ets Faure Services;14.11.2022;13.07.2022;95.835,27;20;EN_COURS;j.faure17@exemple-fictif.fr;06 11 51 77 34;Lyon
+CMD4500000173;C50123;Atelier Faure & Cie;06.02.2025;02.05.2021;113.987,02;267;FACTURE;s.faure76@exemple-fictif.fr;07 97 27 53 72;Nantes
+CMD4500000174;C12872;Industries Rousseau SAS;19.09.2020;04.06.2024;162.638,59;20;ANNULE;m.rousseau94@exemple-fictif.fr;05 78 89 16 86;Lyon
+CMD4500000175;C30070;Atelier Boyer Frères;07.12.2024;21.01.2021;105.223,66;52;FACTURE;a.boyer61@exemple-fictif.fr;03 63 23 75 89;Paris
+CMD4500000176;C63707;Comptoir Gauthier SAS;10.03.2019;18.08.2020;172.054,10;247;FACTURE;a.gauthier91@exemple-fictif.fr;04 10 11 95 21;Paris
+CMD4500000177;C40298;Industries Martinez; SARL;15.05.2021;15.01.2019;203.296,47;448;LIVRE;a.martinez83@exemple-fictif.fr;05 56 96 50 64;Villeurbanne
+CMD4500000178;C91501;Groupe Francois SA;09.12.2019;12.06.2020;28.466,86;205;ANNULE;a.francois57@exemple-fictif.fr;05 59 98 71 63;Saint-Étienne
+CMD4500000179;C73265;Groupe Gauthier SARL;26.10.2024;15.03.2023;94.943,90;184;LIVRE;p.gauthier76@exemple-fictif.fr;03 71 72 24 62;Grenoble
+CMD4500000180;C97797;Industries Legrand Frères;28.06.2023;17.12.2024;154.563,57;222;EN_COURS;s.legrand29@exemple-fictif.fr;08 54 94 96 92;Bordeaux
+CMD4500000181;C31679;Groupe Perrin Frères;03.08.2021;08.06.2021;12.597,18;115;ANNULE;p.perrin64@exemple-fictif.fr;07 40 20 68 66;Rennes
+CMD4500000182;C14696;Atelier Francois SARL;18.09.2019;27.02.2025;151.054,78;317;FACTURE;p.francois53@exemple-fictif.fr;09 81 36 93 95;Grenoble
+CMD4500000183;C96136;Transports Lambert Frères;12.12.2022;04.02.2025;164.730,97;2;FACTURE;s.lambert61@exemple-fictif.fr;06 91 47 80 76;Nantes
+CMD4500000184;C35679;Ets Martinez SARL;07.02.2025;13.04.2022;206.140,29;98;FACTURE;a.martinez79@exemple-fictif.fr;02 63 15 91 96;Rennes
+CMD4500000185;C66729;Atelier Chevalier Frères;27.10.2022;17.03.2024;144.642,81;375;EN_COURS;j.chevalier71@exemple-fictif.fr;02 59 94 86 87;Nantes
+CMD4500000186;C27481;Ets Blanc SA;05.07.2023;23.12.2023;74.735,29;360;FACTURE;a.blanc58@exemple-fictif.fr;09 90 37 35 36;Rennes
+CMD4500000187;C25126;Comptoir Faure Frères;25.06.2023;16.10.2023;#REF!;364;ANNULE;a.faure91@exemple-fictif.fr;09 46 64 11 76;Paris
+CMD4500000188;C48684;Industries Blanc SA;07.09.2019;12.08.2019;154.031,05;346;EN_COURS;m.blanc8@exemple-fictif.fr;09 59 40 75 99;Lille
+CMD4500000189;C42943;Société Francois Frères;07.10.2025;25.08.2025;56.394,87;325;FACTURE;j.francois2@exemple-fictif.fr;09 87 35 34 47;Grenoble
+CMD4500000190;C44634;Atelier Boyer & Cie;05.03.2023;28.05.2019;82.647,39;364;EN_COURS;a.boyer72@exemple-fictif.fr;01 29 51 86 16;Saint-Étienne
+CMD4500000191;C34100;Industries Legrand SA;17.02.2025;17.03.2022;135.774,61;207;LIVRE;s.legrand29@exemple-fictif.fr;06 38 37 94 52;Nantes
+CMD4500000192;C97679;Transports Gauthier Distribution;12.08.2020;21.10.2023;60.964,35;21;FACTURE;j.gauthier15@exemple-fictif.fr;07 24 59 42 79;Villeurbanne
+CMD4500000193;C35232;Ets Chevalier SARL;11.09.2019;04.03.2025;134.498,33;4;LIVRE;a.chevalier84@exemple-fictif.fr;04 95 90 37 97;Bordeaux
+CMD4500000194;C99921;Industries Boyer Services;05.01.2022;23.06.2019;21.889,35;28;EN_COURS;j.boyer96@exemple-fictif.fr;05 81 19 83 39;Lille
+CMD4500000195;C86756;Comptoir Garnier SARL;02.12.2025;03.06.2023;N/A;403;FACTURE;s.garnier9@exemple-fictif.fr;02 46 66 58 60;Saint-Étienne
+CMD4500000196;C98773;Société Lambert Distribution;26.12.2024;12.01.2023;218.692,98;73;LIVRE;m.lambert39@exemple-fictif.fr;01 10 83 86 60;Strasbourg
+CMD4500000197;C31096;Ets Rousseau Distribution;06.04.2023;27.05.2020;28.664,49;344;LIVRE;s.rousseau19@exemple-fictif.fr;09 69 92 80 19;Lille
+CMD4500000198;C47373;Groupe Guerin Distribution;20.02.2020;11.08.2022;82.093,24;338;FACTURE;m.guerin13@exemple-fictif.fr;03 82 82 56 50;Bordeaux
+CMD4500000199;C53458;Transports Blanc SA;16.08.2022;12.05.2022;137.922,44;90;LIVRE;m.blanc87@exemple-fictif.fr;05 27 78 35 43;Villeurbanne
+CMD4500000200;C87337;Transports Morel Frères;07.01.2023;09.09.2023;118.031,27;397;EN_COURS;s.morel52@exemple-fictif.fr;06 60 38 85 47;Marseille
+CMD4500000201;C77388;Transports Gauthier Frères;05.08.2020;06.10.2023;164.856,73;496;EN_COURS;m.gauthier97@exemple-fictif.fr;08 55 15 38 72;Toulouse
+CMD4500000202;C15230;Ets Guerin & Cie;21.06.2019;23.09.2024;207.413,49;428;FACTURE;p.guerin6@exemple-fictif.fr;09 82 32 58 93;Bordeaux
+CMD4500000203;C55224;Groupe Perrin Frères;16.08.2023;01.09.2020;109.980,28;118;LIVRE;p.perrin46@exemple-fictif.fr;09 92 45 37 29;Marseille
+CMD4500000204;C72759;Industries Guerin SARL;16.04.2023;06.11.2025;102.730,69;125;LIVRE;p.guerin87@exemple-fictif.fr;03 83 85 30 27;Saint-Étienne
+CMD4500000205;C12440;Ets Lambert Frères;24.12.2024;27.05.2019;54.156,19;311;ANNULE;s.lambert82@exemple-fictif.fr;08 31 38 62 86;Marseille
+CMD4500000206;C87410;Industries Martinez SA;03.04.2022;13.03.2019;4.150,49;268;ANNULE;p.martinez77@exemple-fictif.fr;03 87 22 32 70;Rennes
+CMD4500000207;C98940;Groupe Francois Frères;21.07.2023;14.06.2025;10.869,14;272;ANNULE;s.francois1@exemple-fictif.fr;04 71 58 54 85;Villeurbanne
+CMD4500000208;C88419;Groupe Legrand Services;18.07.2021;07.01.2024;185.913,98;4;LIVRE;j.legrand37@exemple-fictif.fr;09 10 58 93 36;Villeurbanne
+CMD4500000209;C57925;Transports Blanc Frères;20.05.2024;13.04.2022;138.030,72;286;ANNULE;p.blanc73@exemple-fictif.fr;03 57 81 81 71;Lille
+CMD4500000210;C31206;Industries Gauthier SARL;04.04.2023;13.06.2025;137.648,55;357;LIVRE;m.gauthier58@exemple-fictif.fr;03 59 91 10 21;Marseille
+CMD4500000211;C90473;Atelier Bonnet Distribution;21.09.2021;23.10.2019;236.429,51;420;EN_COURS;p.bonnet52@exemple-fictif.fr;08 66 11 35 94;Strasbourg
+CMD4500000212;C95854;Industries Faure SARL;01.03.2019;09.07.2021;167.418,81;208;EN_COURS;a.faure31@exemple-fictif.fr;09 11 18 21 80;Lille
+CMD4500000213;C85354;Comptoir Rousseau SAS;01.05.2020;14.09.2019;139.662,09;258;FACTURE;p.rousseau52@exemple-fictif.fr;06 24 75 42 78;Rennes
+CMD4500000214;C13584;Transports Guerin & Cie;16.02.2021;03.07.2024;197.166,12;113;EN_COURS;p.guerin76@exemple-fictif.fr;06 62 55 76 78;Lyon
+CMD4500000215;C51139;Atelier Guerin Frères;12.04.2023;09.03.2024;170.780,00;466;EN_COURS;m.guerin61@exemple-fictif.fr;08 35 40 40 43;Toulouse
+CMD4500000216;C10868;Atelier Garnier Distribution;25.09.2019;28.08.2021;155.170,66;253;FACTURE;p.garnier79@exemple-fictif.fr;08 33 75 45 60;Toulouse
+CMD4500000217;C32911;Comptoir Morel SA;15.02.2024;17.08.2021;172.305,75;7;EN_COURS;p.morel88@exemple-fictif.fr;07 84 22 51 56;Rennes
+CMD4500000218;C37594;Société Guerin SAS;14.12.2025;12.06.2025;100.154,14;231;EN_COURS;p.guerin55@exemple-fictif.fr;03 83 97 39 22;Villeurbanne
+CMD4500000219;C65249;Groupe Martinez & Cie;16.03.2025;21.09.2023;180.142,88;403;ANNULE;j.martinez23@exemple-fictif.fr;05 42 81 82 16;Bordeaux
+CMD4500000220;C57312;Ets Garnier Distribution;12.09.2023;26.05.2021;4.968,64;63;FACTURE;a.garnier34@exemple-fictif.fr;04 83 83 93 93;Strasbourg
+CMD4500000221;C47555;Ets Martinez SARL;15.11.2020;28.03.2024;201.931,21;173;ANNULE;p.martinez79@exemple-fictif.fr;07 19 20 30 53;Toulouse
+CMD4500000222;C86928;Ets Perrin Services;17.08.2022;06.03.2025;5.785,04;373;EN_COURS;a.perrin96@exemple-fictif.fr;05 99 20 36 31;Bordeaux
+CMD4500000223;C44400;Comptoir Boyer Services;20.03.2019;21.07.2021;NULL;378;FACTURE;j.boyer14@exemple-fictif.fr;08 90 26 26 77;Marseille
+CMD4500000224;C80685;Société Perrin Frères;06.10.2023;15.11.2024;158.966,43;289;ANNULE;p.perrin18@exemple-fictif.fr;09 91 91 78 49;Nantes
+CMD4500000225;C27865;Société Faure SARL;12.05.2022;18.01.2024;230.522,88;485;ANNULE;j.faure67@exemple-fictif.fr;05 11 65 47 86;Toulouse
+CMD4500000226;C38913;Groupe Rousseau Distribution;09.02.2022;21.04.2023;191.136,93;466;FACTURE;p.rousseau49@exemple-fictif.fr;05 93 78 44 62;Toulouse
+CMD4500000227;C52027;Industries Blanc Frères;01.03.2019;18.01.2020;54,304.85;145;FACTURE;p.blanc25@exemple-fictif.fr;03 66 11 39 21;Marseille
+CMD4500000228;C20515;Ets Guerin Distribution;27.03.2019;09.07.2019;135.802,56;93;EN_COURS;j.guerin43@exemple-fictif.fr;05 58 11 25 41;Bordeaux
+CMD4500000229;C61003;Atelier Legrand Frères;22.05.2021;06.11.2024;10.556,06;480;LIVRE;m.legrand61@exemple-fictif.fr;05 71 91 48 35;Nantes
+CMD4500000230;C25682;Atelier Guerin SAS;13.04.2019;02.10.2025;172.690,95;353;EN_COURS;a.guerin75@exemple-fictif.fr;06 21 41 30 73;Paris
+CMD4500000231;C26492;Industries Guerin SAS;16.04.2021;18.11.2025;86.835,96;457;ANNULE;s.guerin14@exemple-fictif.fr;04 12 98 58 55;Villeurbanne
+CMD4500000232;C81253;Ets Martinez SAS;12.06.2024;15.05.2025;207.839,08;469;EN_COURS;s.martinez24@exemple-fictif.fr;02 77 29 67 47;Lille
+CMD4500000233;C41298;Atelier Perrin Frères;11.12.2019;22.09.2025;96.878,84;269;ANNULE;a.perrin80@exemple-fictif.fr;09 29 88 46 51;Bordeaux
+CMD4500000234;C24031;Groupe Faure Services;16.04.2019;02.10.2024;209.076,52;337;ANNULE;j.faure26@exemple-fictif.fr;09 89 99 85 42;Lyon
+CMD4500000235;C17956;Transports Chevalier SARL;12.09.2024;14.06.2025;177.111,36;422;FACTURE;p.chevalier82@exemple-fictif.fr;09 15 19 48 19;Toulouse
+CMD4500000236;C33448;Industries Lambert SAS;18.12.2023;14.12.2019;191.573,19;296;FACTURE;s.lambert81@exemple-fictif.fr;08 99 95 64 23;Marseille
+CMD4500000237;C52553;Ets Bonnet SA;28.06.2022;25.11.2022;206.540,48;166;EN_COURS;a.bonnet71@exemple-fictif.fr;09 37 58 80 42;Nantes
+CMD4500000238;C10860;Atelier Bonnet Frères;10.04.2020;28.06.2019;192.883,05;483;FACTURE;m.bonnet39@exemple-fictif.fr;09 75 81 83 83;Marseille
+CMD4500000239;C84774;Groupe Rousseau SA;13.10.2020;24.02.2024;81.179,77;248;EN_COURS;a.rousseau12@exemple-fictif.fr;08 98 99 83 22;Rennes
+CMD4500000240;C64594;Transports Perrin SA;28.02.2025;25.04.2024;163.198,27;309;LIVRE;a.perrin56@exemple-fictif.fr;07 16 49 77 15;Nantes
+CMD4500000241;C76155;Ets Martinez & Cie;03.04.2022;10.07.2020;33.055,94;43;ANNULE;s.martinez74@exemple-fictif.fr;01 80 61 43 20;Bordeaux
+CMD4500000242;C83553;Ets Chevalier Distribution;20.12.2023;08.04.2019;66.571,61;221;FACTURE;s.chevalier26@exemple-fictif.fr;02 24 95 62 64;Nantes
+CMD4500000243;C29112;Comptoir Guerin Services;15.01.2025;08.04.2024;173,451.87;388;LIVRE;p.guerin80@exemple-fictif.fr;02 16 41 89 28;Lille
+CMD4500000244;C81620;Industries Rousseau Frères;17.05.2023;16.10.2024;248.075,61;356;LIVRE;m.rousseau27@exemple-fictif.fr;07 84 94 77 15;Lille
+CMD4500000245;C45561;Atelier Francois SARL;22.11.2021;28.02.2019;73.130,97;453;ANNULE;p.francois85@exemple-fictif.fr;04 58 75 22 50;Grenoble
+CMD4500000246;C79391;Industries Perrin SARL;10.06.2022;13.12.2020;4.602,87;351;FACTURE;j.perrin32@exemple-fictif.fr;06 90 48 40 74;Lille
+CMD4500000247;C54798;Comptoir Morel SA;13.11.2020;03.12.2022;130.184,25;348;EN_COURS;m.morel20@exemple-fictif.fr;07 40 83 29 64;Lille
+CMD4500000248;C50501;Industries Lambert Services;23.12.2023;05.07.2025;36.296,65;478;EN_COURS;m.lambert18@exemple-fictif.fr;06 18 81 78 25;Marseille
+CMD4500000249;C93472;Ets Boyer SA;24.05.2020;25.04.2019;32.895,15;14;FACTURE;p.boyer96@exemple-fictif.fr;04 86 39 39 97;Lyon
+CMD4500000250;C74414;Industries Martinez SA;16.03.2020;07.04.2019;102.153,20;497;LIVRE;m.martinez50@exemple-fictif.fr;05 62 38 95 35;Toulouse
+CMD4500000251;C63066;Transports Guerin & Cie;25.01.2023;24.07.2024;78.231,24;314;LIVRE;m.guerin55@exemple-fictif.fr;09 23 67 68 15;Toulouse
+CMD4500000252;C62171;Atelier Francois SAS;10.05.2022;06.07.2021;153.287,44;28;EN_COURS;a.francois57@exemple-fictif.fr;08 92 67 21 74;Paris
+CMD4500000253;C87373;Ets Guerin SARL;23.04.2022;03.05.2021;172.932,44;465;EN_COURS;m.guerin59@exemple-fictif.fr;02 21 24 67 91;Nantes
+CMD4500000254;C32398;Ets Faure; Frères;11.10.2025;22.03.2020;217.205,95;92;LIVRE;p.faure6@exemple-fictif.fr;07 49 49 67 46;Saint-Étienne
+CMD4500000255;C10753;Ets Morel & Cie;20.08.2020;07.10.2024;118.933,24;210;ANNULE;p.morel70@exemple-fictif.fr;02 86 86 10 41;Strasbourg
+CMD4500000256;C14250;Industries Morel SA;22.10.2025;20.05.2021;230.096,97;26;LIVRE;j.morel19@exemple-fictif.fr;07 32 30 96 46;Rennes
+CMD4500000257;C49229;Comptoir Martinez SA;11.06.2022;27.02.2025;106.836,69;282;LIVRE;j.martinez12@exemple-fictif.fr;05 70 27 25 98;Lille
+CMD4500000258;C73394;Industries Bonnet Distribution;24.12.2023;26.12.2021;106.769,13;435;FACTURE;s.bonnet12@exemple-fictif.fr;05 77 83 89 55;Marseille
+CMD4500000259;C10207;Comptoir Perrin SAS;04.01.2022;21.02.2024;212.018,97;410;ANNULE;a.perrin25@exemple-fictif.fr;07 15 52 54 81;Saint-Étienne
+CMD4500000260;C10803;Comptoir Blanc Frères;04.11.2021;11.07.2024;142.234,70;492;LIVRE;a.blanc99@exemple-fictif.fr;03 34 52 53 96;Grenoble
+CMD4500000261;C64257;Transports Perrin Frères;24.01.2025;17.05.2023;181.243,79;162;LIVRE;a.perrin60@exemple-fictif.fr;04 83 97 52 55;Paris
+CMD4500000262;C34560;Groupe Gauthier Frères;20.02.2025;26.05.2024;214.456,29;364;LIVRE;s.gauthier50@exemple-fictif.fr;05 62 21 73 40;Nantes
+CMD4500000263;C68166;Atelier Legrand Services;17.01.2025;16.09.2020;47.561,02;473;ANNULE;m.legrand12@exemple-fictif.fr;09 49 51 28 22;Strasbourg
+CMD4500000264;C87894;Atelier Lambert SARL;28.02.2021;15.01.2019;130.149,22;338;FACTURE;a.lambert6@exemple-fictif.fr;01 83 49 91 36;Nantes
+CMD4500000265;C11999;Groupe Blanc SAS;20.09.2023;04.04.2023;87.586,03;164;FACTURE;a.blanc15@exemple-fictif.fr;03 46 83 41 31;Paris
+CMD4500000266;C17051;Industries Perrin SARL;03.07.2022;06.12.2023;222.820,06;323;ANNULE;j.perrin50@exemple-fictif.fr;06 49 52 35 95;Strasbourg
+CMD4500000267;C50683;Industries Legrand & Cie;22.11.2024;25.08.2022;57.931,24;115;EN_COURS;j.legrand59@exemple-fictif.fr;05 56 60 33 99;Saint-Étienne
+CMD4500000268;C46996;Société Garnier & Cie;25.06.2023;19.03.2023;25.742,02;419;LIVRE;p.garnier22@exemple-fictif.fr;06 81 93 19 48;Strasbourg
+CMD4500000269;C87459;Ets Chevalier SARL;14.07.2023;26.06.2023;173.536,35;89;LIVRE;a.chevalier27@exemple-fictif.fr;08 24 85 86 69;Nantes
+CMD4500000270;C59664;Industries Garnier Services;11.08.2024;22.01.2019;54.410,77;72;LIVRE;s.garnier99@exemple-fictif.fr;03 94 29 67 78;Lille
+CMD4500000271;C55123;Transports Bonnet Distribution;03.10.2019;20.09.2022;211.910,71;437;FACTURE;a.bonnet56@exemple-fictif.fr;01 57 80 16 10;Villeurbanne
+CMD4500000272;C51697;Industries Boyer Frères;23.07.2022;13.07.2023;52.811,91;89;ANNULE;p.boyer81@exemple-fictif.fr;03 34 81 59 56;Bordeaux
+CMD4500000273;C67243;Groupe Morel; Distribution;05.02.2020;21.07.2025;114.012,60;404;ANNULE;p.morel85@exemple-fictif.fr;03 68 75 64 80;Grenoble
+CMD4500000274;C63849;Groupe Martinez Distribution;18.10.2021;02.01.2023;120.822,20;189;LIVRE;s.martinez35@exemple-fictif.fr;08 98 20 28 77;Lille
+CMD4500000275;C93058;Industries Martinez Distribution;18.10.2021;20.01.2021;133.762,97;6;ANNULE;j.martinez88@exemple-fictif.fr;08 75 70 83 52;Bordeaux
+CMD4500000276;C18050;Industries Bonnet SA;21.08.2023;06.10.2019;164.083,41;150;LIVRE;s.bonnet34@exemple-fictif.fr;05 72 20 26 74;Paris
+CMD4500000277;C87564;Industries Morel SARL;24.03.2024;15.06.2025;43.858,09;401;EN_COURS;s.morel23@exemple-fictif.fr;08 33 77 14 53;Paris
+CMD4500000278;C67695;Transports Boyer & Cie;24.11.2020;07.10.2024;210.459,84;28;FACTURE;m.boyer85@exemple-fictif.fr;02 16 31 69 61;Grenoble
+CMD4500000279;C79526;Ets Martinez & Cie;28.07.2019;10.08.2022;169.626,57;493;LIVRE;a.martinez19@exemple-fictif.fr;02 78 91 55 65;Rennes
+CMD4500000280;C98511;Comptoir Francois & Cie;24.04.2024;22.10.2025;24,433.71;173;EN_COURS;p.francois99@exemple-fictif.fr;06 80 11 96 11;Paris
+CMD4500000281;C91185;Société Blanc SAS;03.01.2023;22.04.2023;159.524,34;363;LIVRE;j.blanc4@exemple-fictif.fr;02 87 26 58 94;Saint-Étienne
+CMD4500000282;C65965;Industries Chevalier SARL;23.11.2025;25.06.2021;40.499,89;38;FACTURE;p.chevalier36@exemple-fictif.fr;01 58 59 52 17;Lille
+CMD4500000283;C28857;Ets Bonnet SAS;18.07.2020;20.11.2019;228.153,18;367;FACTURE;p.bonnet14@exemple-fictif.fr;02 14 19 19 83;Villeurbanne
+CMD4500000284;C29871;Atelier Perrin Distribution;23.06.2022;19.01.2023;238,539.29;395;ANNULE;p.perrin35@exemple-fictif.fr;08 65 61 18 79;Toulouse
+CMD4500000285;C17234;Société Perrin SA;21.11.2019;12.09.2025;240.231,77;42;ANNULE;a.perrin52@exemple-fictif.fr;05 92 35 32 80;Lyon
+CMD4500000286;C67407;Société Martinez & Cie;24.04.2020;02.04.2019;179.937,56;304;EN_COURS;j.martinez81@exemple-fictif.fr;08 59 18 79 92;Lille
+CMD4500000287;C25491;Atelier Guerin SA;07.11.2024;17.08.2024;226,795.65;275;EN_COURS;j.guerin52@exemple-fictif.fr;04 19 14 28 72;Saint-Étienne
+CMD4500000288;C22752;Groupe Morel Distribution;15.10.2020;27.10.2019;204.451,87;55;LIVRE;j.morel40@exemple-fictif.fr;08 86 88 38 18;Toulouse
+CMD4500000289;C37948;Comptoir Francois Frères;25.01.2023;06.06.2019;30.195,16;73;ANNULE;m.francois42@exemple-fictif.fr;03 99 57 80 31;Grenoble
+CMD4500000290;C20580;Transports Boyer SAS;01.01.2020;03.12.2024;148.436,69;146;ANNULE;j.boyer63@exemple-fictif.fr;08 98 26 36 28;Saint-Étienne
+CMD4500000291;C21537;Groupe Bonnet Distribution;21.05.2021;14.01.2023;58.917,40;61;LIVRE;p.bonnet79@exemple-fictif.fr;06 79 74 38 69;Saint-Étienne
+CMD4500000292;C97836;Ets Perrin & Cie;02.01.2024;12.05.2020;108.673,56;172;ANNULE;m.perrin21@exemple-fictif.fr;01 23 16 78 32;Marseille
+CMD4500000293;C98716;Comptoir Bonnet SA;11.04.2025;04.06.2020;24.525,05;378;ANNULE;p.bonnet26@exemple-fictif.fr;04 58 38 19 70;Rennes
+CMD4500000294;C35448;Société Boyer SAS;21.06.2021;07.06.2020;8.033,33;292;LIVRE;p.boyer93@exemple-fictif.fr;05 27 24 69 68;Bordeaux
+CMD4500000295;C40107;Comptoir Francois SAS;03.07.2025;17.08.2025;248.916,13;303;ANNULE;s.francois71@exemple-fictif.fr;08 45 11 64 41;Toulouse
+CMD4500000296;C71689;Atelier Bonnet & Cie;24.09.2019;14.09.2022;119.822,54;409;LIVRE;j.bonnet6@exemple-fictif.fr;08 73 40 20 81;Lyon
+CMD4500000297;C70199;Atelier Garnier & Cie;28.10.2024;19.01.2022;115.945,52;71;ANNULE;a.garnier21@exemple-fictif.fr;03 57 90 69 91;Lyon
+CMD4500000298;C85396;Transports Boyer SA;26.04.2025;22.02.2023;220.213,00;377;LIVRE;s.boyer70@exemple-fictif.fr;09 96 56 16 24;Bordeaux
+CMD4500000299;C53899;Comptoir Garnier Distribution;08.09.2019;21.08.2024;234.787,59;298;EN_COURS;m.garnier18@exemple-fictif.fr;04 51 55 44 74;Saint-Étienne
+CMD4500000300;C79842;Atelier Gauthier & Cie;10.08.2023;12.11.2024;202.200,88;482;LIVRE;s.gauthier87@exemple-fictif.fr;04 68 21 20 60;Marseille
+CMD4500000301;C92218;Groupe Chevalier Services;01.05.2022;22.09.2020;118.481,49;216;ANNULE;m.chevalier67@exemple-fictif.fr;01 47 34 18 12;Toulouse
+CMD4500000302;C79489;Société Legrand & Cie;27.09.2022;15.05.2023;32.997,24;405;FACTURE;s.legrand86@exemple-fictif.fr;03 43 39 71 57;Lille
+CMD4500000303;C33891;Groupe Perrin Distribution;06.12.2024;22.03.2020;59.483,95;22;FACTURE;s.perrin37@exemple-fictif.fr;03 66 43 57 33;Toulouse
+CMD4500000304;C13266;Groupe Lambert Frères;13.08.2025;05.08.2021;39.021,76;497;FACTURE;a.lambert16@exemple-fictif.fr;05 70 47 83 95;Marseille
+CMD4500000305;C50380;Atelier Chevalier SAS;01.07.2023;27.04.2022;(134.607,69);168;LIVRE;s.chevalier15@exemple-fictif.fr;04 84 77 38 45;Toulouse
+CMD4500000306;C89058;Ets Lambert SAS;20.09.2019;22.06.2022;36.995,01;438;ANNULE;p.lambert41@exemple-fictif.fr;06 59 57 11 46;Nantes
+CMD4500000307;C31468;Industries Chevalier & Cie;26.12.2022;24.07.2020;208.879,53;307;LIVRE;p.chevalier37@exemple-fictif.fr;03 36 48 70 77;Nantes
+CMD4500000308;C70570;Société Perrin & Cie;23.10.2025;05.04.2020;208.072,61;149;ANNULE;m.perrin72@exemple-fictif.fr;01 48 84 48 73;Strasbourg
+CMD4500000309;C95696;Transports Francois Distribution;22.05.2022;06.08.2024;161.200,01;15;LIVRE;p.francois16@exemple-fictif.fr;05 73 18 86 56;Rennes
+CMD4500000310;C85400;Atelier Gauthier SA;01.05.2020;19.01.2020;79.927,08;450;EN_COURS;s.gauthier94@exemple-fictif.fr;06 30 16 44 56;Bordeaux
+CMD4500000311;C22387;Comptoir Garnier SAS;20.03.2023;11.06.2025;211.250,27;410;FACTURE;m.garnier98@exemple-fictif.fr;05 97 99 98 56;Paris
+CMD4500000312;C23424;Ets Legrand & Cie;07.03.2023;08.04.2025;224.265,21;315;LIVRE;a.legrand21@exemple-fictif.fr;07 68 19 24 26;Lyon
+CMD4500000313;C49935;Comptoir Bonnet Services;01.12.2025;04.04.2020;214.205,23;73;EN_COURS;a.bonnet23@exemple-fictif.fr;05 26 36 26 20;Bordeaux
+CMD4500000314;C77302;Groupe Morel SARL;19.01.2022;04.05.2019;16.571,18;342;LIVRE;j.morel85@exemple-fictif.fr;02 25 87 36 85;Toulouse
+CMD4500000315;C90341;Société Bonnet SA;08.09.2023;03.02.2025;144.537,64;8;EN_COURS;m.bonnet65@exemple-fictif.fr;04 46 31 78 10;Villeurbanne
+CMD4500000316;C56507;Groupe Bonnet & Cie;13.07.2020;17.04.2022;28.220,24;161;LIVRE;j.bonnet24@exemple-fictif.fr;08 24 76 27 73;Nantes
+CMD4500000317;C68190;Ets Blanc Frères;08.09.2022;10.07.2020;214.194,87;459;ANNULE;a.blanc88@exemple-fictif.fr;06 32 11 96 72;Saint-Étienne
+CMD4500000318;C32114;Industries Boyer Frères;03.06.2020;11.04.2023;211.008,93;207;LIVRE;j.boyer95@exemple-fictif.fr;04 64 73 45 84;Rennes
+CMD4500000319;C29316;Ets Bonnet & Cie;25.08.2019;04.05.2022;??;322;EN_COURS;s.bonnet36@exemple-fictif.fr;01 22 16 18 73;Saint-Étienne
+CMD4500000320;C74512;Transports Garnier SARL;26.08.2020;10.11.2022;122.567,69;134;FACTURE;s.garnier99@exemple-fictif.fr;09 79 12 14 65;Paris
+CMD4500000321;C31514;Industries Lambert Services;16.07.2020;10.12.2022;121.868,86;57;ANNULE;a.lambert91@exemple-fictif.fr;09 97 79 83 70;Grenoble
+CMD4500000322;C47281;Comptoir Boyer Distribution;11.01.2019;19.01.2020;209.235,17;179;LIVRE;a.boyer99@exemple-fictif.fr;06 58 22 64 54;Nantes
+CMD4500000323;C54249;Industries Garnier SARL;06.01.2023;11.01.2022;164.445,37;217;ANNULE;a.garnier15@exemple-fictif.fr;05 12 99 70 85;Lyon
+CMD4500000324;C75107;Industries Garnier Distribution;17.11.2021;06.10.2021;90.839,94;224;EN_COURS;m.garnier44@exemple-fictif.fr;08 91 19 78 37;Lille
+CMD4500000325;C87576;Industries Garnier Services;11.05.2019;19.09.2022;106.782,20;178;LIVRE;s.garnier13@exemple-fictif.fr;05 74 48 65 94;Strasbourg
+CMD4500000326;C85608;Groupe Lambert SARL;16.04.2024;27.12.2022;66.991,31;327;ANNULE;s.lambert24@exemple-fictif.fr;01 76 35 56 69;Marseille
+CMD4500000327;C44987;Transports Gauthier SARL;27.05.2024;06.05.2024;150.312,06;208;EN_COURS;m.gauthier53@exemple-fictif.fr;02 29 34 13 41;Lille
+CMD4500000328;C46408;Société Faure SAS;22.09.2020;21.01.2024;121.465,63;11;LIVRE;j.faure34@exemple-fictif.fr;02 50 87 48 18;Bordeaux
+CMD4500000329;C75568;Groupe Gauthier SAS;04.09.2024;27.10.2025;232.889,59;129;ANNULE;j.gauthier74@exemple-fictif.fr;02 40 86 25 50;Nantes
+CMD4500000330;C45985;Groupe Rousseau SARL;15.07.2021;28.10.2019;122.594,74;192;LIVRE;m.rousseau28@exemple-fictif.fr;06 79 64 70 97;Toulouse
+CMD4500000331;C96798;Société Gauthier SARL;26.01.2024;26.11.2020;63.253,19;197;FACTURE;s.gauthier5@exemple-fictif.fr;06 97 25 78 40;Grenoble
+CMD4500000332;C37575;Transports Garnier Services;28.03.2022;21.06.2025;191.687,56;209;LIVRE;m.garnier39@exemple-fictif.fr;05 20 72 70 62;Nantes
+CMD4500000333;C81791;Atelier Lambert SA;24.06.2022;23.01.2025;13.034,18;329;EN_COURS;p.lambert78@exemple-fictif.fr;08 92 27 10 61;Toulouse
+CMD4500000334;C99883;Transports Legrand Distribution;14.06.2022;16.12.2020;65.177,36;352;FACTURE;m.legrand77@exemple-fictif.fr;05 35 20 63 57;Marseille
+CMD4500000335;C39977;Comptoir Morel Distribution;03.08.2020;09.12.2025;42.197,30;206;ANNULE;s.morel81@exemple-fictif.fr;05 29 21 57 31;Rennes
+CMD4500000336;C36626;Ets Francois SARL;07.05.2021;24.08.2022;32.558,53;439;EN_COURS;m.francois92@exemple-fictif.fr;04 46 96 34 63;Marseille
+CMD4500000337;C94834;Groupe Perrin SA;15.02.2019;16.03.2025;80.818,26;355;ANNULE;s.perrin88@exemple-fictif.fr;04 59 64 86 42;Paris
+CMD4500000338;C15965;Industries Bonnet Services;01.05.2023;20.07.2021;244.381,19;344;FACTURE;s.bonnet91@exemple-fictif.fr;03 81 15 84 32;Lille
+CMD4500000339;C25314;Comptoir Martinez & Cie;11.01.2020;16.05.2024;90.154,45;221;FACTURE;m.martinez34@exemple-fictif.fr;05 88 43 76 50;Bordeaux
+CMD4500000340;C34762;Industries Gauthier Distribution;05.01.2020;06.01.2022;65.063,39;362;ANNULE;p.gauthier7@exemple-fictif.fr;07 24 73 15 66;Nantes
+CMD4500000341;C47239;Atelier Faure SA;06.03.2024;17.05.2023;222.724,72;300;EN_COURS;j.faure27@exemple-fictif.fr;01 77 83 33 63;Paris
+CMD4500000342;C23902;Atelier Francois & Cie;27.06.2020;01.02.2022;207.676,50;338;ANNULE;a.francois76@exemple-fictif.fr;08 90 44 86 94;Lyon
+CMD4500000343;C16380;Transports Martinez Frères;26.11.2021;11.01.2024;17.690,32;488;ANNULE;m.martinez28@exemple-fictif.fr;02 61 42 32 40;Bordeaux
+CMD4500000344;C74336;Industries Legrand SAS;26.07.2024;26.05.2024;150.882,37;184;LIVRE;j.legrand39@exemple-fictif.fr;06 75 35 72 67;Bordeaux
+CMD4500000345;C15300;Groupe Bonnet & Cie;17.06.2022;22.04.2024;171.562,27;80;ANNULE;p.bonnet12@exemple-fictif.fr;09 90 92 77 20;Lille
+CMD4500000346;C66063;Société Francois Services;10.10.2019;18.02.2019;128.358,50;262;ANNULE;m.francois67@exemple-fictif.fr;07 22 69 94 82;Lille
+CMD4500000347;C15932;Groupe Chevalier Services;03.07.2024;10.06.2023;181.026,43;388;ANNULE;m.chevalier51@exemple-fictif.fr;05 53 33 37 33;Paris
+CMD4500000348;C95957;Ets Morel SARL;16.08.2024;13.11.2024;150.475,84;250;FACTURE;j.morel22@exemple-fictif.fr;06 98 96 98 96;Bordeaux
+CMD4500000349;C73060;Groupe Martinez Services;21.03.2024;08.07.2025;(41.534,71);405;EN_COURS;j.martinez27@exemple-fictif.fr;02 48 69 28 70;Bordeaux
+CMD4500000350;C41801;Atelier Chevalier Services;07.05.2023;27.07.2019;83.469,18;53;ANNULE;p.chevalier75@exemple-fictif.fr;07 73 84 86 80;Lille
+CMD4500000351;C17956;Transports Perrin Services;17.01.2022;19.06.2023;15.887,01;458;ANNULE;p.perrin30@exemple-fictif.fr;08 24 73 89 92;Nantes
+CMD4500000352;C99780;Groupe Chevalier Frères;11.10.2025;27.12.2024;117.122,14;453;FACTURE;m.chevalier76@exemple-fictif.fr;07 63 96 93 56;Grenoble
+CMD4500000353;C30488;Ets Francois SAS;20.08.2019;26.07.2022;75.919,94;108;LIVRE;m.francois26@exemple-fictif.fr;01 55 43 55 96;Marseille
+CMD4500000354;C39372;Comptoir Garnier SAS;16.05.2021;26.06.2025;11.678,62;450;FACTURE;j.garnier72@exemple-fictif.fr;03 98 75 87 95;Paris
+CMD4500000355;C23352;Atelier Garnier Services;27.09.2019;17.02.2020;157.485,23;446;EN_COURS;s.garnier79@exemple-fictif.fr;06 30 47 66 74;Grenoble
+CMD4500000356;C10863;Groupe Gauthier & Cie;08.08.2021;10.09.2020;21.317,61;191;ANNULE;p.gauthier99@exemple-fictif.fr;06 90 95 41 29;Strasbourg
+CMD4500000357;C68009;Transports Chevalier Frères;05.01.2024;26.09.2019;21.203,71;162;ANNULE;a.chevalier4@exemple-fictif.fr;03 65 17 60 14;Saint-Étienne
+CMD4500000358;C62691;Industries Legrand Frères;22.12.2023;28.05.2024;185.676,95;466;FACTURE;a.legrand54@exemple-fictif.fr;01 45 77 88 28;Villeurbanne
+CMD4500000359;C49522;Industries Chevalier SA;03.01.2023;11.07.2024;179.722,95;451;EN_COURS;p.chevalier26@exemple-fictif.fr;09 79 46 37 21;Strasbourg
+CMD4500000360;C49838;Comptoir Legrand Frères;24.07.2023;04.12.2019;210.397,44;133;FACTURE;a.legrand31@exemple-fictif.fr;02 16 93 25 67;Lille
+CMD4500000361;C40649;Comptoir Bonnet Distribution;12.05.2021;22.12.2023;168.111,73;366;ANNULE;s.bonnet77@exemple-fictif.fr;09 41 23 51 76;Rennes
+CMD4500000362;C27047;Atelier Boyer SARL;16.04.2022;03.06.2024;131.568,64;302;ANNULE;j.boyer55@exemple-fictif.fr;05 84 73 91 64;Grenoble
+CMD4500000363;C77264;Groupe Lambert & Cie;28.09.2019;23.04.2022;118.344,16;383;EN_COURS;p.lambert17@exemple-fictif.fr;09 57 25 87 62;Paris
+CMD4500000364;C28726;Société Guerin SA;05.10.2022;02.05.2021;53.903,21;420;ANNULE;p.guerin4@exemple-fictif.fr;01 25 80 54 18;Lyon
+CMD4500000365;C28156;Transports Chevalier Distribution;17.11.2022;25.08.2024;112.274,19;444;FACTURE;s.chevalier17@exemple-fictif.fr;02 89 95 89 62;Bordeaux
+CMD4500000366;C13251;Société Martinez Distribution;19.11.2025;25.12.2021;140.265,48;64;LIVRE;j.martinez22@exemple-fictif.fr;04 89 79 83 16;Rennes
+CMD4500000367;C42150;Groupe Lambert SARL;27.12.2025;19.08.2019;201.732,19;311;FACTURE;a.lambert27@exemple-fictif.fr;07 85 15 72 12;Nantes
+CMD4500000368;C28878;Atelier Garnier Frères;06.05.2025;03.03.2021;238.041,66;348;EN_COURS;m.garnier37@exemple-fictif.fr;01 88 51 33 13;Villeurbanne
+CMD4500000369;C41407;Transports Boyer SARL;25.10.2023;08.08.2023;188.099,97;198;LIVRE;j.boyer26@exemple-fictif.fr;05 17 50 69 80;Bordeaux
+CMD4500000370;C82706;Comptoir Lambert Distribution;21.03.2021;19.07.2022;20.986,25;326;EN_COURS;j.lambert32@exemple-fictif.fr;03 57 79 31 41;Strasbourg
+CMD4500000371;C17887;Comptoir Gauthier SA;16.05.2023;09.11.2022;249.810,47;432;EN_COURS;m.gauthier1@exemple-fictif.fr;09 46 15 30 78;Rennes
+CMD4500000372;C51720;Ets Blanc SAS;22.06.2024;09.12.2022;68.260,55;340;FACTURE;s.blanc65@exemple-fictif.fr;06 36 68 86 52;Lyon
+CMD4500000372;C51720;Ets Blanc SAS;22.06.2024;09.12.2022;68.260,55;340;FACTURE;s.blanc65@exemple-fictif.fr;06 36 68 86 52;Lyon
+CMD4500000374;C61483;Ets Faure; Frères;18.02.2025;21.11.2019;134.666,95;457;ANNULE;p.faure98@exemple-fictif.fr;02 55 58 86 55;Bordeaux
+CMD4500000375;C12592;Groupe Perrin &; Cie;25.05.2024;23.06.2020;22.500,73;315;FACTURE;j.perrin29@exemple-fictif.fr;04 39 73 56 14;Lille
+CMD4500000376;C75578;Ets Francois SARL;16.03.2023;07.11.2024;141.431,10;350;EN_COURS;a.francois73@exemple-fictif.fr;02 85 26 18 26;Lille
+CMD4500000377;C43150;Industries Gauthier SARL;22.09.2022;01.07.2024;168.278,22;333;LIVRE;s.gauthier79@exemple-fictif.fr;06 65 62 45 25;Saint-Étienne
+CMD4500000378;C51450;Société Morel & Cie;01.07.2020;11.02.2023;201.920,15;378;EN_COURS;s.morel58@exemple-fictif.fr;07 19 41 35 31;Nantes
+CMD4500000379;C42394;Transports Bonnet Distribution;04.08.2020;11.01.2025;83.403,78;407;EN_COURS;a.bonnet33@exemple-fictif.fr;02 86 89 66 22;Saint-Étienne
+CMD4500000380;C18126;Transports Perrin Distribution;26.08.2019;10.10.2024;107.965,43;53;LIVRE;j.perrin17@exemple-fictif.fr;09 16 47 58 61;Paris
+CMD4500000381;C91163;Ets Chevalier & Cie;04.06.2024;22.01.2022;129.308,05;301;EN_COURS;p.chevalier80@exemple-fictif.fr;02 23 11 86 18;Rennes
+CMD4500000382;C34369;Ets Boyer; Distribution;08.03.2025;02.01.2020;77.923,60;224;FACTURE;s.boyer57@exemple-fictif.fr;05 84 79 28 28;Grenoble
+CMD4500000383;C83328;Groupe Francois SARL;28.01.2022;12.04.2020;160.142,29;104;LIVRE;m.francois65@exemple-fictif.fr;06 34 95 70 98;Villeurbanne
+CMD4500000384;C23742;Société Bonnet &; Cie;15.01.2022;00.00.0000;55.764,04;118;ANNULE;a.bonnet21@exemple-fictif.fr;04 40 71 52 58;Toulouse
+CMD4500000385;C35480;Atelier Lambert SAS;21.10.2025;12.01.2019;49.788,73;146;EN_COURS;a.lambert57@exemple-fictif.fr;04 43 32 53 80;Toulouse
+CMD4500000386;C37556;Groupe Francois & Cie;10.08.2020;12.06.2024;42.848,24;270;ANNULE;j.francois44@exemple-fictif.fr;02 25 28 26 34;Toulouse
+CMD4500000387;C34785;Atelier Perrin Services;28.09.2021;26.03.2021;61.800,44;323;FACTURE;s.perrin76@exemple-fictif.fr;03 75 84 72 36;Villeurbanne
+CMD4500000388;C75350;Industries Legrand Services;17.08.2020;11.12.2021;131.373,66;248;ANNULE;s.legrand48@exemple-fictif.fr;08 44 84 61 91;Rennes
+CMD4500000389;C30605;Société Rousseau & Cie;27.06.2021;18.02.2020;187.908,17;152;ANNULE;p.rousseau74@exemple-fictif.fr;09 55 39 84 15;Grenoble
+CMD4500000390;C33536;Société Chevalier SA;15.04.2021;21.02.2021;225.369,95;151;LIVRE;p.chevalier4@exemple-fictif.fr;05 39 22 25 19;Nantes
+CMD4500000391;C89171;Transports Gauthier Distribution;05.12.2024;18.05.2019;192.521,32;145;FACTURE;a.gauthier25@exemple-fictif.fr;07 61 84 93 11;Grenoble
+CMD4500000392;C77610;Industries Martinez SAS;19.09.2025;15.12.2025;115.355,67;406;LIVRE;p.martinez30@exemple-fictif.fr;06 34 64 99 63;Toulouse
+CMD4500000393;C56486;Industries Blanc SARL;11.04.2022;14.11.2025;100.848,15;399;FACTURE;p.blanc85@exemple-fictif.fr;06 85 12 82 14;Marseille
+CMD4500000394;C36765;Comptoir Bonnet Services;13.02.2023;13.04.2022;27.168,50;292;ANNULE;p.bonnet49@exemple-fictif.fr;05 21 31 23 96;Strasbourg
+CMD4500000395;C48155;Ets Perrin SA;22.09.2019;15.01.2021;129.637,73;88;FACTURE;m.perrin30@exemple-fictif.fr;07 60 30 24 26;Strasbourg
+CMD4500000396;C97135;Groupe Gauthier SA;16.03.2023;19.05.2023;50.751,18;367;ANNULE;p.gauthier91@exemple-fictif.fr;05 35 10 28 67;Paris
+CMD4500000397;C21941;Ets Chevalier & Cie;10.11.2022;12.12.2025;177.914,87;153;ANNULE;s.chevalier6@exemple-fictif.fr;03 63 41 32 89;Villeurbanne
+CMD4500000398;C92324;Atelier Martinez SAS;18.05.2024;03.12.2024;180.605,12;112;ANNULE;m.martinez36@exemple-fictif.fr;07 80 25 57 19;Paris
+CMD4500000399;C98555;Ets Morel SARL;24.08.2022;11.12.2022;213.944,73;204;LIVRE;j.morel82@exemple-fictif.fr;01 42 24 27 51;Saint-Étienne
+CMD4500000400;C32359;Groupe Chevalier & Cie;27.01.2023;04.03.2021;31.046,60;380;ANNULE;a.chevalier21@exemple-fictif.fr;03 19 95 11 96;Lille
+CMD4500000401;C78534;Ets Rousseau Distribution;21.11.2024;22.02.2022;172.589,77;228;LIVRE;j.rousseau82@exemple-fictif.fr;01 16 58 35 41;Nantes
+CMD4500000402;C22661;Groupe Gauthier Distribution;26.11.2020;24.03.2019;103.925,85;56;FACTURE;j.gauthier29@exemple-fictif.fr;06 81 90 34 89;Toulouse
+CMD4500000403;C51450;Groupe Guerin SARL;01.07.2020;15.04.2019;164.493,85;143;FACTURE;p.guerin84@exemple-fictif.fr;01 18 37 62 48;Rennes
+CMD4500000404;C52513;Groupe Bonnet SA;21.12.2022;22.12.2020;83.018,32;326;FACTURE;j.bonnet77@exemple-fictif.fr;08 18 52 12 87;Rennes
+CMD4500000405;C26260;Groupe Morel SARL;10.04.2024;14.04.2023;19.856,62;71;FACTURE;s.morel98@exemple-fictif.fr;08 47 35 29 58;Toulouse
+CMD4500000406;C94358;Société Perrin SAS;26.01.2023;26.07.2024;203.179,51;385;LIVRE;a.perrin41@exemple-fictif.fr;04 52 53 41 36;Strasbourg
+CMD4500000407;C52157;Comptoir Rousseau Services;06.08.2024;01.02.2025;122.915,66;489;EN_COURS;p.rousseau67@exemple-fictif.fr;01 91 28 36 26;Paris
+CMD4500000408;C35891;Industries Boyer & Cie;08.07.2020;20.04.2021;71.345,37;230;EN_COURS;a.boyer22@exemple-fictif.fr;05 71 20 56 60;Bordeaux
+CMD4500000409;C59993;Transports Gauthier & Cie;14.02.2025;10.10.2023;38.208,15;373;EN_COURS;j.gauthier98@exemple-fictif.fr;05 58 69 49 68;Lille
+CMD4500000410;C59054;Groupe Faure SARL;16.07.2022;13.12.2021;96.015,52;158;LIVRE;j.faure65@exemple-fictif.fr;07 14 25 59 82;Marseille
+CMD4500000411;C17563;Industries Lambert & Cie;21.07.2022;24.04.2020;119.436,61;472;FACTURE;a.lambert90@exemple-fictif.fr;01 99 95 92 28;Lille
+CMD4500000412;C22098;Transports Francois SAS;21.12.2022;13.12.2023;243.536,66;42;EN_COURS;j.francois15@exemple-fictif.fr;07 31 64 42 98;Lille
+CMD4500000413;C93385;Industries Legrand Services;19.06.2025;05.05.2024;52.389,29;384;ANNULE;j.legrand14@exemple-fictif.fr;05 10 31 72 10;Paris
+CMD4500000414;C27607;Groupe Faure SA;07.08.2020;17.02.2022;141.777,36;109;EN_COURS;m.faure91@exemple-fictif.fr;04 17 33 34 43;Bordeaux
+CMD4500000415;C54846;Ets Garnier SARL;01.10.2020;16.08.2024;190.135,79;5;LIVRE;a.garnier9@exemple-fictif.fr;05 10 95 84 15;Paris
+CMD4500000416;C66289;Ets Blanc & Cie;11.06.2024;11.06.2025;217,636.67;185;ANNULE;a.blanc78@exemple-fictif.fr;07 88 17 55 52;Paris
+CMD4500000417;C42576;Comptoir Morel SARL;12.08.2023;22.11.2025;118.805,10;212;EN_COURS;s.morel36@exemple-fictif.fr;01 91 51 12 91;Nantes
+CMD4500000418;C55656;Ets Chevalier Distribution;14.08.2024;28.12.2019;183.572,09;151;EN_COURS;s.chevalier11@exemple-fictif.fr;03 76 83 74 14;Marseille
+CMD4500000419;C96853;Groupe Chevalier & Cie;18.04.2020;07.03.2025;236.053,03;359;LIVRE;j.chevalier62@exemple-fictif.fr;02 65 13 30 51;Bordeaux
+CMD4500000420;C74482;Industries Garnier SAS;03.12.2021;28.04.2023;191.586,68;308;LIVRE;s.garnier82@exemple-fictif.fr;06 58 58 93 92;Strasbourg
+CMD4500000421;C25218;Atelier Garnier SA;19.06.2020;28.06.2022;144.233,44;1;FACTURE;s.garnier25@exemple-fictif.fr;01 85 78 34 59;Bordeaux
+CMD4500000422;C11204;Comptoir Bonnet SAS;18.08.2021;05.05.2025;??;349;ANNULE;j.bonnet51@exemple-fictif.fr;03 86 46 28 95;Villeurbanne
+CMD4500000423;C48206;Comptoir Martinez & Cie;23.07.2019;26.06.2020;206.972,89;108;EN_COURS;m.martinez64@exemple-fictif.fr;01 32 72 60 48;Saint-Étienne
+CMD4500000424;C19414;Société Chevalier Services;17.12.2021;10.12.2020;175.280,16;281;ANNULE;p.chevalier51@exemple-fictif.fr;02 26 51 84 16;Villeurbanne
+CMD4500000425;C35644;Groupe Perrin SAS;24.11.2019;12.12.2025;143.924,77;348;EN_COURS;m.perrin96@exemple-fictif.fr;07 64 96 31 17;Paris
+CMD4500000426;C62952;Comptoir Guerin & Cie;08.01.2019;08.07.2022;75.679,38;306;EN_COURS;m.guerin81@exemple-fictif.fr;07 98 95 94 21;Grenoble
+CMD4500000427;C94070;Atelier Garnier SARL;22.09.2020;01.10.2023;246.837,46;246;FACTURE;j.garnier63@exemple-fictif.fr;02 85 33 59 71;Saint-Étienne
+CMD4500000428;C12588;Transports Gauthier Frères;13.09.2025;18.09.2022;15.992,28;429;LIVRE;m.gauthier52@exemple-fictif.fr;04 94 25 33 86;Villeurbanne
+CMD4500000429;C43654;Industries Rousseau SAS;28.01.2019;04.09.2021;90.896,27;279;EN_COURS;j.rousseau72@exemple-fictif.fr;07 94 10 41 48;Lyon
+CMD4500000430;C56152;Ets Bonnet Distribution;20.09.2023;07.12.2019;165.657,62;23;EN_COURS;a.bonnet67@exemple-fictif.fr;01 34 28 48 37;Marseille
+CMD4500000431;C95166;Comptoir Garnier SA;06.07.2022;03.05.2024;106.341,59;356;EN_COURS;a.garnier49@exemple-fictif.fr;09 36 19 90 44;Saint-Étienne
+CMD4500000432;C66836;Groupe Bonnet & Cie;13.01.2023;08.02.2021;31.164,06;57;ANNULE;m.bonnet41@exemple-fictif.fr;02 52 91 21 56;Nantes
+CMD4500000433;C79006;Ets Rousseau SARL;24.05.2023;27.08.2019;132.244,74;359;FACTURE;j.rousseau23@exemple-fictif.fr;09 44 87 22 16;Marseille
+CMD4500000434;C72503;Comptoir Legrand Frères;19.03.2021;01.11.2023;178.308,53;337;EN_COURS;s.legrand52@exemple-fictif.fr;03 58 82 44 16;Villeurbanne
+CMD4500000435;C75828;Groupe Chevalier & Cie;10.05.2022;17.12.2025;57.198,74;326;LIVRE;a.chevalier60@exemple-fictif.fr;05 62 50 21 91;Paris
+CMD4500000436;C98740;Comptoir Blanc & Cie;17.12.2020;16.08.2023;171.283,61;347;LIVRE;j.blanc55@exemple-fictif.fr;07 11 88 34 10;Villeurbanne
+CMD4500000437;C89609;Transports Perrin Frères;15.03.2024;25.09.2020;43.711,80;188;EN_COURS;s.perrin6@exemple-fictif.fr;09 55 16 64 73;Bordeaux
+CMD4500000438;C49213;Transports Gauthier Services;16.05.2021;00.00.0000;157.797,80;202;EN_COURS;j.gauthier38@exemple-fictif.fr;05 92 75 14 69;Rennes
+CMD4500000439;C56469;Atelier Garnier SA;01.02.2022;16.04.2019;132.278,85;461;EN_COURS;m.garnier52@exemple-fictif.fr;07 25 72 10 29;Saint-Étienne
+CMD4500000440;C96019;Transports Lambert SA;27.08.2020;05.06.2024;108.495,70;184;EN_COURS;j.lambert57@exemple-fictif.fr;02 34 46 15 27;Bordeaux
+CMD4500000441;C82105;Société Francois SARL;16.11.2024;05.06.2025;191.100,53;452;ANNULE;p.francois63@exemple-fictif.fr;09 59 26 24 23;Lyon
+CMD4500000442;C11052;Société Gauthier & Cie;14.08.2021;10.08.2019;190.227,37;127;EN_COURS;s.gauthier95@exemple-fictif.fr;09 33 41 45 24;Lille
+CMD4500000443;C33748;Atelier Legrand Distribution;07.10.2024;21.03.2020;30.124,09;206;LIVRE;s.legrand79@exemple-fictif.fr;05 34 28 64 12;Rennes
+CMD4500000444;C18041;Groupe Rousseau SA;17.07.2024;02.05.2019;165,111.09;144;FACTURE;p.rousseau62@exemple-fictif.fr;07 41 50 16 33;Lyon
+CMD4500000445;C74393;Atelier Bonnet & Cie;12.06.2021;04.02.2024;3.425,26;283;EN_COURS;m.bonnet33@exemple-fictif.fr;06 56 56 85 77;Rennes
+CMD4500000446;C15379;Industries Faure Distribution;19.11.2025;07.04.2024;111.447,99;51;LIVRE;s.faure16@exemple-fictif.fr;09 89 53 48 70;Toulouse
+CMD4500000447;C57973;Transports Perrin Services;15.11.2024;04.07.2019;120.710,33;269;LIVRE;s.perrin45@exemple-fictif.fr;03 86 45 99 26;Lille
+CMD4500000448;C19828;Ets Boyer Distribution;06.08.2025;17.07.2023;194.845,25;206;FACTURE;s.boyer66@exemple-fictif.fr;04 33 10 30 83;Toulouse
+CMD4500000449;C48844;Comptoir Martinez SA;23.05.2023;04.03.2020;11.412,66;122;FACTURE;a.martinez29@exemple-fictif.fr;01 91 28 45 27;Lille
+CMD4500000450;C89319;Atelier Garnier Distribution;12.06.2019;23.09.2021;180.522,68;210;FACTURE;a.garnier81@exemple-fictif.fr;06 17 90 11 55;Toulouse
+CMD4500000451;C60067;Transports Gauthier Services;21.05.2025;21.11.2023;137.723,94;419;ANNULE;s.gauthier14@exemple-fictif.fr;04 51 44 36 84;Saint-Étienne
+CMD4500000452;C33791;Groupe Guerin & Cie;15.03.2025;28.03.2020;142.418,80;483;EN_COURS;j.guerin64@exemple-fictif.fr;05 12 49 30 32;Bordeaux
+CMD4500000453;C11545;Ets Francois SARL;20.02.2022;00.00.0000;206.642,30;391;LIVRE;s.francois18@exemple-fictif.fr;03 41 20 44 28;Saint-Étienne
+CMD4500000454;C28249;Société Gauthier Services;16.10.2022;27.03.2021;82.945,76;80;EN_COURS;j.gauthier26@exemple-fictif.fr;01 79 98 44 90;Strasbourg
+CMD4500000455;C13145;Ets Gauthier SAS;08.07.2022;05.06.2024;71.718,68;472;ANNULE;j.gauthier29@exemple-fictif.fr;02 72 31 24 38;Paris
+CMD4500000456;C33339;Atelier Perrin SARL;14.09.2021;20.03.2024;106.316,88;458;FACTURE;s.perrin20@exemple-fictif.fr;05 54 23 44 73;Saint-Étienne
+CMD4500000457;C29369;Groupe Gauthier Services;13.08.2024;26.08.2025;16.837,74;296;ANNULE;m.gauthier41@exemple-fictif.fr;05 28 21 51 26;Marseille
+CMD4500000458;C95715;Transports Bonnet Distribution;08.07.2022;18.08.2023;133.447,32;273;EN_COURS;a.bonnet18@exemple-fictif.fr;07 20 84 63 77;Rennes
+CMD4500000459;C72118;Transports Rousseau SARL;05.02.2019;12.06.2025;212.333,79;399;EN_COURS;a.rousseau72@exemple-fictif.fr;05 68 28 80 63;Toulouse
+CMD4500000460;C65667;Ets Faure Distribution;12.01.2024;04.11.2023;18.451,84;429;EN_COURS;j.faure90@exemple-fictif.fr;01 28 56 28 20;Toulouse
+CMD4500000461;C49257;Groupe Martinez Distribution;16.07.2024;11.08.2025;161.215,34;7;FACTURE;s.martinez90@exemple-fictif.fr;02 29 17 92 14;Rennes
+CMD4500000462;C75781;Ets Perrin Frères;10.12.2020;14.03.2021;243.280,85;268;ANNULE;a.perrin74@exemple-fictif.fr;03 37 61 89 17;Toulouse
+CMD4500000463;C94133;Ets Martinez & Cie;13.07.2020;02.06.2024;106.061,23;139;LIVRE;a.martinez84@exemple-fictif.fr;02 19 56 87 52;Lyon
+CMD4500000464;C93674;Société Perrin SAS;02.04.2021;03.10.2023;11.228,19;405;ANNULE;s.perrin26@exemple-fictif.fr;01 16 50 21 49;Lyon
+CMD4500000465;C98432;Industries Boyer SA;04.06.2022;24.09.2019;125.549,26;397;EN_COURS;m.boyer90@exemple-fictif.fr;01 85 58 71 85;Lyon
+CMD4500000466;C31108;Groupe Martinez SAS;17.09.2024;20.11.2023;232.557,50;175;ANNULE;m.martinez99@exemple-fictif.fr;03 53 47 56 89;Bordeaux
+CMD4500000467;C75211;Atelier Bonnet SAS;04.01.2020;25.05.2023;216.884,74;409;LIVRE;s.bonnet81@exemple-fictif.fr;08 22 68 50 31;Lille
+CMD4500000468;C67939;Ets Legrand SA;21.03.2019;19.08.2019;90.874,39;147;ANNULE;p.legrand33@exemple-fictif.fr;07 89 97 26 66;Nantes
+CMD4500000469;C94392;Société Chevalier Distribution;02.12.2025;08.12.2025;140.204,49;80;LIVRE;j.chevalier80@exemple-fictif.fr;05 58 30 82 61;Paris
+CMD4500000470;C33628;Transports Lambert & Cie;24.02.2022;25.07.2020;100.386,10;34;FACTURE;j.lambert11@exemple-fictif.fr;06 87 72 37 99;Villeurbanne
+CMD4500000471;C88784;Groupe Francois SA;25.07.2019;26.06.2025;107.533,13;243;EN_COURS;s.francois5@exemple-fictif.fr;01 37 12 97 64;Lille
+CMD4500000472;C38063;Industries Gauthier & Cie;22.05.2020;27.01.2019;223.740,20;220;FACTURE;p.gauthier68@exemple-fictif.fr;05 31 35 54 63;Grenoble
+CMD4500000473;C88266;Comptoir Martinez & Cie;07.02.2024;22.10.2023;36.162,86;341;FACTURE;j.martinez72@exemple-fictif.fr;01 29 68 28 73;Nantes
+CMD4500000473;C88266;Comptoir Martinez & Cie;07.02.2024;22.10.2023;36.162,86;341;FACTURE;j.martinez72@exemple-fictif.fr;01 29 68 28 73;Nantes
+CMD4500000475;C85809;Transports Gauthier SAS;04.01.2020;24.04.2022;174.114,56;397;EN_COURS;p.gauthier82@exemple-fictif.fr;07 37 54 36 34;Saint-Étienne
+CMD4500000476;C75422;Transports Lambert Services;21.08.2022;14.06.2021;207.048,18;219;FACTURE;j.lambert90@exemple-fictif.fr;02 32 68 64 57;Marseille
+CMD4500000477;C91313;Ets Francois Distribution;28.02.2019;26.02.2019;162.409,65;316;ANNULE;a.francois90@exemple-fictif.fr;02 73 89 79 22;Saint-Étienne
+CMD4500000478;C25007;Transports Rousseau & Cie;07.08.2019;12.08.2022;226.999,31;331;ANNULE;s.rousseau49@exemple-fictif.fr;01 57 38 74 46;Lille
+CMD4500000479;C13440;Atelier Rousseau & Cie;05.06.2025;27.09.2025;185.313,95;163;FACTURE;j.rousseau2@exemple-fictif.fr;03 83 65 40 81;Bordeaux
+CMD4500000480;C51697;Industries Faure & Cie;17.03.2022;08.02.2024;200.294,98;259;LIVRE;m.faure52@exemple-fictif.fr;07 90 43 80 30;Nantes
+CMD4500000481;C84946;Comptoir Morel Distribution;13.01.2024;24.03.2022;158.619,44;399;FACTURE;s.morel11@exemple-fictif.fr;03 40 93 38 48;Toulouse
+CMD4500000482;C92239;Atelier Francois SA;01.11.2023;28.02.2019;114.787,34;306;LIVRE;j.francois19@exemple-fictif.fr;02 28 46 43 33;Paris
+CMD4500000483;C92009;Atelier Legrand & Cie;03.04.2024;14.07.2021;158.391,61;231;EN_COURS;j.legrand63@exemple-fictif.fr;03 48 11 32 94;Rennes
+CMD4500000484;C78386;Comptoir Bonnet Frères;24.05.2019;07.10.2019;133.993,18;266;EN_COURS;j.bonnet21@exemple-fictif.fr;04 56 24 37 13;Nantes
+CMD4500000485;C48577;Atelier Rousseau SA;15.12.2025;16.07.2023;236.586,96;473;EN_COURS;s.rousseau84@exemple-fictif.fr;05 32 35 97 45;Bordeaux
+CMD4500000486;C88162;Ets Martinez & Cie;24.05.2025;11.10.2019;151.827,84;220;EN_COURS;p.martinez55@exemple-fictif.fr;06 57 90 18 67;Marseille
+CMD4500000487;C13924;Industries Perrin Frères;04.03.2025;11.07.2025;46.486,86;126;LIVRE;a.perrin51@exemple-fictif.fr;04 94 57 57 28;Nantes
+CMD4500000488;C60540;Société Legrand SAS;10.10.2020;17.04.2019;140.244,07;367;LIVRE;s.legrand9@exemple-fictif.fr;07 97 65 50 50;Toulouse
+CMD4500000489;C87485;Ets Garnier SAS;13.04.2023;01.05.2019;160.920,22;439;LIVRE;s.garnier42@exemple-fictif.fr;08 46 26 61 14;Strasbourg
+CMD4500000490;C51574;Ets Legrand Distribution;25.06.2022;03.09.2025;78.300,53;314;LIVRE;a.legrand36@exemple-fictif.fr;07 48 99 68 73;Saint-Étienne
+CMD4500000491;C52317;Transports Morel SARL;28.12.2024;14.04.2020;22.013,30;371;FACTURE;m.morel14@exemple-fictif.fr;09 10 98 16 43;Lyon
+CMD4500000492;C86474;Ets Legrand SA;15.02.2020;11.03.2025;146.036,73;436;ANNULE;m.legrand18@exemple-fictif.fr;08 95 25 76 77;Toulouse
+CMD4500000493;C20852;Atelier Rousseau SA;12.09.2025;28.04.2024;161.787,10;439;EN_COURS;a.rousseau92@exemple-fictif.fr;02 19 73 17 37;Lyon
+CMD4500000494;C51072;Comptoir Gauthier Services;25.05.2024;15.11.2020;211.953,27;55;EN_COURS;s.gauthier66@exemple-fictif.fr;04 56 59 67 89;Strasbourg
+CMD4500000495;C70418;Comptoir Gauthier Distribution;04.12.2019;08.01.2022;46.765,57;15;ANNULE;j.gauthier19@exemple-fictif.fr;09 67 55 43 25;Strasbourg
+CMD4500000496;C16440;Ets Morel SA;21.07.2024;14.04.2021;47.370,51;91;FACTURE;a.morel13@exemple-fictif.fr;09 87 73 76 65;Paris
+CMD4500000497;C79747;Comptoir Morel SA;04.05.2020;20.12.2024;101.145,80;202;LIVRE;m.morel9@exemple-fictif.fr;04 98 44 73 36;Marseille
+CMD4500000498;C50019;Groupe Garnier Frères;28.12.2020;06.06.2024;17.372,96;96;FACTURE;s.garnier62@exemple-fictif.fr;08 28 11 95 70;Bordeaux
+CMD4500000499;C86435;Atelier Gauthier Frères;01.08.2025;08.08.2019;11.303,68;9;FACTURE;a.gauthier61@exemple-fictif.fr;04 77 74 31 28;Paris
+CMD4500000500;C57748;Société Lambert Distribution;15.01.2025;12.05.2024;83.441,38;266;ANNULE;p.lambert33@exemple-fictif.fr;02 44 97 76 91;Lyon
+CMD4500000501;C37041;Groupe Morel Frères;24.02.2020;13.11.2019;241.363,61;450;ANNULE;p.morel47@exemple-fictif.fr;09 32 43 96 54;Nantes
+CMD4500000502;C66814;Industries Lambert SA;26.08.2023;26.06.2021;27.556,54;5;ANNULE;s.lambert16@exemple-fictif.fr;03 69 97 29 76;Lille
+CMD4500000503;C87735;Ets Morel SARL;04.01.2022;10.01.2022;88.070,36;428;LIVRE;m.morel37@exemple-fictif.fr;01 42 27 54 46;Strasbourg
+CMD4500000504;C48116;Groupe Martinez & Cie;08.01.2022;12.04.2025;169.628,28;198;ANNULE;s.martinez11@exemple-fictif.fr;07 22 43 48 86;Lille
+CMD4500000505;C82651;Groupe Legrand SA;07.05.2021;03.05.2023;231.780,39;237;EN_COURS;m.legrand54@exemple-fictif.fr;07 65 22 27 77;Grenoble
+CMD4500000506;C83257;Ets Chevalier & Cie;01.07.2019;25.03.2023;226.713,13;403;EN_COURS;p.chevalier4@exemple-fictif.fr;09 57 26 89 79;Rennes
+CMD4500000507;C17123;Transports Chevalier Services;03.01.2021;27.11.2019;83.377,53;50;FACTURE;s.chevalier59@exemple-fictif.fr;08 98 52 17 25;Villeurbanne
+CMD4500000508;C98562;Industries Lambert & Cie;21.03.2021;21.05.2024;247.289,77;4;ANNULE;m.lambert29@exemple-fictif.fr;04 24 18 10 29;Rennes
+CMD4500000509;C49311;Ets Lambert & Cie;13.08.2020;27.04.2025;211.933,59;134;ANNULE;j.lambert16@exemple-fictif.fr;02 65 28 91 12;Marseille
+CMD4500000510;C97495;Ets Rousseau & Cie;04.10.2022;12.11.2021;97.803,39;358;LIVRE;a.rousseau38@exemple-fictif.fr;08 63 64 28 13;Lille
+CMD4500000511;C56494;Industries Perrin Frères;05.08.2024;15.05.2019;245.438,60;184;EN_COURS;p.perrin6@exemple-fictif.fr;06 77 59 75 18;Marseille
+CMD4500000512;C18940;Groupe Legrand SA;27.11.2022;13.08.2023;164.746,36;295;FACTURE;a.legrand51@exemple-fictif.fr;03 99 51 85 84;Nantes
+CMD4500000513;C99040;Atelier Rousseau Distribution;16.06.2025;08.12.2025;59.161,93;461;EN_COURS;j.rousseau64@exemple-fictif.fr;07 63 18 17 88;Lille
+CMD4500000514;C68918;Atelier Gauthier SAS;13.03.2024;19.09.2020;48.937,53;252;ANNULE;a.gauthier14@exemple-fictif.fr;05 38 35 30 65;Strasbourg
+CMD4500000515;C57128;Atelier Rousseau Services;25.07.2023;18.02.2021;46.334,24;374;ANNULE;m.rousseau1@exemple-fictif.fr;04 36 83 70 74;Nantes
+CMD4500000516;C20242;Ets Francois Services;05.09.2021;04.02.2022;57.651,07;308;FACTURE;j.francois73@exemple-fictif.fr;01 38 47 42 59;Villeurbanne
+CMD4500000517;C50925;Transports Rousseau Frères;13.10.2019;18.12.2019;145.697,30;480;FACTURE;s.rousseau65@exemple-fictif.fr;01 14 53 63 43;Toulouse
+CMD4500000518;C74691;Transports Perrin Distribution;03.10.2023;23.01.2021;245.264,20;487;ANNULE;j.perrin31@exemple-fictif.fr;02 80 71 26 44;Villeurbanne
+CMD4500000519;C17255;Transports Blanc Services;01.04.2023;20.07.2024;170.901,93;10;ANNULE;m.blanc3@exemple-fictif.fr;01 59 58 99 26;Bordeaux
+CMD4500000520;C67216;Société Perrin SA;02.04.2020;03.10.2019;56.789,20;383;LIVRE;m.perrin44@exemple-fictif.fr;01 41 17 19 17;Marseille
+CMD4500000521;C96190;Groupe Blanc Frères;04.11.2019;03.05.2023;51.473,18;362;FACTURE;p.blanc62@exemple-fictif.fr;04 66 48 56 80;Lille
+CMD4500000522;C91509;Atelier Garnier SA;16.05.2019;07.03.2025;243.984,84;119;FACTURE;p.garnier91@exemple-fictif.fr;09 36 25 57 28;Lyon
+CMD4500000523;C87101;Transports Chevalier SARL;13.05.2025;03.01.2021;213.645,01;197;ANNULE;a.chevalier36@exemple-fictif.fr;01 58 59 66 15;Toulouse
+CMD4500000524;C54068;Transports Lambert SA;27.05.2025;25.10.2020;189.315,48;175;ANNULE;j.lambert78@exemple-fictif.fr;07 17 23 80 59;Villeurbanne
+CMD4500000525;C31305;Comptoir Martinez Services;13.08.2024;08.03.2019;70.182,23;350;FACTURE;s.martinez34@exemple-fictif.fr;02 41 79 47 53;Rennes
+CMD4500000526;C50225;Transports Legrand Frères;19.11.2021;27.05.2025;44.704,31;237;LIVRE;j.legrand16@exemple-fictif.fr;08 11 69 14 55;Grenoble
+CMD4500000527;C67729;Comptoir Perrin Frères;06.05.2025;26.05.2021;217.265,15;66;EN_COURS;a.perrin9@exemple-fictif.fr;03 28 89 93 16;Toulouse
+CMD4500000528;C43954;Comptoir Morel Distribution;09.01.2024;28.06.2023;179.582,64;308;EN_COURS;m.morel8@exemple-fictif.fr;06 23 19 74 66;Paris
+CMD4500000529;C28753;Atelier Boyer Distribution;01.06.2023;26.06.2021;243.774,96;460;FACTURE;p.boyer37@exemple-fictif.fr;08 47 89 13 30;Nantes
+CMD4500000530;C55095;Société Legrand Frères;07.07.2025;19.01.2024;181.567,68;196;LIVRE;s.legrand75@exemple-fictif.fr;02 38 82 74 83;Saint-Étienne
+CMD4500000531;C67805;Comptoir Morel & Cie;11.05.2020;27.10.2021;227.768,27;169;EN_COURS;s.morel67@exemple-fictif.fr;06 39 68 50 24;Villeurbanne
+CMD4500000532;C40192;Atelier Lambert SA;15.07.2020;19.03.2023;61.243,53;466;ANNULE;p.lambert78@exemple-fictif.fr;03 87 43 46 53;Nantes
+CMD4500000533;C12033;Transports Perrin SAS;06.02.2022;09.09.2024;232.531,99;381;LIVRE;m.perrin59@exemple-fictif.fr;03 14 65 13 98;Marseille
+CMD4500000534;C48455;Groupe Guerin & Cie;04.06.2025;11.10.2023;154.161,23;370;LIVRE;s.guerin31@exemple-fictif.fr;02 55 67 62 90;Grenoble
+CMD4500000535;C29956;Transports Martinez Frères;01.10.2023;12.11.2024;113.387,25;165;ANNULE;s.martinez11@exemple-fictif.fr;03 75 85 45 22;Toulouse
+CMD4500000536;C51756;Ets Gauthier SA;25.03.2020;02.12.2024;52.678,07;266;FACTURE;a.gauthier50@exemple-fictif.fr;06 22 54 46 31;Paris
+CMD4500000537;C97350;Comptoir Blanc Services;09.03.2019;07.09.2025;127.179,46;87;LIVRE;j.blanc30@exemple-fictif.fr;01 79 78 34 10;Grenoble
+CMD4500000538;C48658;Ets Martinez Frères;04.12.2024;28.02.2022;222.221,05;253;FACTURE;m.martinez59@exemple-fictif.fr;02 27 45 95 24;Nantes
+CMD4500000539;C19710;Société Guerin & Cie;23.12.2021;02.07.2019;233.092,68;407;FACTURE;s.guerin87@exemple-fictif.fr;04 81 94 90 14;Saint-Étienne
+CMD4500000540;C34524;Société Rousseau & Cie;24.08.2021;05.04.2024;218.967,23;487;EN_COURS;m.rousseau63@exemple-fictif.fr;01 65 18 72 81;Rennes
+CMD4500000541;C79528;Groupe Bonnet Distribution;22.03.2021;27.04.2021;166.997,27;251;ANNULE;a.bonnet62@exemple-fictif.fr;06 79 71 47 22;Toulouse
+CMD4500000542;C33094;Groupe Guerin Distribution;15.06.2024;04.06.2024;99.528,35;66;ANNULE;p.guerin15@exemple-fictif.fr;08 86 62 97 40;Lyon
+CMD4500000543;C61298;Société Legrand SA;26.08.2022;13.05.2019;67.086,63;373;EN_COURS;a.legrand53@exemple-fictif.fr;06 91 15 49 67;Bordeaux
+CMD4500000544;C80748;Comptoir Bonnet SA;01.12.2019;26.07.2019;195.110,58;171;FACTURE;m.bonnet78@exemple-fictif.fr;09 18 93 16 76;Toulouse
+CMD4500000545;C53450;Société Rousseau Services;14.04.2023;24.04.2019;9.028,38;11;LIVRE;m.rousseau48@exemple-fictif.fr;09 60 72 15 30;Lille
+CMD4500000546;C62527;Transports Garnier Services;05.12.2021;28.02.2019;18.481,82;370;ANNULE;p.garnier84@exemple-fictif.fr;01 11 79 87 29;Paris
+CMD4500000547;C45920;Ets Guerin Frères;15.04.2019;09.11.2023;117.855,37;150;ANNULE;j.guerin39@exemple-fictif.fr;02 38 62 81 45;Grenoble
+CMD4500000548;C24195;Ets Martinez SA;15.04.2023;01.07.2025;58.036,57;190;ANNULE;s.martinez92@exemple-fictif.fr;02 92 49 52 28;Saint-Étienne
+CMD4500000549;C72064;Atelier Rousseau SAS;17.12.2025;00.00.0000;191.854,45;130;ANNULE;p.rousseau79@exemple-fictif.fr;05 53 29 14 51;Villeurbanne
+CMD4500000550;C95460;Ets Legrand Frères;08.06.2022;23.08.2023;138.706,26;379;LIVRE;p.legrand41@exemple-fictif.fr;02 64 99 19 58;Marseille
+CMD4500000551;C92072;Atelier Garnier & Cie;26.09.2022;05.12.2025;136.775,79;205;LIVRE;p.garnier22@exemple-fictif.fr;05 25 65 47 96;Lille
+CMD4500000552;C58660;Industries Lambert; SAS;17.10.2021;16.08.2020;234.051,26;475;EN_COURS;s.lambert92@exemple-fictif.fr;03 77 70 11 50;Bordeaux
+CMD4500000553;C53389;Industries Rousseau SARL;04.01.2023;15.10.2020;16.702,33;326;EN_COURS;s.rousseau59@exemple-fictif.fr;06 90 11 34 45;Lille
+CMD4500000554;C96424;Société Boyer Frères;07.02.2023;05.02.2024;54.118,20;92;FACTURE;s.boyer83@exemple-fictif.fr;02 26 76 85 92;Bordeaux
+CMD4500000555;C32033;Comptoir Gauthier Distribution;01.04.2020;03.10.2020;35.841,90;244;LIVRE;p.gauthier27@exemple-fictif.fr;06 19 16 27 75;Grenoble
+CMD4500000556;C72190;Ets Boyer Services;12.05.2025;17.06.2023;19.559,13;310;EN_COURS;p.boyer91@exemple-fictif.fr;03 91 45 28 65;Strasbourg
+CMD4500000557;C71089;Société Francois SAS;25.11.2021;24.07.2020;154.247,38;449;EN_COURS;j.francois47@exemple-fictif.fr;07 57 32 11 35;Grenoble
+CMD4500000558;C45786;Société Perrin Frères;02.11.2021;21.08.2022;10.988,91;357;FACTURE;j.perrin78@exemple-fictif.fr;05 90 17 83 13;Villeurbanne
+CMD4500000559;C15006;Industries Gauthier Services;12.01.2023;23.03.2024;184.051,68;446;EN_COURS;s.gauthier14@exemple-fictif.fr;02 63 25 17 66;Saint-Étienne
+CMD4500000560;C98079;Comptoir Francois Distribution;28.06.2024;06.10.2024;236.075,80;265;LIVRE;j.francois43@exemple-fictif.fr;07 63 95 95 17;Paris
+CMD4500000561;C76252;Société Morel Frères;14.03.2024;24.01.2021;68.448,05;180;LIVRE;m.morel89@exemple-fictif.fr;06 69 82 99 21;Rennes
+CMD4500000562;C32195;Comptoir Guerin Distribution;26.01.2020;21.06.2022;20.327,92;371;EN_COURS;j.guerin99@exemple-fictif.fr;05 97 92 34 26;Lille
+CMD4500000563;C33214;Transports Rousseau SAS;10.05.2024;15.05.2019;122.476,52;297;FACTURE;a.rousseau26@exemple-fictif.fr;06 92 76 67 90;Saint-Étienne
+CMD4500000564;C99393;Industries Rousseau & Cie;26.05.2020;11.12.2023;137.907,29;381;FACTURE;a.rousseau83@exemple-fictif.fr;02 75 36 43 37;Grenoble
+CMD4500000565;C59533;Comptoir Chevalier SA;22.10.2019;11.12.2019;157.371,73;446;LIVRE;a.chevalier73@exemple-fictif.fr;03 63 70 52 53;Saint-Étienne
+CMD4500000566;C87801;Atelier Legrand & Cie;19.12.2022;24.07.2022;208.525,76;130;FACTURE;s.legrand59@exemple-fictif.fr;06 71 96 61 48;Lyon
+CMD4500000567;C62527;Ets Boyer Services;19.01.2020;17.03.2021;221.649,95;495;EN_COURS;a.boyer74@exemple-fictif.fr;03 26 94 52 16;Paris
+CMD4500000568;C49489;Industries Morel SAS;10.02.2020;08.04.2022;22.550,82;126;EN_COURS;m.morel23@exemple-fictif.fr;09 57 10 71 30;Nantes
+CMD4500000569;C22559;Transports Boyer & Cie;13.03.2021;25.03.2022;193.317,38;460;FACTURE;m.boyer98@exemple-fictif.fr;07 86 60 78 19;Nantes
+CMD4500000570;C75726;Groupe Legrand SA;27.01.2023;20.07.2019;161.397,86;71;ANNULE;a.legrand44@exemple-fictif.fr;04 15 37 48 65;Paris
+CMD4500000571;C33529;Ets Gauthier SARL;06.07.2024;17.02.2022;201.559,17;178;LIVRE;a.gauthier54@exemple-fictif.fr;07 11 30 50 26;Rennes
+CMD4500000572;C43901;Transports Boyer; SARL;24.11.2019;20.08.2023;93.212,60;243;FACTURE;a.boyer55@exemple-fictif.fr;09 56 24 32 64;Strasbourg
+CMD4500000573;C90546;Comptoir Martinez SA;24.08.2022;02.08.2021;9.970,71;445;ANNULE;m.martinez66@exemple-fictif.fr;08 56 16 86 97;Nantes
+CMD4500000574;C68559;Société Faure SA;11.05.2024;02.10.2019;89.317,55;19;ANNULE;p.faure3@exemple-fictif.fr;04 32 20 78 22;Marseille
+CMD4500000575;C70085;Comptoir Martinez SAS;02.02.2021;12.01.2020;152.342,28;371;LIVRE;s.martinez73@exemple-fictif.fr;07 75 20 53 91;Villeurbanne
+CMD4500000576;C35119;Atelier Martinez Services;19.05.2021;20.09.2023;213.562,37;125;LIVRE;p.martinez15@exemple-fictif.fr;06 83 70 37 65;Lille
+CMD4500000577;C10662;Groupe Perrin Distribution;14.04.2019;26.07.2024;32.450,44;137;ANNULE;a.perrin35@exemple-fictif.fr;06 22 38 38 12;Villeurbanne
+CMD4500000578;C80969;Ets Bonnet Distribution;13.08.2023;01.06.2021;79.917,51;422;ANNULE;s.bonnet43@exemple-fictif.fr;03 69 73 36 78;Villeurbanne
+CMD4500000579;C20891;Industries Garnier & Cie;07.12.2023;12.05.2021;187.716,87;232;ANNULE;s.garnier45@exemple-fictif.fr;01 29 89 84 31;Rennes
+CMD4500000580;C80463;Industries Lambert & Cie;05.07.2023;28.02.2019;98.943,47;109;LIVRE;m.lambert49@exemple-fictif.fr;05 32 30 61 80;Bordeaux
+CMD4500000581;C80205;Atelier Francois Distribution;18.07.2020;28.07.2022;189.209,48;147;ANNULE;a.francois65@exemple-fictif.fr;03 32 61 46 10;Strasbourg
+CMD4500000582;C34756;Industries Bonnet & Cie;21.01.2023;08.03.2023;154.983,87;42;ANNULE;p.bonnet53@exemple-fictif.fr;01 51 88 41 31;Rennes
+CMD4500000583;C35301;Industries Legrand & Cie;28.03.2022;12.12.2025;59.836,44;242;EN_COURS;s.legrand66@exemple-fictif.fr;06 26 47 18 13;Toulouse
+CMD4500000584;C53418;Ets Faure Frères;28.03.2020;15.12.2019;1.730,76;17;ANNULE;j.faure78@exemple-fictif.fr;09 70 59 19 63;Lille
+CMD4500000585;C17836;Atelier Martinez & Cie;10.07.2025;27.12.2025;9.986,22;205;ANNULE;p.martinez93@exemple-fictif.fr;07 25 23 28 43;Rennes
+CMD4500000586;C44669;Groupe Perrin Services;04.06.2024;23.02.2022;224.799,84;252;EN_COURS;p.perrin27@exemple-fictif.fr;05 53 47 98 66;Nantes
+CMD4500000587;C58608;Comptoir Faure SA;19.06.2024;10.05.2024;39.584,03;325;FACTURE;j.faure29@exemple-fictif.fr;08 66 96 47 29;Villeurbanne
+CMD4500000588;C49709;Atelier Rousseau Services;05.10.2019;09.06.2024;127.152,80;446;ANNULE;m.rousseau75@exemple-fictif.fr;08 89 31 54 92;Marseille
+CMD4500000589;C32988;Groupe Francois Services;16.07.2019;22.02.2021;56.214,05;106;EN_COURS;s.francois62@exemple-fictif.fr;03 45 87 25 93;Toulouse
+CMD4500000590;C36546;Transports Gauthier Services;12.11.2019;13.11.2019;238.007,55;260;LIVRE;s.gauthier30@exemple-fictif.fr;05 80 78 78 20;Lyon
+CMD4500000591;C69777;Industries Perrin Services;06.01.2023;09.09.2021;22.848,89;98;LIVRE;m.perrin30@exemple-fictif.fr;03 76 48 17 36;Toulouse
+CMD4500000592;C72691;Société Morel Services;04.08.2019;16.04.2019;135.596,78;111;ANNULE;j.morel26@exemple-fictif.fr;05 82 11 84 65;Paris
+CMD4500000593;C63368;Ets Legrand SARL;20.05.2022;21.03.2021;126.828,17;264;FACTURE;a.legrand97@exemple-fictif.fr;05 43 78 41 53;Lille
+CMD4500000594;C71670;Ets Faure SARL;16.03.2020;03.07.2024;76.167,20;474;ANNULE;a.faure66@exemple-fictif.fr;06 91 97 78 33;Toulouse
+CMD4500000595;C37563;Ets Lambert SARL;19.11.2020;11.03.2020;191.601,68;403;EN_COURS;a.lambert79@exemple-fictif.fr;03 88 94 30 51;Strasbourg
+CMD4500000596;C29003;Société Perrin & Cie;10.06.2024;12.12.2021;112.432,47;218;ANNULE;a.perrin48@exemple-fictif.fr;07 10 61 17 62;Nantes
+CMD4500000597;C58952;Groupe Rousseau Distribution;01.06.2022;26.07.2021;139.521,46;379;EN_COURS;a.rousseau38@exemple-fictif.fr;04 89 74 66 45;Paris
+CMD4500000598;C73837;Transports Morel Distribution;08.05.2023;19.07.2019;25.368,96;328;FACTURE;p.morel89@exemple-fictif.fr;05 78 57 66 46;Paris
+CMD4500000599;C49171;Groupe Gauthier Services;19.04.2023;03.08.2020;81.967,25;280;FACTURE;m.gauthier76@exemple-fictif.fr;09 77 47 98 12;Marseille
+CMD4500000600;C38155;Société Gauthier Services;06.06.2022;08.08.2021;83.259,69;347;FACTURE;p.gauthier96@exemple-fictif.fr;05 87 12 27 25;Saint-Étienne
+CMD4500000601;C67305;Comptoir Perrin SA;02.09.2025;26.06.2025;134.706,96;145;FACTURE;j.perrin73@exemple-fictif.fr;02 19 82 21 81;Paris
+CMD4500000602;C99647;Industries Bonnet SAS;14.05.2022;15.12.2020;162.614,42;38;EN_COURS;j.bonnet99@exemple-fictif.fr;06 68 77 98 65;Lyon
+CMD4500000603;C86595;Ets Guerin SAS;22.06.2023;15.11.2024;50.090,88;421;FACTURE;a.guerin29@exemple-fictif.fr;03 34 28 36 49;Marseille
+CMD4500000604;C96267;Atelier Guerin SA;07.04.2021;06.07.2021;N/A;471;EN_COURS;a.guerin30@exemple-fictif.fr;06 13 27 66 25;Bordeaux
+CMD4500000605;C22170;Transports Rousseau & Cie;06.09.2023;24.09.2019;40.729,12;108;LIVRE;s.rousseau16@exemple-fictif.fr;08 87 55 50 63;Toulouse
+CMD4500000606;C62469;Atelier Chevalier SARL;28.02.2021;12.05.2025;16.335,75;485;FACTURE;p.chevalier54@exemple-fictif.fr;04 99 20 93 92;Bordeaux
+CMD4500000607;C84000;Groupe Morel Services;01.03.2023;05.03.2024;117.458,48;20;LIVRE;m.morel23@exemple-fictif.fr;04 94 47 57 89;Bordeaux
+CMD4500000608;C24338;Transports Legrand Distribution;26.03.2019;16.04.2021;-;192;FACTURE;m.legrand47@exemple-fictif.fr;06 13 13 52 13;Grenoble
+CMD4500000609;C55700;Groupe Lambert SAS;08.02.2022;03.02.2022;116.113,69;213;ANNULE;j.lambert2@exemple-fictif.fr;03 87 91 10 49;Grenoble
+CMD4500000610;C74592;Industries Bonnet Distribution;24.10.2020;05.04.2023;32.460,61;483;EN_COURS;j.bonnet62@exemple-fictif.fr;04 94 20 22 61;Lille
+CMD4500000611;C77751;Industries Guerin & Cie;19.05.2025;05.06.2022;93.698,93;75;LIVRE;s.guerin67@exemple-fictif.fr;07 90 16 35 33;Lyon
+CMD4500000612;C92406;Ets Bonnet & Cie;28.10.2022;15.04.2022;155.331,93;280;ANNULE;a.bonnet25@exemple-fictif.fr;02 45 93 75 53;Nantes
+CMD4500000613;C78035;Industries Chevalier SARL;09.02.2025;12.07.2024;6.363,24;279;EN_COURS;a.chevalier98@exemple-fictif.fr;02 39 68 24 25;Strasbourg
+CMD4500000614;C76965;Transports Garnier Frères;07.03.2025;22.04.2025;4.189,64;376;FACTURE;m.garnier51@exemple-fictif.fr;09 86 29 82 77;Strasbourg
+CMD4500000615;C31710;Société Faure SAS;21.11.2025;20.04.2025;232.662,91;367;EN_COURS;j.faure88@exemple-fictif.fr;09 88 64 35 45;Lyon
+CMD4500000616;C49320;Ets Perrin & Cie;01.02.2021;23.09.2024;77.908,22;473;LIVRE;a.perrin18@exemple-fictif.fr;01 62 27 28 71;Marseille
+CMD4500000617;C42580;Ets Francois & Cie;27.06.2019;08.05.2020;29,331.83;64;EN_COURS;s.francois25@exemple-fictif.fr;04 66 28 96 45;Nantes
+CMD4500000618;C26366;Groupe Chevalier Distribution;18.12.2023;15.03.2019;220.057,92;387;FACTURE;p.chevalier39@exemple-fictif.fr;05 15 58 42 24;Saint-Étienne
+CMD4500000619;C21609;Société Legrand SAS;24.10.2023;28.06.2020;217.341,63;341;ANNULE;s.legrand14@exemple-fictif.fr;07 63 17 91 23;Lille
+CMD4500000620;C11694;Transports Francois SA;04.12.2025;16.04.2023;123.749,07;303;ANNULE;a.francois11@exemple-fictif.fr;05 23 72 81 87;Rennes
+CMD4500000621;C22440;Transports Bonnet Services;04.04.2021;19.11.2024;225.948,36;216;ANNULE;j.bonnet74@exemple-fictif.fr;01 54 92 66 68;Rennes
+CMD4500000622;C33689;Industries Boyer SARL;01.11.2021;04.05.2022;200.475,79;374;ANNULE;m.boyer73@exemple-fictif.fr;05 55 97 54 55;Toulouse
+CMD4500000623;C81732;Transports Legrand SAS;21.06.2024;13.06.2025;203.869,21;433;ANNULE;m.legrand72@exemple-fictif.fr;02 52 55 88 78;Villeurbanne
+CMD4500000624;C75168;Industries Garnier & Cie;21.03.2025;13.04.2021;47,455.54;249;FACTURE;a.garnier80@exemple-fictif.fr;06 66 56 30 31;Nantes
+CMD4500000625;C62162;Transports Blanc Frères;20.12.2019;07.02.2019;177.919,28;469;ANNULE;s.blanc23@exemple-fictif.fr;05 28 53 78 55;Bordeaux
+CMD4500000626;C52445;Société Legrand Frères;08.08.2025;02.04.2023;38.761,40;141;LIVRE;s.legrand11@exemple-fictif.fr;08 38 98 38 41;Toulouse
+CMD4500000627;C82918;Comptoir Gauthier & Cie;18.10.2020;14.03.2025;129.647,66;205;ANNULE;p.gauthier54@exemple-fictif.fr;05 56 43 65 57;Nantes
+CMD4500000628;C85885;Société Faure Services;05.02.2025;17.12.2022;133.844,62;54;EN_COURS;m.faure69@exemple-fictif.fr;06 99 92 80 38;Grenoble
+CMD4500000629;C83268;Groupe Garnier SARL;21.01.2021;16.12.2020;15.953,57;182;LIVRE;s.garnier58@exemple-fictif.fr;05 82 42 13 86;Grenoble
+CMD4500000630;C40482;Comptoir Blanc Distribution;19.09.2022;05.09.2024;146.722,25;442;LIVRE;a.blanc43@exemple-fictif.fr;01 55 85 25 19;Rennes
+CMD4500000631;C95119;Transports Legrand SAS;16.12.2019;11.02.2019;236.537,32;294;ANNULE;m.legrand4@exemple-fictif.fr;07 58 99 70 27;Nantes
+CMD4500000632;C39706;Groupe Garnier SA;12.11.2024;03.06.2022;187.956,33;269;FACTURE;p.garnier26@exemple-fictif.fr;01 87 17 81 17;Saint-Étienne
+CMD4500000632;C39706;Groupe Garnier SA;12.11.2024;03.06.2022;187.956,33;269;FACTURE;p.garnier26@exemple-fictif.fr;01 87 17 81 17;Saint-Étienne
+CMD4500000634;C19094;Transports Morel Frères;06.04.2024;20.08.2020;133.808,15;500;FACTURE;s.morel48@exemple-fictif.fr;02 97 29 86 57;Rennes
+CMD4500000635;C15082;Transports Gauthier & Cie;18.02.2025;10.05.2019;87.270,01;93;EN_COURS;j.gauthier80@exemple-fictif.fr;02 73 34 87 29;Rennes
+CMD4500000636;C54347;Atelier Chevalier Distribution;08.06.2020;08.08.2020;198.515,55;22;FACTURE;s.chevalier9@exemple-fictif.fr;01 71 94 85 22;Strasbourg
+CMD4500000637;C36336;Ets Lambert Services;10.06.2020;15.04.2021;236.062,38;219;ANNULE;s.lambert83@exemple-fictif.fr;07 58 20 72 13;Grenoble
+CMD4500000638;C15456;Société Legrand Services;07.02.2021;19.12.2023;135.701,33;329;FACTURE;j.legrand68@exemple-fictif.fr;01 78 13 16 48;Bordeaux
+CMD4500000639;C58604;Comptoir Martinez Frères;22.12.2019;07.02.2022;237.491,58;457;EN_COURS;m.martinez66@exemple-fictif.fr;06 19 36 73 36;Rennes
+CMD4500000640;C53352;Société Perrin SARL;06.07.2025;08.06.2025;100.495,66;80;EN_COURS;m.perrin85@exemple-fictif.fr;04 89 95 43 64;Saint-Étienne
+CMD4500000641;C64216;Société Martinez & Cie;13.05.2025;07.08.2021;150.036,41;321;ANNULE;j.martinez54@exemple-fictif.fr;01 99 67 26 94;Villeurbanne
+CMD4500000642;C43619;Comptoir Faure SA;22.12.2024;13.05.2023;71.616,88;439;FACTURE;m.faure95@exemple-fictif.fr;02 25 60 35 21;Strasbourg
+CMD4500000643;C20958;Groupe Garnier SARL;25.12.2025;03.04.2022;153.834,05;EN_COURS;p.garnier24@exemple-fictif.fr;08 86 15 94 74;Toulouse
+CMD4500000644;C36299;Société Gauthier SAS;21.01.2022;13.03.2021;126.403,59;116;EN_COURS;a.gauthier60@exemple-fictif.fr;04 52 94 66 13;Grenoble
+CMD4500000645;C77901;Atelier Guerin SARL;18.01.2023;24.03.2024;14,613.80;190;LIVRE;j.guerin53@exemple-fictif.fr;03 23 97 39 10;Bordeaux
+CMD4500000646;C19689;Industries Legrand SARL;01.11.2025;16.10.2024;96.519,83;352;ANNULE;s.legrand70@exemple-fictif.fr;08 40 97 72 88;Lille
+CMD4500000647;C93505;Société Lambert SAS;24.03.2022;09.03.2021;185.003,99;222;FACTURE;m.lambert37@exemple-fictif.fr;03 15 68 62 79;Toulouse
+CMD4500000648;C60913;Ets Perrin & Cie;15.06.2021;11.11.2022;33.287,34;272;EN_COURS;p.perrin57@exemple-fictif.fr;04 37 34 82 34;Villeurbanne
+CMD4500000649;C61488;Société Boyer Distribution;05.08.2019;18.11.2022;75.087,07;427;ANNULE;a.boyer28@exemple-fictif.fr;01 35 37 53 80;Marseille
+CMD4500000650;C99211;Ets Rousseau Frères;19.03.2024;13.10.2025;200.211,19;78;ANNULE;m.rousseau35@exemple-fictif.fr;06 69 41 26 72;Nantes
+CMD4500000651;C11136;Transports Garnier SARL;28.01.2021;28.02.2021;232.891,35;183;EN_COURS;j.garnier3@exemple-fictif.fr;03 37 49 18 56;Rennes
+CMD4500000652;C29925;Société Blanc SARL;06.07.2019;18.10.2022;39.578,52;283;ANNULE;s.blanc21@exemple-fictif.fr;05 98 41 24 94;Marseille
+CMD4500000653;C57498;Groupe Chevalier Services;15.10.2023;06.08.2019;242.574,47;485;FACTURE;j.chevalier76@exemple-fictif.fr;06 20 57 18 32;Marseille
+CMD4500000654;C20888;Groupe Francois Distribution;12.10.2025;16.01.2023;222.763,01;214;EN_COURS;a.francois38@exemple-fictif.fr;06 42 34 75 45;Strasbourg
+CMD4500000655;C54239;Société Martinez SA;02.05.2024;25.11.2022;164.856,04;171;LIVRE;p.martinez56@exemple-fictif.fr;03 89 11 83 12;Lille
+CMD4500000656;C65641;Ets Martinez SA;14.12.2021;05.06.2024;65.404,37;99;ANNULE;a.martinez66@exemple-fictif.fr;05 44 20 67 95;Paris
+CMD4500000657;C19753;Transports Faure Services;06.06.2019;05.10.2025;59.243,96;45;LIVRE;j.faure32@exemple-fictif.fr;01 11 53 89 19;Marseille
+CMD4500000658;C28181;Atelier Francois Frères;07.12.2019;06.02.2024;237.848,47;2;ANNULE;j.francois8@exemple-fictif.fr;04 36 16 20 59;Nantes
+CMD4500000659;C98625;Groupe Martinez & Cie;19.01.2022;06.09.2019;19.898,78;499;EN_COURS;a.martinez94@exemple-fictif.fr;05 28 79 83 34;Villeurbanne
+CMD4500000660;C88846;Groupe Rousseau & Cie;14.09.2024;10.04.2022;62.744,94;177;EN_COURS;s.rousseau38@exemple-fictif.fr;09 10 93 97 42;Lille
+CMD4500000661;C98347;Transports Bonnet Services;25.12.2022;01.12.2024;22.067,04;302;FACTURE;p.bonnet11@exemple-fictif.fr;02 82 43 50 67;Nantes
+CMD4500000662;C15596;Groupe Martinez SAS;23.06.2022;15.08.2021;230.862,27;434;ANNULE;s.martinez22@exemple-fictif.fr;08 69 67 29 28;Villeurbanne
+CMD4500000663;C11828;Industries Gauthier SAS;14.11.2020;05.10.2020;54.256,28;9;ANNULE;p.gauthier47@exemple-fictif.fr;08 29 44 53 35;Lyon
+CMD4500000664;C67030;Ets Rousseau Frères;28.03.2022;22.01.2021;240.360,24;FACTURE;p.rousseau56@exemple-fictif.fr;08 87 47 28 40;Strasbourg
+CMD4500000665;C91065;Société Faure Distribution;14.10.2019;20.03.2023;70.481,46;372;FACTURE;a.faure88@exemple-fictif.fr;03 57 82 70 18;Lyon
+CMD4500000666;C82744;Société Gauthier Distribution;11.10.2025;11.12.2020;225.464,93;495;FACTURE;p.gauthier36@exemple-fictif.fr;04 85 88 40 41;Grenoble
+CMD4500000667;C74348;Comptoir Faure SA;15.10.2024;09.02.2022;97.400,22;99;FACTURE;j.faure68@exemple-fictif.fr;03 56 17 70 41;Toulouse
+CMD4500000668;C80295;Société Blanc & Cie;07.11.2020;20.10.2019;73.911,94;32;EN_COURS;a.blanc78@exemple-fictif.fr;09 74 46 41 58;Bordeaux
+CMD4500000669;C58317;Industries Morel Distribution;15.03.2022;21.07.2023;39.253,03;228;FACTURE;p.morel11@exemple-fictif.fr;02 45 68 45 35;Villeurbanne
+CMD4500000670;C58342;Transports Morel SA;05.06.2025;24.07.2023;6.376,06;223;FACTURE;s.morel62@exemple-fictif.fr;07 32 51 88 14;Saint-Étienne
+CMD4500000671;C18899;Industries Martinez SAS;05.03.2019;17.03.2024;58.761,05;387;FACTURE;p.martinez9@exemple-fictif.fr;06 53 20 62 53;Paris
+CMD4500000672;C68785;Comptoir Faure Services;06.02.2025;28.05.2020;59.823,95;331;LIVRE;j.faure27@exemple-fictif.fr;01 92 99 38 71;Lyon
+CMD4500000673;C76879;Société Guerin & Cie;25.05.2022;01.11.2024;174.284,22;282;LIVRE;p.guerin3@exemple-fictif.fr;01 35 85 14 36;Toulouse
+CMD4500000674;C29956;Transports Perrin SAS;18.01.2024;24.10.2021;66.419,02;192;ANNULE;p.perrin28@exemple-fictif.fr;03 35 87 42 52;Toulouse
+CMD4500000675;C63174;Industries Bonnet Distribution;07.03.2019;02.07.2025;26.691,34;478;EN_COURS;s.bonnet99@exemple-fictif.fr;04 82 48 98 96;Toulouse
+CMD4500000676;C13121;Transports Bonnet SA;10.01.2020;27.03.2025;83.489,66;256;ANNULE;m.bonnet66@exemple-fictif.fr;06 68 60 87 31;Grenoble
+CMD4500000677;C91169;Comptoir Garnier SARL;02.01.2021;01.05.2022;95.361,41;291;EN_COURS;j.garnier4@exemple-fictif.fr;02 16 57 37 92;Toulouse
+CMD4500000678;C28591;Transports Blanc SARL;09.08.2025;07.02.2024;186.067,69;350;LIVRE;j.blanc39@exemple-fictif.fr;08 32 11 24 21;Villeurbanne
+CMD4500000679;C30092;Comptoir Martinez & Cie;07.02.2022;22.07.2019;9.299,92;222;ANNULE;j.martinez94@exemple-fictif.fr;07 32 11 83 15;Saint-Étienne
+CMD4500000680;C40778;Société Legrand SARL;23.08.2025;01.11.2019;218.381,49;428;ANNULE;a.legrand25@exemple-fictif.fr;09 99 72 39 16;Lille
+CMD4500000681;C29096;Société Francois Distribution;11.12.2024;12.07.2020;145.057,15;191;ANNULE;s.francois70@exemple-fictif.fr;06 47 28 96 73;Saint-Étienne
+CMD4500000682;C80675;Société Guerin Distribution;28.11.2020;02.06.2023;229.575,49;321;EN_COURS;p.guerin58@exemple-fictif.fr;06 79 90 30 83;Marseille
+CMD4500000683;C78100;Atelier Perrin Frères;04.10.2019;09.09.2024;235.573,04;379;EN_COURS;s.perrin6@exemple-fictif.fr;06 72 24 51 57;Strasbourg
+CMD4500000684;C93947;Industries Boyer Services;21.08.2020;27.12.2025;47.090,90;1;LIVRE;j.boyer29@exemple-fictif.fr;08 28 19 98 49;Toulouse
+CMD4500000685;C25869;Atelier Rousseau SARL;07.03.2025;25.11.2019;16.764,79;232;LIVRE;j.rousseau38@exemple-fictif.fr;07 55 94 61 11;Villeurbanne
+CMD4500000686;C15488;Ets Perrin Distribution;22.08.2019;16.06.2021;7.769,77;359;ANNULE;s.perrin76@exemple-fictif.fr;07 78 22 64 98;Rennes
+CMD4500000687;C43050;Ets Morel Services;18.02.2019;08.12.2025;-;473;LIVRE;j.morel61@exemple-fictif.fr;08 58 53 40 87;Grenoble
+CMD4500000688;C68252;Comptoir Faure Services;03.09.2020;15.05.2024;141.266,84;411;LIVRE;j.faure65@exemple-fictif.fr;05 84 25 99 76;Grenoble
+CMD4500000689;C36099;Atelier Boyer Distribution;16.08.2020;01.07.2025;186.135,25;335;EN_COURS;m.boyer10@exemple-fictif.fr;07 15 48 33 38;Nantes
+CMD4500000690;C27301;Atelier Perrin SARL;24.10.2023;01.08.2022;91.675,24;358;ANNULE;m.perrin18@exemple-fictif.fr;01 77 98 57 91;Strasbourg
+CMD4500000691;C62602;Atelier Garnier SA;17.04.2020;04.01.2020;21.603,52;96;EN_COURS;a.garnier61@exemple-fictif.fr;08 94 79 57 81;Lille
+CMD4500000692;C27460;Groupe Morel SAS;24.12.2022;01.06.2019;127.553,91;7;LIVRE;m.morel39@exemple-fictif.fr;09 95 44 84 77;Lyon
+CMD4500000693;C72748;Groupe Rousseau Distribution;07.02.2020;13.09.2024;156.761,18;440;LIVRE;p.rousseau62@exemple-fictif.fr;03 95 26 75 28;Paris
+CMD4500000694;C44402;Transports Boyer Distribution;14.01.2025;14.01.2025;80.128,69;203;LIVRE;a.boyer29@exemple-fictif.fr;04 95 57 60 67;Rennes
+CMD4500000695;C88509;Ets Lambert Distribution;17.05.2022;25.02.2022;149.959,45;214;LIVRE;m.lambert31@exemple-fictif.fr;09 20 28 92 15;Nantes
+CMD4500000696;C71592;Comptoir Gauthier Frères;17.08.2022;25.12.2023;173.815,44;473;EN_COURS;a.gauthier40@exemple-fictif.fr;08 53 21 98 72;Nantes
+CMD4500000697;C51032;Société Gauthier Frères;11.04.2023;07.06.2021;47.969,72;172;ANNULE;s.gauthier30@exemple-fictif.fr;05 43 86 64 95;Saint-Étienne
+CMD4500000698;C81142;Industries Rousseau Distribution;18.06.2020;26.08.2023;130.032,97;61;FACTURE;a.rousseau92@exemple-fictif.fr;04 36 86 91 53;Marseille
+CMD4500000699;C29181;Comptoir Perrin & Cie;09.10.2019;09.02.2022;203.280,50;202;LIVRE;s.perrin44@exemple-fictif.fr;02 34 42 73 68;Strasbourg
+CMD4500000700;C72438;Industries Boyer & Cie;14.07.2021;04.03.2020;30.737,92;390;LIVRE;s.boyer14@exemple-fictif.fr;01 18 45 23 80;Strasbourg
+CMD4500000701;C24605;Industries Perrin Frères;11.10.2024;09.05.2022;60.177,66;113;FACTURE;j.perrin2@exemple-fictif.fr;09 55 40 29 12;Strasbourg
+CMD4500000702;C84873;Comptoir Lambert SARL;24.10.2021;00.00.0000;23.929,96;433;ANNULE;m.lambert12@exemple-fictif.fr;04 40 68 88 31;Marseille
+CMD4500000703;C37969;Comptoir Gauthier Services;08.02.2025;03.07.2024;111.038,83;77;ANNULE;p.gauthier58@exemple-fictif.fr;07 12 79 44 36;Saint-Étienne
+CMD4500000704;C36931;Ets Bonnet Services;12.03.2024;03.10.2025;174.735,22;194;EN_COURS;p.bonnet78@exemple-fictif.fr;07 36 37 50 55;Bordeaux
+CMD4500000705;C18479;Industries Morel Frères;15.12.2025;01.07.2023;86.302,59;196;LIVRE;m.morel83@exemple-fictif.fr;08 65 67 64 21;Bordeaux
+CMD4500000706;C77786;Groupe Faure Services;20.09.2025;07.01.2022;91.149,31;390;EN_COURS;s.faure83@exemple-fictif.fr;02 30 21 88 99;Strasbourg
+CMD4500000707;C63669;Ets Gauthier SA;10.03.2023;03.04.2025;240,335.92;27;EN_COURS;m.gauthier30@exemple-fictif.fr;05 80 70 64 31;Toulouse
+CMD4500000708;C26270;Transports Blanc Services;25.08.2023;25.06.2024;44.739,21;274;EN_COURS;m.blanc69@exemple-fictif.fr;04 11 51 31 44;Strasbourg
+CMD4500000709;C89818;Groupe Chevalier Services;27.06.2023;26.05.2022;61.454,77;90;LIVRE;m.chevalier31@exemple-fictif.fr;04 30 91 87 15;Paris
+CMD4500000710;C62939;Ets Legrand Frères;17.08.2024;17.06.2025;151.383,24;368;ANNULE;s.legrand93@exemple-fictif.fr;05 77 62 31 74;Grenoble
+CMD4500000711;C49258;Comptoir Garnier & Cie;12.01.2021;16.04.2025;4.020,22;223;EN_COURS;p.garnier49@exemple-fictif.fr;08 85 27 93 48;Bordeaux
+CMD4500000712;C70725;Industries Chevalier & Cie;05.07.2019;08.03.2024;230.687,45;152;FACTURE;a.chevalier27@exemple-fictif.fr;01 54 69 59 93;Bordeaux
+CMD4500000713;C53444;Transports Gauthier & Cie;07.05.2023;06.01.2019;36.493,30;365;FACTURE;j.gauthier46@exemple-fictif.fr;01 13 75 37 90;Strasbourg
+CMD4500000714;C86758;Société Guerin SA;04.08.2025;16.07.2025;128.497,77;342;LIVRE;j.guerin67@exemple-fictif.fr;03 58 52 94 66;Villeurbanne
+CMD4500000715;C15768;Société Boyer & Cie;10.01.2020;07.07.2023;48.424,13;410;EN_COURS;m.boyer6@exemple-fictif.fr;07 80 82 42 36;Lyon
+CMD4500000716;C20481;Ets Rousseau SAS;22.08.2025;11.10.2024;244.864,74;436;ANNULE;p.rousseau15@exemple-fictif.fr;05 83 81 80 52;Saint-Étienne
+CMD4500000717;C39648;Société Francois Services;27.01.2022;16.05.2021;234.985,61;154;ANNULE;s.francois32@exemple-fictif.fr;07 16 85 48 42;Paris
+CMD4500000718;C57578;Groupe Chevalier SARL;14.12.2022;14.10.2021;74.778,14;125;EN_COURS;s.chevalier65@exemple-fictif.fr;08 94 18 50 17;Bordeaux
+CMD4500000719;C74469;Atelier Guerin SA;13.10.2020;13.07.2025;58.785,48;125;EN_COURS;m.guerin63@exemple-fictif.fr;06 30 86 51 85;Bordeaux
+CMD4500000720;C10273;Ets Boyer SARL;16.03.2019;05.05.2025;91.698,08;352;FACTURE;m.boyer7@exemple-fictif.fr;02 15 31 49 52;Paris
+CMD4500000721;C24095;Transports Rousseau SAS;09.10.2021;20.09.2019;207.952,24;146;EN_COURS;p.rousseau63@exemple-fictif.fr;02 69 87 43 30;Saint-Étienne
+CMD4500000722;C71952;Transports Boyer SA;26.08.2021;17.05.2021;163.375,82;418;ANNULE;m.boyer89@exemple-fictif.fr;07 40 49 95 51;Toulouse
+CMD4500000723;C29572;Groupe Garnier SARL;24.02.2021;25.06.2024;79.994,40;123;ANNULE;p.garnier17@exemple-fictif.fr;07 62 25 92 95;Saint-Étienne
+CMD4500000724;C55231;Société Morel SAS;03.01.2019;27.05.2022;46.648,76;255;ANNULE;p.morel25@exemple-fictif.fr;07 51 67 27 51;Villeurbanne
+CMD4500000725;C64499;Groupe Martinez SARL;03.08.2021;05.01.2020;60.013,44;310;ANNULE;m.martinez33@exemple-fictif.fr;05 35 33 63 14;Lyon
+CMD4500000725;C64499;Groupe Martinez SARL;03.08.2021;05.01.2020;60.013,44;310;ANNULE;m.martinez33@exemple-fictif.fr;05 35 33 63 14;Lyon
+CMD4500000727;C53583;Comptoir Gauthier SAS;22.11.2025;24.12.2023;68.368,77;201;EN_COURS;m.gauthier19@exemple-fictif.fr;07 15 68 85 80;Lille
+CMD4500000728;C70757;Transports Francois SARL;20.10.2020;11.10.2020;57,312.92;154;LIVRE;p.francois54@exemple-fictif.fr;04 95 84 42 60;Lille
+CMD4500000729;C80157;Ets Morel SARL;27.09.2022;01.09.2025;238.149,79;407;FACTURE;j.morel36@exemple-fictif.fr;01 73 84 37 78;Saint-Étienne
+CMD4500000730;C36248;Société Martinez SAS;01.11.2022;03.06.2024;61.406,62;246;LIVRE;s.martinez84@exemple-fictif.fr;02 26 43 31 94;Lille
+CMD4500000731;C81916;Transports Garnier SA;21.02.2019;05.02.2025;234.276,33;489;EN_COURS;a.garnier70@exemple-fictif.fr;02 44 32 24 67;Nantes
+CMD4500000732;C22062;Comptoir Francois SA;12.03.2022;26.04.2023;236.235,73;372;LIVRE;j.francois46@exemple-fictif.fr;02 18 30 28 53;Marseille
+CMD4500000733;C66675;Atelier Guerin SA;04.09.2025;26.07.2020;41.889,08;318;ANNULE;p.guerin97@exemple-fictif.fr;02 39 94 73 81;Grenoble
+CMD4500000734;C58829;Comptoir Morel SA;21.06.2022;24.01.2021;215.503,09;44;EN_COURS;j.morel86@exemple-fictif.fr;02 86 76 81 24;Rennes
+CMD4500000735;C50902;Transports Bonnet SARL;18.07.2021;02.02.2019;234.762,76;341;EN_COURS;a.bonnet32@exemple-fictif.fr;05 58 29 45 53;Bordeaux
+CMD4500000736;C34218;Atelier Boyer SARL;23.02.2025;05.09.2023;149.890,49;52;FACTURE;a.boyer42@exemple-fictif.fr;02 22 43 52 50;Paris
+CMD4500000737;C81950;Transports Gauthier Frères;19.12.2023;10.09.2024;74.393,54;459;ANNULE;s.gauthier11@exemple-fictif.fr;01 49 63 21 94;Nantes
+CMD4500000738;C63213;Ets Garnier SARL;18.02.2021;06.10.2023;223.757,18;127;LIVRE;p.garnier47@exemple-fictif.fr;06 31 33 93 82;Villeurbanne
+CMD4500000739;C63465;Industries Faure Services;01.11.2023;09.10.2025;182.465,52;432;EN_COURS;s.faure31@exemple-fictif.fr;08 80 40 17 65;Toulouse
+CMD4500000740;C42640;Ets Bonnet Frères;20.02.2024;14.05.2024;151.317,93;1;LIVRE;a.bonnet35@exemple-fictif.fr;07 85 34 42 98;Marseille
+CMD4500000741;C16103;Atelier Martinez SAS;24.02.2024;13.03.2020;69.144,50;58;LIVRE;m.martinez96@exemple-fictif.fr;04 24 99 11 62;Paris
+CMD4500000742;C78008;Société Guerin &; Cie;22.05.2022;22.04.2025;158.766,54;106;ANNULE;p.guerin85@exemple-fictif.fr;06 34 95 94 41;Grenoble
+CMD4500000743;C70128;Transports Morel Services;17.05.2020;14.02.2021;35.183,06;144;EN_COURS;j.morel96@exemple-fictif.fr;07 11 70 77 18;Rennes
+CMD4500000744;C72960;Ets Gauthier & Cie;08.08.2020;01.04.2024;121.480,78;113;EN_COURS;a.gauthier21@exemple-fictif.fr;02 44 57 76 42;Villeurbanne
+CMD4500000745;C43043;Comptoir Garnier SARL;26.04.2025;22.09.2025;153.402,39;410;EN_COURS;m.garnier37@exemple-fictif.fr;08 77 10 29 12;Nantes
+CMD4500000746;C65685;Atelier Faure Distribution;09.12.2025;09.10.2020;157.215,47;343;FACTURE;a.faure93@exemple-fictif.fr;02 58 70 89 35;Toulouse
+CMD4500000747;C19996;Groupe Chevalier & Cie;04.10.2020;08.07.2025;10.978,75;240;ANNULE;s.chevalier3@exemple-fictif.fr;09 19 23 97 80;Grenoble
+CMD4500000748;C94281;Comptoir Morel & Cie;19.08.2020;03.06.2020;152.947,39;48;FACTURE;j.morel36@exemple-fictif.fr;09 90 40 15 70;Villeurbanne
+CMD4500000749;C23119;Transports Chevalier SAS;03.09.2023;08.10.2021;33,23;357;FACTURE;p.chevalier43@exemple-fictif.fr;06 67 81 99 31;Lyon
+CMD4500000750;C33513;Groupe Gauthier SAS;07.04.2020;05.05.2022;15.328,18;231;EN_COURS;j.gauthier94@exemple-fictif.fr;03 14 25 36 56;Saint-Étienne
+CMD4500000751;C32462;Groupe Gauthier & Cie;12.01.2023;06.11.2025;223.226,17;56;LIVRE;p.gauthier1@exemple-fictif.fr;03 37 19 29 63;Paris
+CMD4500000752;C53260;Industries Perrin Frères;15.03.2025;20.09.2024;141.827,73;489;ANNULE;s.perrin75@exemple-fictif.fr;07 32 88 66 45;Nantes
+CMD4500000753;C21930;Société Boyer & Cie;28.10.2019;26.12.2020;225.208,73;118;LIVRE;s.boyer60@exemple-fictif.fr;09 71 60 93 84;Villeurbanne
+CMD4500000754;C81259;Groupe Faure SARL;03.04.2023;18.02.2021;131.273,72;48;FACTURE;s.faure78@exemple-fictif.fr;05 52 80 27 32;Lyon
+CMD4500000755;C67979;Atelier Francois Frères;03.07.2024;21.09.2019;184.437,90;165;ANNULE;m.francois80@exemple-fictif.fr;03 97 45 53 13;Lyon
+CMD4500000756;C93498;Atelier Martinez SARL;19.02.2019;23.04.2022;238.272,63;51;ANNULE;a.martinez22@exemple-fictif.fr;09 92 57 17 90;Villeurbanne
+CMD4500000757;C48291;Transports Garnier Frères;09.03.2019;18.03.2023;167.039,21;277;ANNULE;a.garnier97@exemple-fictif.fr;05 72 76 19 29;Marseille
+CMD4500000758;C15786;Comptoir Morel & Cie;20.01.2019;22.05.2020;94.480,16;326;FACTURE;p.morel4@exemple-fictif.fr;02 56 76 45 77;Marseille
+CMD4500000759;C50648;Société Rousseau SA;27.03.2025;19.07.2024;10.477,87;366;LIVRE;j.rousseau47@exemple-fictif.fr;08 16 62 36 40;Bordeaux
+CMD4500000760;C26484;Comptoir Legrand Services;03.01.2021;26.01.2019;216.314,18;130;LIVRE;s.legrand24@exemple-fictif.fr;09 77 10 43 90;Villeurbanne
+CMD4500000761;C34600;Groupe Perrin Frères;17.11.2019;13.05.2020;38.723,68;34;EN_COURS;m.perrin49@exemple-fictif.fr;07 89 96 47 31;Strasbourg
+CMD4500000762;C79248;Ets Rousseau Services;14.04.2019;10.05.2019;115.496,70;21;ANNULE;m.rousseau48@exemple-fictif.fr;05 90 59 30 55;Nantes
+CMD4500000763;C34504;Société Francois SA;10.04.2025;24.01.2024;21.160,87;194;FACTURE;s.francois88@exemple-fictif.fr;07 45 47 75 83;Strasbourg
+CMD4500000764;C46101;Industries Lambert Frères;11.12.2020;15.10.2025;174.300,67;345;FACTURE;s.lambert23@exemple-fictif.fr;01 47 97 91 17;Lille
+CMD4500000765;C26014;Comptoir Gauthier SA;13.12.2020;26.03.2025;25.552,89;49;ANNULE;s.gauthier41@exemple-fictif.fr;09 69 25 79 16;Rennes
+CMD4500000766;C15139;Ets Faure; Distribution;14.01.2024;03.02.2025;152.972,67;259;ANNULE;a.faure29@exemple-fictif.fr;06 59 22 69 74;Bordeaux
+CMD4500000767;C23991;Transports Rousseau SARL;11.07.2019;18.03.2025;149.303,19;474;LIVRE;j.rousseau76@exemple-fictif.fr;04 98 58 52 70;Saint-Étienne
+CMD4500000768;C38010;Ets Martinez SARL;13.06.2023;26.06.2020;221.472,13;40;FACTURE;s.martinez88@exemple-fictif.fr;02 25 77 91 83;Lille
+CMD4500000769;C32360;Comptoir Morel SAS;27.12.2020;07.10.2023;126.468,09;38;EN_COURS;p.morel25@exemple-fictif.fr;08 45 52 53 63;Paris
+CMD4500000770;C92638;Comptoir Lambert & Cie;01.06.2020;16.07.2022;108.848,46;405;LIVRE;j.lambert47@exemple-fictif.fr;09 98 22 24 26;Bordeaux
+CMD4500000771;C89616;Groupe Lambert SA;03.01.2022;05.11.2022;18.179,13;482;EN_COURS;p.lambert51@exemple-fictif.fr;02 32 37 42 53;Nantes
+CMD4500000772;C83580;Transports Francois & Cie;21.03.2023;07.09.2025;65.953,13;384;LIVRE;p.francois98@exemple-fictif.fr;02 40 48 80 10;Strasbourg
+CMD4500000773;C63406;Comptoir Perrin Distribution;02.04.2020;21.06.2023;180.967,10;28;LIVRE;s.perrin18@exemple-fictif.fr;06 67 98 98 12;Rennes
+CMD4500000774;C69389;Société Blanc Frères;09.10.2025;06.07.2025;149.466,61;294;ANNULE;m.blanc3@exemple-fictif.fr;07 94 47 80 92;Rennes
+CMD4500000775;C57996;Comptoir Garnier SA;19.07.2024;19.04.2020;82.595,15;53;FACTURE;m.garnier69@exemple-fictif.fr;01 74 49 82 89;Toulouse
+CMD4500000776;C62980;Société Rousseau Services;19.09.2019;14.10.2024;5.749,94;286;ANNULE;m.rousseau56@exemple-fictif.fr;03 60 91 25 68;Bordeaux
+CMD4500000777;C52700;Groupe Martinez Frères;22.11.2023;12.11.2020;224.631,49;267;EN_COURS;s.martinez29@exemple-fictif.fr;09 12 46 10 54;Bordeaux
+CMD4500000778;C87399;Atelier Guerin Frères;25.06.2023;22.03.2022;120,487.45;48;ANNULE;m.guerin52@exemple-fictif.fr;07 54 62 90 19;Toulouse
+CMD4500000779;C84908;Transports Faure SAS;11.02.2021;27.04.2025;66.769,09;278;EN_COURS;s.faure41@exemple-fictif.fr;04 85 49 75 44;Saint-Étienne
+CMD4500000780;C88694;Atelier Morel Distribution;13.07.2019;02.02.2025;244.912,84;199;EN_COURS;s.morel56@exemple-fictif.fr;02 20 95 34 88;Nantes
+CMD4500000781;C48408;Comptoir Morel Distribution;21.10.2019;28.12.2021;13.590,34;209;EN_COURS;a.morel11@exemple-fictif.fr;09 35 84 66 92;Bordeaux
+CMD4500000782;C46896;Ets Perrin & Cie;13.03.2019;23.08.2020;181.508,04;391;ANNULE;p.perrin77@exemple-fictif.fr;03 86 27 54 12;Strasbourg
+CMD4500000783;C88878;Atelier Boyer SAS;03.05.2019;13.09.2024;133.388,67;35;EN_COURS;s.boyer90@exemple-fictif.fr;04 35 68 39 21;Marseille
+CMD4500000784;C70850;Atelier Boyer & Cie;01.04.2025;06.11.2019;19.657,86;84;LIVRE;s.boyer11@exemple-fictif.fr;07 24 38 64 40;Strasbourg
+CMD4500000785;C19743;Atelier Boyer SAS;22.09.2021;10.05.2023;12.305,56;493;EN_COURS;m.boyer58@exemple-fictif.fr;06 16 28 60 47;Strasbourg
+CMD4500000786;C62213;Groupe Chevalier Distribution;16.09.2019;05.08.2024;197.736,30;342;EN_COURS;a.chevalier14@exemple-fictif.fr;03 19 11 30 91;Paris
+CMD4500000787;C85041;Société Rousseau Frères;18.06.2024;27.08.2025;182.809,82;311;ANNULE;p.rousseau22@exemple-fictif.fr;04 64 39 79 41;Paris
+CMD4500000788;C13003;Comptoir Rousseau Services;16.12.2023;18.12.2024;107.178,01;349;LIVRE;p.rousseau95@exemple-fictif.fr;08 71 99 17 61;Grenoble
+CMD4500000789;C28825;Transports Guerin SARL;03.11.2025;06.03.2020;157.297,44;168;EN_COURS;p.guerin70@exemple-fictif.fr;02 60 96 94 56;Lyon
+CMD4500000790;C95367;Groupe Bonnet Distribution;25.03.2019;19.03.2021;141.971,08;497;ANNULE;j.bonnet67@exemple-fictif.fr;01 81 85 78 97;Lille
+CMD4500000791;C89320;Groupe Faure SARL;23.12.2020;22.09.2022;243.752,58;307;FACTURE;a.faure5@exemple-fictif.fr;09 47 92 26 48;Rennes
+CMD4500000792;C70015;Société Blanc & Cie;26.01.2024;21.08.2019;89.240,90;92;EN_COURS;s.blanc65@exemple-fictif.fr;09 61 67 59 71;Toulouse
+CMD4500000793;C92289;Transports Boyer SARL;22.08.2022;20.09.2022;96.124,76;77;ANNULE;s.boyer9@exemple-fictif.fr;09 73 29 26 50;Strasbourg
+CMD4500000794;C34410;Comptoir Francois SARL;22.11.2025;08.06.2019;173.878,45;453;LIVRE;p.francois83@exemple-fictif.fr;06 59 58 89 52;Saint-Étienne
+CMD4500000795;C45169;Transports Faure Distribution;09.03.2023;13.08.2023;98.522,81;72;FACTURE;a.faure48@exemple-fictif.fr;05 33 91 41 91;Marseille
+CMD4500000796;C23513;Transports Rousseau SAS;11.07.2020;09.02.2024;170.135,57;168;EN_COURS;s.rousseau74@exemple-fictif.fr;09 53 71 32 53;Bordeaux
+CMD4500000797;C58503;Société Rousseau Frères;04.04.2025;17.02.2023;177.656,72;190;FACTURE;s.rousseau88@exemple-fictif.fr;01 92 72 76 43;Bordeaux
+CMD4500000798;C10996;Société Francois Services;07.05.2024;20.02.2024;223.467,84;423;LIVRE;a.francois29@exemple-fictif.fr;02 71 86 71 31;Lyon
+CMD4500000799;C50315;Transports Garnier SA;03.06.2021;15.02.2021;206.901,56;104;LIVRE;m.garnier51@exemple-fictif.fr;04 32 56 89 37;Bordeaux
+CMD4500000800;C44832;Société Gauthier SARL;28.03.2024;28.11.2025;27.285,08;487;LIVRE;j.gauthier80@exemple-fictif.fr;01 55 32 68 59;Rennes
+CMD4500000801;C72654;Industries Bonnet Services;01.05.2021;05.04.2025;128.568,80;286;FACTURE;m.bonnet97@exemple-fictif.fr;07 30 27 52 81;Bordeaux
+CMD4500000802;C49144;Ets Legrand Frères;28.03.2020;16.12.2021;127.556,99;380;FACTURE;p.legrand36@exemple-fictif.fr;09 90 53 85 64;Nantes
+CMD4500000803;C66112;Société Faure Frères;11.01.2020;28.01.2019;10.728,30;411;FACTURE;j.faure11@exemple-fictif.fr;06 91 39 85 92;Toulouse
+CMD4500000804;C37308;Transports Garnier SA;01.06.2021;16.01.2023;51.030,78;325;ANNULE;a.garnier9@exemple-fictif.fr;09 33 97 22 46;Lille
+CMD4500000805;C39109;Ets Martinez SAS;14.08.2024;26.08.2024;237.364,88;330;ANNULE;p.martinez89@exemple-fictif.fr;03 10 26 56 75;Villeurbanne
+CMD4500000806;C81219;Transports Rousseau Services;26.02.2024;05.04.2025;15.738,27;103;EN_COURS;m.rousseau91@exemple-fictif.fr;01 90 49 89 21;Lyon
+CMD4500000807;C55220;Groupe Faure Distribution;01.09.2020;25.08.2022;129.675,14;45;ANNULE;s.faure60@exemple-fictif.fr;03 33 54 71 69;Nantes
+CMD4500000808;C28670;Transports Faure Frères;20.02.2023;27.11.2024;113.398,78;461;EN_COURS;j.faure42@exemple-fictif.fr;02 60 16 80 33;Villeurbanne
+CMD4500000809;C95904;Ets Rousseau Services;19.03.2025;01.06.2020;43.144,24;296;EN_COURS;m.rousseau73@exemple-fictif.fr;07 31 22 64 51;Saint-Étienne
+CMD4500000810;C42049;Groupe Perrin SA;26.10.2025;18.04.2021;138.990,47;158;FACTURE;a.perrin90@exemple-fictif.fr;07 25 72 92 69;Villeurbanne
+CMD4500000811;C85708;Comptoir Morel SA;26.08.2023;23.12.2019;45.123,31;229;ANNULE;a.morel33@exemple-fictif.fr;01 33 83 32 66;Paris
+CMD4500000812;C74268;Ets Perrin Distribution;23.06.2020;19.09.2023;60.764,37;77;LIVRE;j.perrin28@exemple-fictif.fr;02 27 56 60 16;Strasbourg
+CMD4500000813;C76311;Industries Legrand & Cie;28.10.2022;12.11.2020;173.332,97;370;FACTURE;s.legrand65@exemple-fictif.fr;09 55 33 40 91;Strasbourg
+CMD4500000814;C49597;Atelier Legrand SAS;08.07.2024;03.10.2025;198.564,23;165;LIVRE;j.legrand36@exemple-fictif.fr;08 18 54 30 36;Villeurbanne
+CMD4500000815;C55645;Transports Faure Distribution;22.01.2019;10.04.2022;69.303,27;445;EN_COURS;s.faure96@exemple-fictif.fr;01 88 35 10 83;Bordeaux
+CMD4500000816;C29782;Groupe Garnier & Cie;24.03.2019;07.03.2019;216.684,05;474;ANNULE;j.garnier82@exemple-fictif.fr;07 69 94 27 16;Paris
+CMD4500000817;C14183;Groupe Faure SARL;15.03.2024;11.11.2024;231.383,41;390;ANNULE;j.faure80@exemple-fictif.fr;04 35 89 37 14;Lille
+CMD4500000818;C23582;Industries Chevalier Distribution;05.05.2020;04.02.2021;5.687,13;286;ANNULE;a.chevalier67@exemple-fictif.fr;09 27 53 11 83;Saint-Étienne
+CMD4500000819;C59872;Comptoir Gauthier SAS;27.02.2025;24.12.2024;319,01;477;EN_COURS;a.gauthier45@exemple-fictif.fr;06 26 98 84 73;Lyon
+CMD4500000820;C58062;Société Perrin Frères;13.05.2025;05.04.2025;6.770,27;483;LIVRE;a.perrin70@exemple-fictif.fr;03 13 28 71 16;Bordeaux
+CMD4500000821;C21190;Comptoir Faure Frères;14.07.2025;19.01.2022;57.058,03;65;FACTURE;j.faure57@exemple-fictif.fr;09 93 23 53 50;Lille
+CMD4500000822;C42728;Industries Martinez Services;02.02.2019;20.06.2022;239.147,70;289;ANNULE;a.martinez5@exemple-fictif.fr;06 64 49 89 18;Nantes
+CMD4500000823;C27938;Groupe Faure SA;27.05.2022;14.01.2019;11.040,46;31;LIVRE;p.faure14@exemple-fictif.fr;09 25 14 36 13;Villeurbanne
+CMD4500000824;C15586;Ets Garnier SAS;18.01.2023;04.12.2024;91.567,31;55;EN_COURS;p.garnier67@exemple-fictif.fr;01 23 53 17 69;Paris
+CMD4500000825;C57332;Société Rousseau SARL;17.05.2022;10.04.2025;100.160,28;59;EN_COURS;j.rousseau37@exemple-fictif.fr;01 12 82 65 33;Nantes
+CMD4500000826;C83565;Ets Blanc SARL;01.06.2020;22.04.2023;100.650,94;422;ANNULE;m.blanc16@exemple-fictif.fr;05 65 60 65 29;Paris
+CMD4500000827;C64369;Atelier Morel SARL;14.02.2021;11.11.2023;6.243,10;35;LIVRE;a.morel52@exemple-fictif.fr;01 67 85 72 95;Grenoble
+CMD4500000828;C83783;Transports Lambert Frères;25.12.2025;23.11.2024;67.396,37;2;FACTURE;j.lambert92@exemple-fictif.fr;04 95 18 50 32;Lyon
+CMD4500000829;C79361;Transports Bonnet & Cie;16.11.2020;21.02.2020;115.817,31;225;LIVRE;p.bonnet78@exemple-fictif.fr;07 58 87 81 47;Paris
+CMD4500000830;C42537;Ets Morel & Cie;08.03.2025;11.07.2020;52.741,75;353;FACTURE;s.morel35@exemple-fictif.fr;02 88 67 11 18;Villeurbanne
+CMD4500000831;C77576;Atelier Faure SAS;15.09.2025;06.02.2019;102.691,37;431;EN_COURS;p.faure7@exemple-fictif.fr;01 90 94 90 43;Paris
+CMD4500000832;C77234;Industries Guerin Distribution;20.09.2025;19.08.2020;224.362,73;43;ANNULE;s.guerin74@exemple-fictif.fr;01 78 74 90 85;Lille
+CMD4500000833;C28119;Ets Perrin SA;06.02.2022;12.09.2023;184.364,02;120;ANNULE;a.perrin69@exemple-fictif.fr;09 57 66 11 79;Marseille
+CMD4500000834;C59840;Atelier Francois Services;19.02.2021;20.07.2019;191.154,74;343;LIVRE;m.francois25@exemple-fictif.fr;03 75 73 96 85;Lille
+CMD4500000835;C72539;Transports Martinez & Cie;22.11.2019;09.01.2023;88.666,76;366;LIVRE;s.martinez86@exemple-fictif.fr;05 21 84 64 24;Nantes
+CMD4500000836;C39377;Transports Francois Distribution;11.12.2022;12.02.2025;232.753,23;298;ANNULE;s.francois72@exemple-fictif.fr;03 47 91 15 87;Bordeaux
+CMD4500000837;C69383;Comptoir Blanc & Cie;17.05.2020;03.08.2019;38.245,78;174;LIVRE;j.blanc35@exemple-fictif.fr;07 28 30 55 84;Toulouse
+CMD4500000838;C80073;Transports Bonnet Services;13.09.2024;17.04.2023;10.281,57;224;EN_COURS;m.bonnet35@exemple-fictif.fr;05 60 71 29 77;Grenoble
+CMD4500000839;C42543;Groupe Garnier Services;12.11.2025;20.11.2025;40.819,64;421;EN_COURS;j.garnier76@exemple-fictif.fr;07 23 39 37 70;Villeurbanne
+CMD4500000840;C53574;Comptoir Guerin Frères;25.12.2019;06.06.2021;187.621,61;254;EN_COURS;j.guerin52@exemple-fictif.fr;05 25 88 22 64;Nantes
+CMD4500000841;C73470;Ets Boyer Services;24.02.2025;17.03.2024;64.680,38;276;LIVRE;j.boyer61@exemple-fictif.fr;09 79 10 61 69;Strasbourg
+CMD4500000842;C34210;Transports Garnier SAS;13.11.2022;09.09.2022;154.120,88;276;EN_COURS;a.garnier80@exemple-fictif.fr;07 99 89 80 66;Lille
+CMD4500000843;C16461;Comptoir Guerin SA;04.02.2023;05.12.2023;169.883,97;30;ANNULE;a.guerin85@exemple-fictif.fr;06 41 99 58 98;Lyon
+CMD4500000844;C37150;Comptoir Gauthier Frères;14.06.2020;14.12.2024;6,203.05;264;FACTURE;s.gauthier51@exemple-fictif.fr;06 57 86 17 58;Grenoble
+CMD4500000845;C16154;Comptoir Blanc Frères;10.07.2022;22.05.2025;225.758,38;442;ANNULE;a.blanc23@exemple-fictif.fr;07 73 62 16 51;Bordeaux
+CMD4500000846;C80453;Ets Guerin Services;01.10.2022;26.05.2025;79.739,88;114;EN_COURS;p.guerin44@exemple-fictif.fr;09 87 13 64 26;Toulouse
+CMD4500000847;C47904;Industries Gauthier SAS;02.02.2022;21.06.2023;152.063,95;118;LIVRE;p.gauthier44@exemple-fictif.fr;01 98 96 64 30;Marseille
+CMD4500000848;C62590;Ets Perrin; Distribution;05.06.2023;03.07.2019;25.923,04;91;FACTURE;p.perrin40@exemple-fictif.fr;02 21 57 74 42;Strasbourg
+CMD4500000849;C77668;Atelier Lambert SARL;13.08.2024;16.09.2020;48.978,99;41;EN_COURS;p.lambert76@exemple-fictif.fr;06 66 11 44 67;Marseille
+CMD4500000850;C17008;Groupe Garnier Distribution;07.09.2021;08.12.2025;221.125,64;176;EN_COURS;j.garnier22@exemple-fictif.fr;07 54 99 85 59;Strasbourg
+CMD4500000851;C26175;Comptoir Blanc SAS;22.09.2024;25.04.2023;81.081,48;130;FACTURE;a.blanc17@exemple-fictif.fr;05 16 14 96 64;Lille
+CMD4500000852;C35368;Transports Rousseau SARL;05.12.2022;10.09.2023;191.339,84;375;ANNULE;j.rousseau18@exemple-fictif.fr;02 67 66 60 36;Toulouse
+CMD4500000853;C59742;Transports Rousseau Services;22.03.2025;03.08.2021;178.557,05;336;LIVRE;s.rousseau69@exemple-fictif.fr;02 87 59 41 15;Lille
+CMD4500000854;C28982;Société Rousseau Distribution;09.10.2020;11.04.2021;2.963,71;440;LIVRE;s.rousseau65@exemple-fictif.fr;09 18 60 66 70;Strasbourg
+CMD4500000855;C44326;Société Blanc Distribution;14.01.2025;18.04.2025;133.774,70;186;LIVRE;a.blanc34@exemple-fictif.fr;08 87 89 37 67;Villeurbanne
+CMD4500000856;C88086;Industries Martinez SA;04.03.2023;15.09.2023;165.271,01;448;ANNULE;m.martinez83@exemple-fictif.fr;07 85 77 75 29;Villeurbanne
+CMD4500000857;C99263;Ets Gauthier SARL;05.05.2022;08.01.2025;22.394,53;374;ANNULE;a.gauthier58@exemple-fictif.fr;05 32 44 26 36;Strasbourg
+CMD4500000858;C13943;Groupe Garnier SARL;13.03.2023;07.03.2023;216.734,85;474;LIVRE;s.garnier64@exemple-fictif.fr;09 37 31 28 25;Lyon
+CMD4500000859;C59729;Comptoir Martinez & Cie;04.01.2019;17.11.2023;167.871,54;286;ANNULE;p.martinez56@exemple-fictif.fr;07 25 11 80 20;Lille
+CMD4500000860;C41977;Comptoir Perrin SA;21.02.2023;17.01.2025;120.652,14;216;EN_COURS;a.perrin84@exemple-fictif.fr;04 50 49 62 85;Nantes
+CMD4500000861;C10459;Ets Morel Services;12.05.2021;24.10.2022;109.389,34;39;FACTURE;p.morel24@exemple-fictif.fr;01 98 15 65 65;Saint-Étienne
+CMD4500000862;C21835;Société Guerin Services;23.04.2021;01.08.2023;80.989,51;205;FACTURE;j.guerin91@exemple-fictif.fr;08 15 76 88 11;Nantes
+CMD4500000863;C91504;Ets Faure Frères;13.03.2022;20.08.2025;3.866,50;120;ANNULE;s.faure73@exemple-fictif.fr;09 81 76 91 82;Paris
+CMD4500000864;C33672;Atelier Guerin SA;12.08.2025;03.10.2022;224.199,08;12;EN_COURS;s.guerin55@exemple-fictif.fr;03 12 21 26 65;Villeurbanne
+CMD4500000865;C49678;Transports Gauthier SAS;03.09.2025;01.10.2021;233.631,74;482;LIVRE;p.gauthier2@exemple-fictif.fr;08 56 52 75 50;Paris
+CMD4500000866;C22657;Ets Blanc Frères;18.11.2025;27.11.2023;36.171,91;48;ANNULE;m.blanc10@exemple-fictif.fr;03 65 44 32 30;Marseille
+CMD4500000867;C27287;Société Martinez Distribution;04.09.2021;22.05.2021;121.531,78;428;LIVRE;a.martinez35@exemple-fictif.fr;06 65 74 26 10;Rennes
+CMD4500000868;C62336;Industries Morel SARL;08.12.2021;14.05.2019;114.844,95;109;EN_COURS;j.morel81@exemple-fictif.fr;05 70 32 74 30;Strasbourg
+CMD4500000869;C31091;Comptoir Chevalier Distribution;23.05.2024;15.04.2019;34.071,07;215;LIVRE;s.chevalier24@exemple-fictif.fr;07 79 57 10 71;Paris
+CMD4500000870;C90008;Atelier Garnier Frères;06.08.2025;04.11.2019;78.752,69;219;LIVRE;a.garnier1@exemple-fictif.fr;01 56 39 66 16;Rennes
+CMD4500000871;C95674;Atelier Francois SARL;03.09.2023;26.05.2023;177.847,01;358;FACTURE;p.francois33@exemple-fictif.fr;04 92 28 82 76;Grenoble
+CMD4500000872;C25147;Société Bonnet SA;14.12.2019;20.12.2023;231.424,61;243;EN_COURS;p.bonnet99@exemple-fictif.fr;05 78 20 37 19;Lyon
+CMD4500000873;C48898;Industries Rousseau SAS;07.12.2021;15.05.2023;190.987,58;422;EN_COURS;j.rousseau60@exemple-fictif.fr;06 29 63 77 17;Bordeaux
+CMD4500000874;C81033;Comptoir Bonnet SAS;17.04.2023;10.03.2021;200.052,48;196;FACTURE;a.bonnet39@exemple-fictif.fr;07 27 79 16 52;Nantes
+CMD4500000875;C57739;Comptoir Chevalier SA;13.03.2020;19.03.2024;206.164,74;305;LIVRE;a.chevalier11@exemple-fictif.fr;09 52 51 23 15;Grenoble
+CMD4500000876;C76520;Atelier Rousseau SARL;13.02.2023;22.01.2020;82.140,20;152;ANNULE;j.rousseau60@exemple-fictif.fr;07 16 97 99 32;Marseille
+CMD4500000877;C33216;Société Perrin Distribution;01.02.2024;05.03.2022;225.280,22;402;FACTURE;j.perrin88@exemple-fictif.fr;01 11 30 63 99;Lyon
+CMD4500000878;C67691;Société Perrin Services;21.10.2021;02.08.2021;10.966,03;428;ANNULE;s.perrin34@exemple-fictif.fr;02 66 34 26 69;Rennes
+CMD4500000879;C11274;Groupe Morel Distribution;13.05.2024;20.04.2021;193.217,61;7;EN_COURS;j.morel7@exemple-fictif.fr;02 10 45 54 26;Lyon
+CMD4500000880;C90403;Atelier Garnier Frères;04.04.2024;11.10.2023;222.977,80;492;FACTURE;a.garnier81@exemple-fictif.fr;06 41 57 97 82;Nantes
+CMD4500000881;C84867;Comptoir Bonnet SARL;14.09.2019;03.09.2022;179.285,03;245;FACTURE;j.bonnet51@exemple-fictif.fr;01 99 40 71 74;Lille
+CMD4500000882;C59147;Société Gauthier SA;28.04.2019;01.07.2022;114.624,48;389;EN_COURS;s.gauthier90@exemple-fictif.fr;06 51 11 37 30;Saint-Étienne
+CMD4500000883;C70211;Ets Faure SAS;18.05.2020;19.01.2024;196,865.86;485;EN_COURS;a.faure14@exemple-fictif.fr;04 38 49 52 22;Paris
+CMD4500000884;C10736;Industries Gauthier SARL;21.09.2023;14.09.2021;60.751,50;78;LIVRE;a.gauthier32@exemple-fictif.fr;02 59 60 66 38;Marseille
+CMD4500000885;C81176;Ets Perrin; SA;15.06.2025;19.03.2019;42.756,27;378;ANNULE;s.perrin72@exemple-fictif.fr;05 31 60 15 39;Toulouse
+CMD4500000886;C20189;Société Chevalier SA;09.08.2022;01.12.2023;31.529,32;465;ANNULE;s.chevalier24@exemple-fictif.fr;02 21 54 30 38;Villeurbanne
+CMD4500000887;C56212;Transports Francois Frères;17.02.2023;19.08.2024;1.078,94;188;LIVRE;m.francois9@exemple-fictif.fr;07 23 24 74 65;Toulouse
+CMD4500000888;C22346;Industries Bonnet & Cie;13.09.2023;02.12.2019;187.605,61;396;FACTURE;p.bonnet22@exemple-fictif.fr;04 71 78 99 87;Toulouse
+CMD4500000889;C53476;Groupe Chevalier Services;10.01.2024;04.09.2020;42.038,66;387;ANNULE;s.chevalier36@exemple-fictif.fr;03 10 16 32 80;Toulouse
+CMD4500000890;C46362;Groupe Francois SARL;09.08.2021;21.04.2024;32.928,46;384;LIVRE;a.francois12@exemple-fictif.fr;02 63 56 83 87;Villeurbanne
+CMD4500000891;C29564;Industries Morel SAS;08.03.2020;23.08.2022;89.800,22;477;EN_COURS;j.morel36@exemple-fictif.fr;02 41 57 34 15;Marseille
+CMD4500000892;C87970;Industries Morel Services;08.08.2022;15.06.2022;225.774,31;50;EN_COURS;j.morel45@exemple-fictif.fr;03 19 97 12 93;Marseille
+CMD4500000893;C15357;Ets Garnier SA;28.03.2023;24.09.2020;29.841,72;403;LIVRE;p.garnier78@exemple-fictif.fr;05 41 79 45 18;Rennes
+CMD4500000894;C17323;Ets Garnier & Cie;12.07.2023;12.07.2025;242.428,42;202;ANNULE;j.garnier65@exemple-fictif.fr;01 59 39 99 60;Marseille
+CMD4500000895;C95986;Transports Blanc Services;02.08.2022;13.04.2024;76.549,33;395;EN_COURS;a.blanc39@exemple-fictif.fr;04 82 63 54 11;Lille
+CMD4500000896;C48734;Ets Faure Services;05.05.2020;26.07.2024;34.369,98;425;FACTURE;j.faure12@exemple-fictif.fr;09 99 51 44 96;Marseille
+CMD4500000897;C91628;Ets Martinez Frères;14.03.2024;08.12.2021;226.860,89;365;LIVRE;s.martinez13@exemple-fictif.fr;07 43 38 35 81;Nantes
+CMD4500000898;C79681;Groupe Chevalier SA;08.04.2020;09.04.2025;8.693,27;354;EN_COURS;j.chevalier47@exemple-fictif.fr;02 20 56 95 77;Grenoble
+CMD4500000899;C45201;Ets Martinez Distribution;16.06.2025;15.07.2023;178.029,47;369;FACTURE;s.martinez87@exemple-fictif.fr;06 35 56 40 65;Nantes
+CMD4500000900;C37344;Comptoir Legrand & Cie;09.03.2019;06.06.2021;92.491,07;275;LIVRE;j.legrand56@exemple-fictif.fr;06 89 49 75 21;Nantes
+CMD4500000901;C24790;Ets Boyer SA;28.04.2019;15.05.2020;59.906,93;398;LIVRE;p.boyer24@exemple-fictif.fr;05 33 59 25 46;Lyon
+CMD4500000902;C51515;Groupe Perrin & Cie;10.04.2024;26.01.2022;141.647,15;113;ANNULE;j.perrin39@exemple-fictif.fr;04 23 97 12 13;Strasbourg
+CMD4500000903;C81956;Groupe Faure SARL;15.02.2023;09.06.2020;52.286,72;418;FACTURE;j.faure48@exemple-fictif.fr;03 65 74 68 43;Lille
+CMD4500000904;C79341;Groupe Francois Services;14.06.2024;00.00.0000;226.235,27;237;ANNULE;j.francois89@exemple-fictif.fr;03 83 65 61 97;Nantes
+CMD4500000905;C67583;Atelier Gauthier Services;18.02.2019;12.06.2024;129.790,81;24;LIVRE;a.gauthier20@exemple-fictif.fr;01 29 71 97 32;Villeurbanne
+CMD4500000906;C39715;Ets Garnier SARL;19.12.2025;04.04.2025;99.505,02;413;LIVRE;s.garnier39@exemple-fictif.fr;08 31 14 35 25;Toulouse
+CMD4500000907;C34443;Industries Perrin SARL;19.12.2024;28.08.2025;61.540,35;66;FACTURE;s.perrin83@exemple-fictif.fr;06 94 97 37 40;Marseille
+CMD4500000908;C10186;Comptoir Rousseau Frères;10.06.2025;16.12.2024;207.078,10;401;EN_COURS;s.rousseau23@exemple-fictif.fr;06 38 26 39 64;Bordeaux
+CMD4500000909;C60998;Ets Lambert SARL;20.08.2025;04.09.2025;39.607,15;438;EN_COURS;s.lambert24@exemple-fictif.fr;07 14 22 11 72;Paris
+CMD4500000910;C33971;Comptoir Rousseau Distribution;23.02.2025;16.11.2025;210.455,21;223;FACTURE;s.rousseau81@exemple-fictif.fr;09 43 61 71 35;Nantes
+CMD4500000911;C76631;Groupe Martinez SAS;01.11.2019;25.10.2021;63.446,54;79;FACTURE;m.martinez92@exemple-fictif.fr;09 95 82 29 95;Saint-Étienne
+CMD4500000912;C58705;Transports Faure Frères;21.01.2022;08.11.2025;180.517,73;443;EN_COURS;a.faure28@exemple-fictif.fr;02 92 24 78 17;Lille
+CMD4500000912;C58705;Transports aFure Frères;21.01.2022;08.11.2025;180.517,73;443;EN_COURS;a.faure28@exemple-fictif.fr;02 92 24 78 17;Lille
+CMD4500000914;C83621;Société Lambert Services;11.03.2019;22.02.2020;193.694,34;90;ANNULE;j.lambert84@exemple-fictif.fr;01 75 46 94 61;Toulouse
+CMD4500000915;C51736;Transports Blanc & Cie;09.10.2019;26.03.2024;164.925,46;189;LIVRE;j.blanc47@exemple-fictif.fr;07 44 19 19 82;Saint-Étienne
+CMD4500000916;C52079;Ets Martinez Frères;15.09.2022;12.03.2019;155,691.11;1;EN_COURS;m.martinez76@exemple-fictif.fr;01 42 31 65 30;Saint-Étienne
+CMD4500000917;C84917;Groupe Garnier SA;08.12.2022;20.07.2022;132.999,76;332;ANNULE;j.garnier26@exemple-fictif.fr;07 14 82 76 70;Toulouse
+CMD4500000918;C61039;Groupe Legrand SAS;22.01.2022;11.12.2023;240.959,04;274;ANNULE;p.legrand84@exemple-fictif.fr;09 63 55 40 91;Toulouse
+CMD4500000919;C50470;Comptoir Garnier SARL;07.01.2023;22.12.2025;144.558,82;172;EN_COURS;p.garnier43@exemple-fictif.fr;04 25 28 15 30;Paris
+CMD4500000920;C72906;Société Blanc Frères;01.12.2019;01.03.2022;242.042,71;238;ANNULE;p.blanc37@exemple-fictif.fr;05 49 79 95 65;Grenoble
+CMD4500000921;C55555;Ets Garnier Services;14.12.2019;09.06.2019;5.773,17;126;FACTURE;m.garnier50@exemple-fictif.fr;06 99 38 70 35;Lyon
+CMD4500000922;C84112;Ets Chevalier SARL;21.06.2020;19.12.2022;55.692,81;106;LIVRE;j.chevalier82@exemple-fictif.fr;06 85 69 11 32;Nantes
+CMD4500000923;C48008;Groupe Blanc SARL;17.10.2025;18.10.2025;83.856,44;202;FACTURE;a.blanc79@exemple-fictif.fr;05 62 94 65 41;Lille
+CMD4500000924;C50023;Société Rousseau Distribution;20.02.2022;19.10.2023;61.154,60;312;EN_COURS;a.rousseau10@exemple-fictif.fr;05 45 84 67 46;Toulouse
+CMD4500000925;C29150;Industries Gauthier Distribution;08.01.2023;11.09.2022;32.084,64;371;ANNULE;s.gauthier22@exemple-fictif.fr;04 83 95 78 92;Strasbourg
+CMD4500000926;C18022;Transports Perrin Frères;23.03.2019;28.08.2025;10.847,50;168;FACTURE;p.perrin17@exemple-fictif.fr;09 54 34 46 90;Villeurbanne
+CMD4500000927;C49553;Atelier Faure SAS;09.10.2022;28.05.2022;232.225,81;76;EN_COURS;j.faure6@exemple-fictif.fr;01 13 28 55 23;Marseille
+CMD4500000928;C34944;Comptoir Guerin Distribution;11.10.2021;21.11.2025;117.843,62;2;ANNULE;s.guerin51@exemple-fictif.fr;02 83 88 37 18;Lille
+CMD4500000929;C82185;Atelier Rousseau SARL;12.01.2020;10.03.2020;207.205,10;81;EN_COURS;m.rousseau70@exemple-fictif.fr;01 41 34 49 68;Lille
+CMD4500000930;C98447;Industries Chevalier Frères;26.11.2022;26.09.2025;7.014,82;283;FACTURE;p.chevalier65@exemple-fictif.fr;03 82 45 58 84;Lyon
+CMD4500000931;C34683;Société Perrin SARL;02.05.2020;27.06.2019;38.799,89;275;FACTURE;p.perrin34@exemple-fictif.fr;01 30 30 81 88;Lille
+CMD4500000932;C27495;Transports Perrin SAS;17.03.2023;26.04.2019;34.081,68;69;FACTURE;m.perrin26@exemple-fictif.fr;07 83 23 37 36;Lyon
+CMD4500000933;C57867;Atelier Martinez Distribution;27.01.2022;28.07.2020;193.978,67;313;FACTURE;p.martinez59@exemple-fictif.fr;06 41 17 32 45;Saint-Étienne
+CMD4500000934;C32364;Comptoir Bonnet Services;08.01.2020;09.12.2025;32.961,18;66;FACTURE;a.bonnet63@exemple-fictif.fr;08 18 84 12 21;Grenoble
+CMD4500000935;C96580;Atelier Guerin & Cie;18.08.2024;25.02.2025;229.336,90;329;ANNULE;p.guerin34@exemple-fictif.fr;06 43 62 23 89;Rennes
+CMD4500000936;C98819;Comptoir Rousseau Services;16.11.2020;11.09.2025;232.784,20;93;EN_COURS;p.rousseau20@exemple-fictif.fr;06 86 15 84 98;Nantes
+CMD4500000937;C92208;Groupe Martinez SAS;07.08.2023;25.02.2025;46.584,85;67;LIVRE;p.martinez32@exemple-fictif.fr;02 16 25 77 68;Strasbourg
+CMD4500000938;C16485;Comptoir Martinez SARL;28.08.2021;23.01.2025;157.323,59;116;EN_COURS;j.martinez59@exemple-fictif.fr;06 23 85 89 89;Lille
+CMD4500000939;C74517;Atelier Chevalier SAS;13.12.2021;08.04.2023;113.606,33;84;LIVRE;m.chevalier19@exemple-fictif.fr;06 47 29 28 24;Bordeaux
+CMD4500000940;C10197;Transports Boyer SAS;23.09.2025;07.04.2021;73.613,97;227;LIVRE;m.boyer95@exemple-fictif.fr;05 74 76 73 75;Rennes
+CMD4500000941;C76517;Société Gauthier Frères;22.06.2019;20.06.2020;197.007,83;230;ANNULE;p.gauthier99@exemple-fictif.fr;05 89 99 33 60;Bordeaux
+CMD4500000942;C72149;Société Rousseau SAS;11.03.2020;12.10.2020;N/A;42;ANNULE;p.rousseau64@exemple-fictif.fr;06 79 20 28 87;Marseille
+CMD4500000943;C15510;Transports Perrin Services;05.10.2021;11.11.2024;145.395,60;120;ANNULE;p.perrin28@exemple-fictif.fr;04 69 95 29 92;Bordeaux
+CMD4500000944;C43975;Ets Boyer SARL;20.09.2019;21.11.2023;84.917,21;100;EN_COURS;a.boyer85@exemple-fictif.fr;02 38 93 78 15;Lyon
+CMD4500000945;C22368;Industries Gauthier; SARL;27.03.2025;03.06.2024;74.025,17;340;LIVRE;m.gauthier20@exemple-fictif.fr;06 78 29 65 79;Bordeaux
+CMD4500000946;C80416;Comptoir Garnier SA;02.07.2021;10.03.2025;209.206,67;1;LIVRE;a.garnier72@exemple-fictif.fr;07 32 82 74 73;Grenoble
+CMD4500000947;C50736;Industries Boyer & Cie;25.12.2019;20.07.2024;32.334,00;152;EN_COURS;a.boyer52@exemple-fictif.fr;02 88 28 65 28;Marseille
+CMD4500000948;C46884;Société Bonnet Frères;24.08.2023;19.12.2025;27.988,04;242;ANNULE;m.bonnet15@exemple-fictif.fr;03 62 85 88 86;Rennes
+CMD4500000949;C38749;Industries Garnier Frères;14.07.2022;01.12.2024;186.284,06;362;LIVRE;j.garnier8@exemple-fictif.fr;01 10 54 35 30;Strasbourg
+CMD4500000950;C42017;Société Morel Services;17.04.2023;23.01.2021;138.292,15;83;ANNULE;m.morel35@exemple-fictif.fr;03 94 82 88 17;Lyon
+CMD4500000951;C82851;Groupe Perrin Services;07.09.2023;13.11.2025;220.692,16;105;EN_COURS;m.perrin23@exemple-fictif.fr;08 62 20 74 53;Saint-Étienne
+CMD4500000952;C42483;Groupe Boyer & Cie;14.09.2021;25.02.2019;243.287,14;98;EN_COURS;p.boyer14@exemple-fictif.fr;09 30 35 38 87;Marseille
+CMD4500000953;C18296;Ets Faure Distribution;17.08.2021;23.12.2024;4.956,01;488;ANNULE;s.faure94@exemple-fictif.fr;08 59 22 93 15;Bordeaux
+CMD4500000954;C44917;Comptoir Perrin Frères;08.02.2023;05.08.2023;111.154,22;210;LIVRE;j.perrin84@exemple-fictif.fr;08 74 98 24 55;Rennes
+CMD4500000955;C29749;Ets Francois SAS;23.07.2022;12.12.2025;99.819,45;197;EN_COURS;j.francois92@exemple-fictif.fr;06 83 22 27 51;Grenoble
+CMD4500000956;C67036;Groupe Guerin Frères;21.11.2019;25.08.2024;74.472,40;70;LIVRE;a.guerin86@exemple-fictif.fr;08 44 90 70 28;Rennes
+CMD4500000957;C10504;Ets Bonnet & Cie;18.10.2022;10.11.2024;124.512,65;287;FACTURE;j.bonnet72@exemple-fictif.fr;05 61 45 19 75;Toulouse
+CMD4500000958;C55005;Transports Blanc & Cie;07.07.2024;19.09.2025;133.309,16;195;FACTURE;s.blanc81@exemple-fictif.fr;09 13 43 47 50;Lyon
+CMD4500000959;C62228;Groupe Guerin SARL;05.08.2019;13.07.2021;138.223,71;462;LIVRE;j.guerin21@exemple-fictif.fr;01 79 32 44 78;Lille
+CMD4500000960;C73237;Groupe Lambert Services;10.11.2025;18.09.2020;231,364.33;378;ANNULE;j.lambert43@exemple-fictif.fr;05 23 80 54 63;Toulouse
+CMD4500000961;C61167;Groupe Morel SARL;25.11.2022;04.10.2025;194.640,78;183;EN_COURS;a.morel93@exemple-fictif.fr;01 55 59 47 22;Strasbourg
+CMD4500000962;C16787;Société Perrin & Cie;17.08.2024;01.11.2019;132.709,57;83;ANNULE;p.perrin73@exemple-fictif.fr;01 13 24 90 36;Bordeaux
+CMD4500000963;C61563;Groupe Blanc Frères;16.05.2024;11.07.2023;225.597,70;206;FACTURE;s.blanc6@exemple-fictif.fr;03 48 14 58 28;Marseille
+CMD4500000964;C33697;Ets Guerin Services;04.10.2019;11.04.2020;232.968,22;332;FACTURE;m.guerin24@exemple-fictif.fr;08 13 43 73 49;Grenoble
+CMD4500000965;C22633;Comptoir Rousseau &; Cie;28.04.2023;08.06.2019;122.279,84;42;EN_COURS;a.rousseau22@exemple-fictif.fr;05 52 54 37 23;Marseille
+CMD4500000966;C71905;Industries Faure SAS;08.11.2020;21.08.2022;39.271,66;396;FACTURE;j.faure9@exemple-fictif.fr;09 92 79 41 89;Nantes
+CMD4500000967;C50976;Société Francois SAS;04.07.2019;17.06.2022;92.067,17;44;ANNULE;a.francois18@exemple-fictif.fr;02 17 53 16 77;Saint-Étienne
+CMD4500000968;C38157;Groupe Chevalier Services;12.03.2021;15.09.2024;185.840,04;375;FACTURE;a.chevalier82@exemple-fictif.fr;02 69 25 55 84;Lille
+CMD4500000969;C74006;Groupe Bonnet SARL;17.09.2019;08.04.2019;132.467,49;216;LIVRE;a.bonnet30@exemple-fictif.fr;02 98 35 40 92;Strasbourg
+CMD4500000970;C56219;Groupe Lambert Services;26.03.2022;18.08.2020;2.420,57;424;ANNULE;s.lambert9@exemple-fictif.fr;03 50 97 18 50;Marseille
+CMD4500000971;C16553;Industries Guerin SAS;04.09.2023;28.02.2021;106.219,70;245;EN_COURS;p.guerin66@exemple-fictif.fr;05 45 58 73 21;Villeurbanne
+CMD4500000972;C61911;Atelier Perrin SA;05.10.2023;19.05.2022;157.279,96;221;FACTURE;m.perrin27@exemple-fictif.fr;06 16 88 85 83;Rennes
+CMD4500000973;C40664;Groupe Chevalier Frères;27.11.2024;11.03.2019;176.070,89;277;ANNULE;j.chevalier69@exemple-fictif.fr;09 47 46 31 93;Lille
+CMD4500000974;C70007;Transports Perrin Distribution;19.06.2022;06.09.2021;205.973,07;456;ANNULE;s.perrin93@exemple-fictif.fr;06 91 83 54 76;Marseille
+CMD4500000975;C80623;Industries Chevalier Frères;20.11.2024;28.11.2025;18.503,93;71;FACTURE;p.chevalier94@exemple-fictif.fr;09 79 34 91 87;Grenoble
+CMD4500000976;C37015;Société Perrin SA;14.08.2025;28.03.2023;248.728,51;268;LIVRE;j.perrin35@exemple-fictif.fr;02 33 37 91 13;Toulouse
+CMD4500000977;C20457;Groupe Bonnet Frères;09.06.2023;01.01.2024;198.733,76;337;EN_COURS;p.bonnet69@exemple-fictif.fr;02 66 69 83 16;Nantes
+CMD4500000978;C96113;Transports Gauthier SA;11.12.2023;18.01.2025;180.480,87;493;LIVRE;j.gauthier81@exemple-fictif.fr;06 34 26 96 60;Lyon
+CMD4500000979;C72168;Transports Rousseau Frères;10.03.2024;28.06.2021;30.324,43;371;ANNULE;m.rousseau74@exemple-fictif.fr;01 83 17 98 77;Nantes
+CMD4500000980;C70429;Atelier Guerin SAS;07.07.2019;11.12.2025;196.756,58;255;EN_COURS;a.guerin28@exemple-fictif.fr;07 61 27 66 20;Toulouse
+CMD4500000981;C10932;Transports Rousseau Frères;21.06.2023;11.07.2019;91.685,85;490;FACTURE;j.rousseau91@exemple-fictif.fr;08 95 41 21 93;Nantes
+CMD4500000982;C48034;Transports Guerin SARL;08.07.2024;20.01.2024;33.514,64;261;EN_COURS;j.guerin49@exemple-fictif.fr;08 72 33 68 13;Marseille
+CMD4500000982;C48034;Transports Guerin SARL;08.07.2024;20.01.2024;33.514,64;261;EN_COURS;j.guerin49@exemple-fictif.fr;08 72 33 68 13;Marseille
+CMD4500000984;C43408;Groupe Blanc Frères;09.02.2025;23.11.2022;19.145,08;458;LIVRE;j.blanc49@exemple-fictif.fr;08 51 91 36 52;Strasbourg
+CMD4500000985;C83428;Atelier Guerin SARL;18.01.2020;16.04.2019;66.022,05;250;ANNULE;m.guerin86@exemple-fictif.fr;04 64 27 75 23;Lille
+CMD4500000986;C85411;Société Bonnet Services;14.10.2025;02.07.2022;100.538,96;356;LIVRE;m.bonnet3@exemple-fictif.fr;03 32 74 78 45;Rennes
+CMD4500000987;C69464;Industries Gauthier SAS;05.08.2019;15.05.2020;5.328,03;496;ANNULE;a.gauthier69@exemple-fictif.fr;09 81 25 23 59;Lille
+CMD4500000988;C74673;Transports Lambert; Frères;07.09.2022;15.11.2024;62,774.71;263;EN_COURS;j.lambert65@exemple-fictif.fr;04 37 61 46 70;Grenoble
+CMD4500000989;C93481;Atelier Perrin SA;28.07.2019;06.09.2020;98.980,54;179;FACTURE;m.perrin66@exemple-fictif.fr;03 15 43 18 93;Marseille
+CMD4500000990;C46634;Ets Chevalier SAS;03.01.2019;23.12.2022;172.369,87;430;FACTURE;j.chevalier35@exemple-fictif.fr;02 82 37 30 44;Nantes
+CMD4500000991;C28932;Comptoir Martinez SA;05.05.2023;15.01.2023;182.550,14;286;ANNULE;j.martinez82@exemple-fictif.fr;03 59 42 83 62;Toulouse
+CMD4500000992;C94631;Société Faure SARL;22.04.2020;14.02.2019;133.397,01;LIVRE;a.faure89@exemple-fictif.fr;01 34 49 58 77;Bordeaux
+CMD4500000993;C29850;Industries Chevalier Distribution;25.01.2019;00.00.0000;198.107,70;201;ANNULE;m.chevalier8@exemple-fictif.fr;03 18 83 56 35;Bordeaux
+CMD4500000994;C27899;Atelier Morel SARL;11.10.2019;01.08.2020;153.837,83;46;EN_COURS;p.morel32@exemple-fictif.fr;01 93 67 31 30;Paris
+CMD4500000995;C28682;Atelier Perrin Distribution;06.02.2019;26.05.2021;217.535,99;364;FACTURE;p.perrin64@exemple-fictif.fr;07 24 73 24 82;Marseille
+CMD4500000996;C39567;Groupe Blanc & Cie;25.05.2021;28.03.2020;90.142,87;48;ANNULE;j.blanc19@exemple-fictif.fr;01 28 53 33 37;Rennes
+CMD4500000997;C68468;Comptoir Morel SA;26.08.2020;13.10.2019;52.068,95;94;ANNULE;a.morel95@exemple-fictif.fr;06 50 22 38 26;Grenoble
+CMD4500000998;C57066;Groupe Francois SA;19.09.2021;04.07.2019;32.862,00;55;LIVRE;a.francois89@exemple-fictif.fr;06 78 84 21 31;Bordeaux
+CMD4500000999;C66093;Ets Lambert SA;26.09.2024;14.03.2020;(187.302,87);31;LIVRE;p.lambert72@exemple-fictif.fr;09 77 44 49 68;Lille
